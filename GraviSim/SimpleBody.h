@@ -12,13 +12,10 @@ public:
 
 	SimpleBody(int mass, sf::Vector2f pos, sf::Vector2f speed=sf::Vector2f(0,0));
 
-	void Update(float EllapsedTime, SimpleBody& anotherBody);
+	void Update(float EllapsedTime);
 
-	sf::CircleShape GetDrawing() {
-		sf::CircleShape c(30);
-		c.setPosition(pos);
-		return c;
+	sf::CircleShape GetDrawing();
 
-	}
+	void UpdateBoost(SimpleBody& anotherBody);
 };
 

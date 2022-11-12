@@ -4,9 +4,9 @@ void Simulation::update(float EllapsedTime) {
 	for (auto &body: bodies) {
 		for (auto& anotherBody : bodies) {
 			if (&body == &anotherBody) continue;
-
-			body.Update(EllapsedTime,anotherBody);
+			body.UpdateBoost(anotherBody);
 		}
+		body.Update(EllapsedTime);
 	}
 }
 
