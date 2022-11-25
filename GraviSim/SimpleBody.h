@@ -14,7 +14,7 @@ public:
 
 	void Update(float EllapsedTime);
 
-	sf::CircleShape GetDrawing();
+	sf::CircleShape GetDrawing(sf::Vector2f offset, float size);
 
 	void UpdateBoost(SimpleBody& anotherBody);
 };
