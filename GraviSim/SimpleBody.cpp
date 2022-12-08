@@ -15,12 +15,13 @@ void SimpleBody::Update(float EllapsedTime) {
 	this->boost = sf::Vector2f(0,0);
 }
 
-sf::CircleShape SimpleBody::GetDrawing(sf::Vector2f offset, float size) {
-	sf::CircleShape c((mass / 200 + 4));;
-	c.setPosition(pos+offset);
+sf::CircleShape SimpleBody::GetDrawing() {
+	sf::CircleShape c((mass / 200 + 4));
+	c.setPosition(pos);
 	return c;
 
 }
+SimpleBody::SimpleBody() {}
 
 void SimpleBody::UpdateBoost(SimpleBody& anotherBody) {
 	float r = std::max(sqrtf((pos.x - anotherBody.pos.x) * (pos.x - anotherBody.pos.x) + (pos.y - anotherBody.pos.y) * (pos.y - anotherBody.pos.y)),float(0.1));
