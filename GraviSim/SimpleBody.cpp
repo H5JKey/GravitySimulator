@@ -2,10 +2,11 @@
 #include <iostream>
 
 
-SimpleBody::SimpleBody(int mass, sf::Vector2f pos, sf::Vector2f speed) {
+SimpleBody::SimpleBody(int mass, sf::Vector2f pos, sf::Vector2f speed, std::string name) {
 	this->pos = pos;
 	this->mass = mass;//Â 10^12 êã
 	this->speed = speed;
+	this->name = name;
 }
 
 void SimpleBody::Update(float EllapsedTime) {

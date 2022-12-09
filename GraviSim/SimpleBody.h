@@ -9,8 +9,9 @@ public:
 	sf::Vector2f pos;
 	sf::Vector2f speed;
 	sf::Vector2f boost;
+	std::string name;
 
-	SimpleBody(int mass, sf::Vector2f pos, sf::Vector2f speed=sf::Vector2f(0,0));
+	SimpleBody(int mass, sf::Vector2f pos, sf::Vector2f speed=sf::Vector2f(0,0), std::string name="NoName");
 
 	SimpleBody();
 
