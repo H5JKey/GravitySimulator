@@ -1,11 +1,11 @@
 #pragma once
 #include <vector>
-#include "SimpleBody.h"
+#include "Object.h"
 
 class Simulation
 {
 public:
-	static std::vector<SimpleBody> bodies;
+	static std::vector<Object> objects;
 
 	static void update(float EllapsedTime);
 	

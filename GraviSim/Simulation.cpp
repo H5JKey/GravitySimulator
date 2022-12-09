@@ -1,8 +1,8 @@
 #include "Simulation.h"
 
 void Simulation::update(float EllapsedTime) {
-	for (auto &body: bodies) {
-		for (auto& anotherBody : bodies) {
+	for (auto &body: objects) {
+		for (auto& anotherBody : objects) {
 			if (&body == &anotherBody) continue;
 			body.UpdateBoost(anotherBody);
 		}
@@ -10,4 +10,4 @@ void Simulation::update(float EllapsedTime) {
 	}
 }
 
-std::vector<SimpleBody> Simulation::bodies;
+std::vector<Object> Simulation::objects;
