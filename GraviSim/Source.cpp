@@ -99,7 +99,9 @@ int main()
         ImGui::SFML::Update(App, clock.restart());
         if (selectedObj != nullptr) {
             ImGui::Begin("Object:",nullptr,ImGuiWindowFlags_NoResize+ImGuiWindowFlags_NoMove);
+            ImGui::Text("Name:");
             ImGui::InputText("##Name", &selectedObj->name);
+            ImGui::Text("Mass:");
             ImGui::InputInt("##Mass", &selectedObj->mass);
             ImGui::Text(("Speed: (" + std::to_string(selectedObj->speed.x) + " , " + std::to_string(selectedObj->speed.y)+") m/s").c_str());
             ImGui::End();
