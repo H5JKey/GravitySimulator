@@ -15,7 +15,7 @@ int main()
     sf::RenderWindow App(sf::VideoMode(), "Gravity Simulator",sf::Style::Fullscreen,settings);
     ImGui::SFML::Init(App);
 
-    sf::Clock clock;
+    sf::Clock clock, delta;
     clock.restart();
 
     Simulation::objects.push_back(Object(10000, sf::Vector2f(App.getSize().x / 2, App.getSize().y / 2), sf::Vector2f(0, 0), "Sun"));
@@ -83,7 +83,11 @@ int main()
                     if (!AddObj) {
                         for (auto& body : Simulation::objects) {
                             if (body.GetDrawing().getGlobalBounds().contains(App.mapPixelToCoords(mb))) {
-                                selectedObj = &body;
+                                if (delta.getElapsedTime().asMilliseconds()>500) delta.restart();
+                                else {
+                                    selectedObj = &body;
+                                    delta.restart();
+                                }
                                 break;
                             }
                         }
@@ -101,7 +105,7 @@ int main()
             }
         }
 
-        /*if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+      /*if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
 
             sf::Vector2f CurrentmousePos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
 
@@ -110,9 +114,10 @@ int main()
         }
         else {
             Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
-        }*/
+        }
 
         camera.move(-offset);
+        */
 
 
         if (!TimeStop) 
@@ -132,7 +137,10 @@ int main()
            ImGui::Separator();
            ImGui::Text("Mass:");
            ImGui::InputInt("##Mass", &selectedObj->mass);
-           ImGui::Text(("Speed: (" + std::to_string(selectedObj->speed.x) + " , " + std::to_string(selectedObj->speed.y) + ") m/s").c_str());
+           ImGui::Text(("Speed: (" + std::to_string(selectedObj->speed.x) + " , " + std::to_string(selectedObj->speed.y) + ")").c_str());
+           ImGui::Separator();
+           ImGui::Text("Color:");
+           ImGui::ColorEdit3("", selectedObj->color);
            ImGui::Separator();
            if (ImGui::Button("Cancel"))
                selectedObj = nullptr;
@@ -161,6 +169,10 @@ int main()
                 ImGui::Separator();
                 ImGui::Text("Mass:");
                 ImGui::InputInt("##Mass", &newObj.mass);
+                ImGui::Separator();
+                ImGui::Text("Color:");
+                ImGui::ColorEdit3("", newObj.color);
+                
                 ImGui::Separator();
                 if (ImGui::Button("Cancel"))
                        AddObj = false;

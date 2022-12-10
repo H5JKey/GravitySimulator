@@ -2,11 +2,12 @@
 #include <iostream>
 
 
-Object::Object(int mass, sf::Vector2f pos, sf::Vector2f speed, std::string name) {
+Object::Object(int mass, sf::Vector2f pos, sf::Vector2f speed, std::string name, sf::Color color) {
 	this->pos = pos;
 	this->mass = mass;//Â 10^12 êã
 	this->speed = speed;
 	this->name = name;
+	this->color[0] = color.r; this->color[1] = color.g; this->color[2] = color.b;
 }
 
 void Object::Update(float EllapsedTime) {
@@ -19,6 +20,7 @@ void Object::Update(float EllapsedTime) {
 sf::CircleShape Object::GetDrawing() {
 	sf::CircleShape c((mass / 200 + 4));
 	c.setPosition(pos-sf::Vector2f(c.getRadius(), c.getRadius()));
+	c.setFillColor(sf::Color(static_cast<sf::Uint8>(color[0] * 255.f), static_cast<sf::Uint8>(color[1] * 255.f), static_cast<sf::Uint8>(color[2] * 255.f)));
 	return c;
 
 }
