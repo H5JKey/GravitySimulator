@@ -27,6 +27,7 @@ sf::CircleShape Object::GetDrawing() {
 Object::Object() {
 	this->mass = 0;
 	this->name = "";
+	this->color[0] = this->color[1] = this->color[2] = 1;
 }
 
 void Object::UpdateBoost(Object& anotherBody) {

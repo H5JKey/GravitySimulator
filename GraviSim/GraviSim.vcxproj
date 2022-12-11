@@ -124,6 +124,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>lib\SFML-2.5.1\include;$(SolutionDir)\imgui\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,6 +143,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>lib\SFML-2.5.1\include;$(SolutionDir)\imgui\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

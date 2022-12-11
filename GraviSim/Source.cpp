@@ -65,8 +65,9 @@ int main()
             if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Tab))
                 TimeStop = !TimeStop;
 
-            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::LControl || event.key.code == sf::Keyboard::RControl))
+            /*if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::LControl || event.key.code == sf::Keyboard::RControl))
                 DrawBackground = !DrawBackground;
+            */
 
             if (!ImGui::GetIO().WantCaptureMouse) {
                 if (event.type == sf::Event::MouseWheelMoved) {
@@ -104,8 +105,7 @@ int main()
                 }
             }
         }
-
-      /*if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
 
             sf::Vector2f CurrentmousePos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
 
@@ -117,7 +117,7 @@ int main()
         }
 
         camera.move(-offset);
-        */
+        
 
 
         if (!TimeStop) 
@@ -137,7 +137,10 @@ int main()
            ImGui::Separator();
            ImGui::Text("Mass:");
            ImGui::InputInt("##Mass", &selectedObj->mass);
-           ImGui::Text(("Speed: (" + std::to_string(selectedObj->speed.x) + " , " + std::to_string(selectedObj->speed.y) + ")").c_str());
+           ImGui::Separator();
+           ImGui::Text("Speed:");
+           float* speed[2] = { &selectedObj->speed.x, &selectedObj->speed.y };
+           ImGui::InputFloat2("",*speed);
            ImGui::Separator();
            ImGui::Text("Color:");
            ImGui::ColorEdit3("", selectedObj->color);
@@ -158,7 +161,7 @@ int main()
                 ImGui::Checkbox("Time stop\t\tPress Tab", &TimeStop);
 
                 ImGui::Separator();
-                ImGui::Checkbox("Draw background  Press Ctrl", &DrawBackground);
+                ImGui::Checkbox("Draw background", &DrawBackground);
             }
             
             if (AddObj) {
@@ -169,6 +172,10 @@ int main()
                 ImGui::Separator();
                 ImGui::Text("Mass:");
                 ImGui::InputInt("##Mass", &newObj.mass);
+                ImGui::Separator();
+                ImGui::Text("Speed:");
+                float* speed[2] = { &newObj.speed.x, &newObj.speed.y };
+                ImGui::InputFloat2("", *speed);
                 ImGui::Separator();
                 ImGui::Text("Color:");
                 ImGui::ColorEdit3("", newObj.color);
