@@ -4,14 +4,14 @@
 
 Object::Object(int mass, sf::Vector2f pos, sf::Vector2f speed, std::string name, sf::Color color) {
 	this->pos = pos;
-	this->mass = mass;//Â 10^12 êã
+	this->mass = mass;//ï¿½ 10^12 ï¿½ï¿½
 	this->speed = speed;
 	this->name = name;
 	this->color[0] = color.r; this->color[1] = color.g; this->color[2] = color.b;
 }
 
 void Object::Update(float EllapsedTime) {
-
+	
 	this->pos += this->speed * EllapsedTime + (this->boost * EllapsedTime * (EllapsedTime/2));
 	this->speed += this->boost * EllapsedTime;
 	this->boost = sf::Vector2f(0,0);

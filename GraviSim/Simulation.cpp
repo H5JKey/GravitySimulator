@@ -6,7 +6,17 @@ void Simulation::update(float EllapsedTime) {
 			if (&body == &anotherBody) continue;
 			body.UpdateBoost(anotherBody);
 		}
-		body.Update(EllapsedTime);
+		bool Collision=false;
+		for (auto& anotherBody: objects) {
+			if (&body==&anotherBody) continue;
+			if ((anotherBody.pos-body.pos).length()<=(anotherBody.mass/200+4+body.mass/200+4)) {
+				Collision=true;
+				break;
+			}
+		}
+		if (!checkCollision) {
+	        body.Update(EllapsedTime);
+		}
 	}
 }
 
