@@ -15,7 +15,7 @@ void Object::Update(float EllapsedTime) {
 	/*this->pos += this->speed * EllapsedTime + (this->boost * EllapsedTime * (EllapsedTime/2));
 	this->speed += this->boost * EllapsedTime;*/
 	this->speed+=this->boost*EllapsedTime;
-	thia->pos+=this->speed*EllapsedTime;
+	this->pos+=this->speed*EllapsedTime;
 	this->boost = sf::Vector2f(0,0);
 }
 
