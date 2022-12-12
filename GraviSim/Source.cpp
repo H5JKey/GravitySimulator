@@ -18,9 +18,9 @@ int main()
     sf::Clock clock, delta;
     clock.restart();
 
-    Simulation::objects.push_back(Object(10000, sf::Vector2f(App.getSize().x / 2, App.getSize().y / 2), sf::Vector2f(0, 0), "Sun"));
-    Simulation::objects.push_back(Object(300, sf::Vector2f(App.getSize().x / 2, App.getSize().y / 2-500), sf::Vector2f(120, 0)));
-    Simulation::objects.push_back(Object(0.001, sf::Vector2f(App.getSize().x / 2-10, App.getSize().y / 2 - 510), sf::Vector2f(185, 0)));
+    Simulation::objects.push_back(Object(100000, sf::Vector2f(App.getSize().x / 2, App.getSize().y / 2), sf::Vector2f(0, 0), "Sun"));
+    Simulation::objects.push_back(Object(300, sf::Vector2f(App.getSize().x / 2, App.getSize().y / 2-500), sf::Vector2f(320, 0)));
+    Simulation::objects.push_back(Object(0.001, sf::Vector2f(App.getSize().x / 2-10, App.getSize().y / 2 - 510), sf::Vector2f(385, 0)));
 
     sf::Vector2f offset = sf::Vector2f(0, 0);
     float size = 1;
@@ -36,7 +36,6 @@ int main()
     Object* selectedObj = nullptr;
     Object newObj;
 
-    bool TimeStop = false;
     bool AddObj = false;
     bool DeleteObj = false;
     bool DrawBackground = true;
@@ -47,7 +46,9 @@ int main()
     background.setScale(camera.getSize().x / t.getSize().x, camera.getSize().y / t.getSize().y);
     background.setTexture(t);
 
-
+    float timeSpeed = 1;
+    int savedTimeSpeed = timeSpeed;;
+    bool timeStop = false;
     while (App.isOpen())
     {
         sf::Event event;
@@ -63,7 +64,7 @@ int main()
                     App.close();
 
             if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Tab))
-                TimeStop = !TimeStop;
+                timeStop = !timeStop;
 
             /*if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::LControl || event.key.code == sf::Keyboard::RControl))
                 DrawBackground = !DrawBackground;
@@ -120,8 +121,8 @@ int main()
         
 
 
-        if (!TimeStop) 
-            Simulation::update(clock.getElapsedTime().asSeconds());     
+        if (timeSpeed!=0 && !timeStop) 
+            Simulation::update(timeSpeed*clock.getElapsedTime().asSeconds());     
 
         if (selectedObj != nullptr)
             camera.setCenter(selectedObj->pos);
@@ -158,8 +159,9 @@ int main()
                     DeleteObj = true;
 
                 ImGui::Separator();
-                ImGui::Checkbox("Time stop\t\tPress Tab", &TimeStop);
-
+                ImGui::Text("Time Speed");
+                ImGui::SliderFloat("", &timeSpeed, -5, 5);
+                ImGui::Checkbox("Stop time\t\tPress Tab", &timeStop);
                 ImGui::Separator();
                 ImGui::Checkbox("Draw background", &DrawBackground);
             }
@@ -190,8 +192,9 @@ int main()
                     Simulation::objects.clear();
                 }
                 ImGui::Separator();
-                if (ImGui::Button("Cancel"))
+                if (ImGui::Button("Cancel")) 
                     DeleteObj = false;
+                
             }
         }
         ImGui::End();

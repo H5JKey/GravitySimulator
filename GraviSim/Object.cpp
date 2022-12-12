@@ -20,7 +20,7 @@ void Object::Update(float EllapsedTime) {
 }
 
 sf::CircleShape Object::GetDrawing() {
-	sf::CircleShape c((mass / 200 + 4));
+	sf::CircleShape c((mass / 1000 + 4));
 	c.setPosition(pos-sf::Vector2f(c.getRadius(), c.getRadius()));
 	c.setFillColor(sf::Color(static_cast<sf::Uint8>(color[0] * 255.f), static_cast<sf::Uint8>(color[1] * 255.f), static_cast<sf::Uint8>(color[2] * 255.f)));
 	return c;
