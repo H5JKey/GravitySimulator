@@ -66,10 +66,6 @@ int main()
             if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Tab))
                 timeStop = !timeStop;
 
-            /*if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::LControl || event.key.code == sf::Keyboard::RControl))
-                DrawBackground = !DrawBackground;
-            */
-
             if (!ImGui::GetIO().WantCaptureMouse) {
                 if (event.type == sf::Event::MouseWheelMoved) {
                     if (event.mouseWheel.delta > 0) 
@@ -97,7 +93,6 @@ int main()
                     else {
                         newObj.pos = App.mapPixelToCoords(mb);
                         Simulation::objects.push_back(newObj);
-                       // AddObj = !AddObj;
                     }
                     if (DeleteObj && selectedObj!=nullptr) {
                         Simulation::objects.erase(std::remove_if(Simulation::objects.begin(), Simulation::objects.end(), [selectedObj](const auto& i) {return &i == selectedObj; }), Simulation::objects.end());
@@ -129,72 +124,72 @@ int main()
 
         ImGui::SFML::Update(App, clock.restart());
         ImGui::Begin("Menu:",nullptr,ImGuiWindowFlags_NoResize+ImGuiWindowFlags_NoMove);
-
-        if (selectedObj != nullptr) {
-           ImGui::Text("Selected object:");
-           ImGui::Separator();
-           ImGui::Text("Name:");
-           ImGui::InputText("##Name", &selectedObj->name);
-           ImGui::Separator();
-           ImGui::Text("Mass:");
-           ImGui::InputInt("##Mass", &selectedObj->mass);
-           ImGui::Separator();
-           ImGui::Text("Speed:");
-           float* speed[2] = { &selectedObj->speed.x, &selectedObj->speed.y };
-           ImGui::InputFloat2("",*speed);
-           ImGui::Separator();
-           ImGui::Text("Color:");
-           ImGui::ColorEdit3("", selectedObj->color);
-           ImGui::Separator();
-           if (ImGui::Button("Cancel"))
-               selectedObj = nullptr;
-        }
-        else {
-            if (!AddObj && !DeleteObj) {
-                if (ImGui::Button("Add new objects")) 
-                    AddObj = true;
-
-                ImGui::Separator();
-                if (ImGui::Button("Delete objects"))
-                    DeleteObj = true;
-
-                ImGui::Separator();
-                ImGui::Text("Time Speed");
-                ImGui::SliderFloat("", &timeSpeed, -5, 5);
-                ImGui::Checkbox("Stop time\t\tPress Tab", &timeStop);
-                ImGui::Separator();
-                ImGui::Checkbox("Draw background", &DrawBackground);
-            }
-            
-            if (AddObj) {
-                ImGui::Text("New Object:");
+        {
+            if (selectedObj != nullptr) {
+                ImGui::Text("Selected object:");
                 ImGui::Separator();
                 ImGui::Text("Name:");
-                ImGui::InputText("##Name", &newObj.name);
+                ImGui::InputText("##Name", &selectedObj->name);
                 ImGui::Separator();
                 ImGui::Text("Mass:");
-                ImGui::InputInt("##Mass", &newObj.mass);
+                ImGui::InputInt("##Mass", &selectedObj->mass);
                 ImGui::Separator();
                 ImGui::Text("Speed:");
-                float* speed[2] = { &newObj.speed.x, &newObj.speed.y };
+                float* speed[2] = { &selectedObj->speed.x, &selectedObj->speed.y };
                 ImGui::InputFloat2("", *speed);
                 ImGui::Separator();
                 ImGui::Text("Color:");
-                ImGui::ColorEdit3("", newObj.color);
-                
+                ImGui::ColorEdit3("", selectedObj->color);
                 ImGui::Separator();
                 if (ImGui::Button("Cancel"))
-                       AddObj = false;
-                
+                    selectedObj = nullptr;
             }
-            else if (DeleteObj) {
-                if (ImGui::Button("Delete all objects")) {
-                    Simulation::objects.clear();
+            else {
+                if (!AddObj && !DeleteObj) {
+                    if (ImGui::Button("Add new objects"))
+                        AddObj = true;
+
+                    ImGui::Separator();
+                    if (ImGui::Button("Delete objects"))
+                        DeleteObj = true;
+
+                    ImGui::Separator();
+                    ImGui::Text("Time Speed");
+                    ImGui::SliderFloat("", &timeSpeed, -5, 5);
+                    ImGui::Checkbox("Stop time\t\tPress Tab", &timeStop);
+                    ImGui::Separator();
+                    ImGui::Checkbox("Draw background", &DrawBackground);
                 }
-                ImGui::Separator();
-                if (ImGui::Button("Cancel")) 
-                    DeleteObj = false;
-                
+
+                if (AddObj) {
+                    ImGui::Text("New Object:");
+                    ImGui::Separator();
+                    ImGui::Text("Name:");
+                    ImGui::InputText("##Name", &newObj.name);
+                    ImGui::Separator();
+                    ImGui::Text("Mass:");
+                    ImGui::InputInt("##Mass", &newObj.mass);
+                    ImGui::Separator();
+                    ImGui::Text("Speed:");
+                    float* speed[2] = { &newObj.speed.x, &newObj.speed.y };
+                    ImGui::InputFloat2("", *speed);
+                    ImGui::Separator();
+                    ImGui::Text("Color:");
+                    ImGui::ColorEdit3("", newObj.color);
+
+                    ImGui::Separator();
+                    if (ImGui::Button("Cancel"))
+                        AddObj = false;
+
+                }
+                else if (DeleteObj) {
+                    if (ImGui::Button("Delete all objects")) {
+                        Simulation::objects.clear();
+                    }
+                    ImGui::Separator();
+                    if (ImGui::Button("Cancel"))
+                        DeleteObj = false;
+                }
             }
         }
         ImGui::End();
