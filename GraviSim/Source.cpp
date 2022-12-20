@@ -11,7 +11,7 @@
 int main()
 {
     sf::ContextSettings settings;
-    settings.antialiasingLevel = 8;
+    settings.antialiasingLevel = 16;
     sf::RenderWindow App(sf::VideoMode(), "Gravity Simulator",sf::Style::Fullscreen,settings);
     ImGui::SFML::Init(App);
 
@@ -20,7 +20,7 @@ int main()
 
     Simulation::objects.push_back(Object(100000, sf::Vector2f(App.getSize().x / 2, App.getSize().y / 2), sf::Vector2f(0, 0), "Sun"));
     Simulation::objects.push_back(Object(300, sf::Vector2f(App.getSize().x / 2, App.getSize().y / 2-500), sf::Vector2f(320, 0)));
-    Simulation::objects.push_back(Object(0.001, sf::Vector2f(App.getSize().x / 2-10, App.getSize().y / 2 - 510), sf::Vector2f(385, 0)));
+    //Simulation::objects.push_back(Object(0.001, sf::Vector2f(App.getSize().x / 2-10, App.getSize().y / 2 - 510), sf::Vector2f(385, 0)));
 
     sf::Vector2f offset = sf::Vector2f(0, 0);
     float size = 1;
@@ -80,7 +80,7 @@ int main()
                     auto mb = sf::Mouse::getPosition();
                     if (!AddObj) {
                         for (auto& body : Simulation::objects) {
-                            if (body.GetDrawing().getGlobalBounds().contains(App.mapPixelToCoords(mb))) {
+                            if (body.sprite.getGlobalBounds().contains(App.mapPixelToCoords(mb))) {
                                 if (delta.getElapsedTime().asMilliseconds()>500) delta.restart();
                                 else {
                                     selectedObj = &body;
@@ -115,9 +115,8 @@ int main()
         camera.move(-offset);
         
 
+       Simulation::update(clock.getElapsedTime().asSeconds(),timeSpeed, timeStop);     
 
-        if (timeSpeed!=0 && !timeStop) 
-            Simulation::update(timeSpeed*clock.getElapsedTime().asSeconds());     
 
         if (selectedObj != nullptr)
             camera.setCenter(selectedObj->pos);
@@ -199,9 +198,8 @@ int main()
             App.draw(background);
         }
         App.setView(camera);
-        for (auto &body : Simulation::objects) {
-             App.draw(body.GetDrawing());
-        }
+        for (auto& body : Simulation::objects)
+            body.draw(App);
 
         ImGui::SFML::Render(App);
         App.display();

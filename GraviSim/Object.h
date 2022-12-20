@@ -2,7 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <math.h>
 
-class Object
+class Object:sf::Drawable
 {
 public:
 	int mass;
@@ -10,6 +10,7 @@ public:
 	sf::Vector2f speed;
 	sf::Vector2f boost;
 	std::string name;
+	sf::CircleShape sprite;
 	float color[3];
 
 
@@ -17,9 +18,13 @@ public:
 
 	Object();
 
-	void Update(float EllapsedTime);
+	void UpdateParams(float EllapsedTime);
 
-	sf::CircleShape GetDrawing();
+	void UpdateGraphic();
+
+
+	virtual void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const;
+
 
 	void UpdateBoost(Object& anotherBody);
 };

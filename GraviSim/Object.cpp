@@ -8,24 +8,28 @@ Object::Object(int mass, sf::Vector2f pos, sf::Vector2f speed, std::string name,
 	this->speed = speed;
 	this->name = name;
 	this->color[0] = color.r; this->color[1] = color.g; this->color[2] = color.b;
+	Object::UpdateGraphic();
 }
 
-void Object::Update(float EllapsedTime) {
-	
-	/*this->pos += this->speed * EllapsedTime + (this->boost * EllapsedTime * (EllapsedTime/2));
-	this->speed += this->boost * EllapsedTime;*/
+void Object::UpdateParams(float EllapsedTime) {
 	this->speed+=this->boost*EllapsedTime;
 	this->pos+=this->speed*EllapsedTime;
 	this->boost = sf::Vector2f(0,0);
+	
 }
 
-sf::CircleShape Object::GetDrawing() {
-	sf::CircleShape c((mass / 1000 + 4));
-	c.setPosition(pos-sf::Vector2f(c.getRadius(), c.getRadius()));
-	c.setFillColor(sf::Color(static_cast<sf::Uint8>(color[0] * 255.f), static_cast<sf::Uint8>(color[1] * 255.f), static_cast<sf::Uint8>(color[2] * 255.f)));
-	return c;
-
+void Object::UpdateGraphic() {
+	sprite.setRadius(this->mass / 1000 + 4);
+	sprite.setPosition(pos-sf::Vector2f(sprite.getRadius(),sprite.getRadius()));
+	sprite.setFillColor(sf::Color(static_cast<sf::Uint8>(this->color[0] * 255.f), static_cast<sf::Uint8>(this->color[1] * 255.f), static_cast<sf::Uint8>(this->color[2] * 255.f)));
 }
+
+
+void Object::draw(sf::RenderTarget& target, sf::RenderStates states) const {
+	target.draw(sprite);
+}
+
+
 Object::Object() {
 	this->mass = 0;
 	this->name = "";
