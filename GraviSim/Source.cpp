@@ -54,12 +54,9 @@ int main()
         sf::Event event;
         while (App.pollEvent(event)) {
             ImGui::SFML::ProcessEvent(event);
-
-            // Close window : exit
             if (event.type == sf::Event::Closed)
                 App.close();
 
-            // Escape key : exit
             if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
                     App.close();
 
