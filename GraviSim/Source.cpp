@@ -26,6 +26,7 @@ int main()
     float size = 1;
 
     bool flag = false;
+    sf::Time EllapsedTime;
     sf::Vector2f Pos;
 
     sf::View camera;
@@ -49,6 +50,9 @@ int main()
     float timeSpeed = 1;
     int savedTimeSpeed = timeSpeed;;
     bool timeStop = false;
+
+
+
     while (App.isOpen())
     {
         sf::Event event;
@@ -98,11 +102,15 @@ int main()
                 }
             }
         }
+
+        /**************************************
+        Проблемы с движение мышью.
+        В будущем переделать*/
         if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
 
             sf::Vector2f CurrentmousePos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
 
-            offset = (CurrentmousePos - Pos) * float(0.7);
+            offset = (CurrentmousePos - Pos) * 0.7f;
             Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
         }
         else {
@@ -110,17 +118,18 @@ int main()
         }
 
         camera.move(-offset);
+        //**************************************
         
 
-       Simulation::update(clock.getElapsedTime().asSeconds(),timeSpeed, timeStop);     
-
+       EllapsedTime = clock.restart();
+       Simulation::update(EllapsedTime.asSeconds(),timeSpeed, timeStop);     
 
         if (selectedObj != nullptr)
             camera.setCenter(selectedObj->pos);
-
-        ImGui::SFML::Update(App, clock.restart());
+        ImGui::SFML::Update(App,EllapsedTime);
         ImGui::Begin("Menu:",nullptr,ImGuiWindowFlags_NoResize+ImGuiWindowFlags_NoMove);
         {
+            ImGui::Separator();
             if (selectedObj != nullptr) {
                 ImGui::Text("Selected object:");
                 ImGui::Separator();
@@ -155,6 +164,18 @@ int main()
                     ImGui::Checkbox("Stop time\t\tPress Tab", &timeStop);
                     ImGui::Separator();
                     ImGui::Checkbox("Draw background", &DrawBackground);
+                    ImGui::Separator();
+                    ImGui::Text("Objects:");
+                    ImGui::ListBoxHeader("");
+                    for (auto& obj : Simulation::objects) {
+                        if (obj.name == "") continue;
+                        std::string& item_name = obj.name;
+                        if (ImGui::Selectable(obj.name.c_str())) {
+                            selectedObj = &obj;
+                        }
+                    }
+                    ImGui::ListBoxFooter();
+
                 }
 
                 if (AddObj) {
