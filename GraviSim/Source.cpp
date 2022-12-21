@@ -146,6 +146,11 @@ int main()
                 ImGui::Text("Color:");
                 ImGui::ColorEdit3("", selectedObj->color);
                 ImGui::Separator();
+                if (ImGui::Button("Delete this object")) {
+                    Simulation::objects.erase(std::remove_if(Simulation::objects.begin(), Simulation::objects.end(), [selectedObj](const auto& i) {return &i == selectedObj; }), Simulation::objects.end());
+                    selectedObj = nullptr;
+                }
+                ImGui::Separator();
                 if (ImGui::Button("Cancel"))
                     selectedObj = nullptr;
             }
