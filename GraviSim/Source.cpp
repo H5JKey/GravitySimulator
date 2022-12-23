@@ -180,7 +180,6 @@ int main()
                         }
                     }
                     ImGui::ListBoxFooter();
-
                 }
 
                 if (AddObj) {
@@ -221,9 +220,8 @@ int main()
             App.draw(background);
         }
         App.setView(camera);
-        for (auto& body : Simulation::objects)
+        for (auto& body : Simulation::objects) 
             body.draw(App);
-
         ImGui::SFML::Render(App);
         App.display();
     }
