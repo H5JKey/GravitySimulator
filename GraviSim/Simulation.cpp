@@ -1,5 +1,5 @@
 #include "Simulation.h"
-#include <iostream>
+
 
 
 void Simulation::update(float EllapsedTime, float timeSpeed, bool timeStop) {
@@ -17,8 +17,9 @@ void Simulation::update(float EllapsedTime, float timeSpeed, bool timeStop) {
 		for (auto& anotherBody : objects) {
 			if (&i == &anotherBody) continue;
 			if (anotherBody.sprite.getGlobalBounds().intersects(i.sprite.getGlobalBounds())) {
-				if (i.mass < anotherBody.mass) {
+				if (i.mass < 0.1*anotherBody.mass) {
 					//anotherBody.speed = (float(anotherBody.mass) * anotherBody.speed + i.speed * float(i.mass))/float(anotherBody.mass);
+					//anotherBody.mass += i.mass;
 					return true;
 				}
 				
