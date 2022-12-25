@@ -2,11 +2,14 @@
 #include "Simulation.h"
 #include "Object.h"
 #include <ppl.h>
+#include <algorithm>
 #include <iostream>
+#include <algorithm>
 
 #include "lib/imgui/imgui.h"
 #include "lib/imgui/imgui-SFML.h"
 #include "lib/imgui/imgui_stdlib.h"
+
 
 int main()
 {
@@ -187,6 +190,8 @@ int main()
                     ImGui::Separator();
                     ImGui::Text("Name:");
                     ImGui::InputText("##Name", &newObj.name);
+                    /*if (std::find_if(Simulation::objects.begin(), Simulation::objects.end(), [&](auto i) {return i.name == newObj.name && i.name != "" && newObj.name != ""; }) != Simulation::objects.end())
+                          newObj.name += '_';*/
                     ImGui::Separator();
                     ImGui::Text("Mass:");
                     ImGui::InputInt("##Mass", &newObj.mass);
