@@ -6,10 +6,10 @@
 class Simulation
 {
 public:
+	static float timeSpeed;
 	static std::vector<Object> objects;
 
-	static void update(float EllapsedTime, float timeSpeed, bool timeStop);
-	
+	static void update(float EllapsedTime, bool timeStop);
 };
 
 

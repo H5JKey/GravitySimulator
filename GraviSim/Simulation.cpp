@@ -2,14 +2,14 @@
 
 
 
-void Simulation::update(float EllapsedTime, float timeSpeed, bool timeStop) {
+void Simulation::update(float EllapsedTime, bool timeStop) {
 		concurrency::parallel_for_each(objects.begin(), objects.end(), [&](auto& body) {
-			if (timeSpeed != 0 && !timeStop) {
+			if (Simulation::timeSpeed != 0 && !timeStop) {
 				for (auto& anotherBody : objects) {
 					if (&body == &anotherBody) continue;
 					body.UpdateBoost(anotherBody);
 				}
-				body.UpdateParams(EllapsedTime * timeSpeed);
+				body.UpdateParams(EllapsedTime * Simulation::timeSpeed);
 			}
 		body.UpdateGraphic();
 	});
@@ -30,3 +30,4 @@ void Simulation::update(float EllapsedTime, float timeSpeed, bool timeStop) {
 
 }
 std::vector<Object> Simulation::objects;
+float timeSpeed=1;

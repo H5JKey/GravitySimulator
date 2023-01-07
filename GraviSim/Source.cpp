@@ -10,6 +10,14 @@
 #include "lib/imgui/imgui-SFML.h"
 #include "lib/imgui/imgui_stdlib.h"
 
+namespace Flags {
+    bool timeStop=false;
+    bool DrawBackground=true;
+    bool DeleteObj=false;
+    bool AddObj=false;
+    bool Editing=false;
+}
+
 
 int main()
 {
@@ -40,19 +48,13 @@ int main()
     Object* selectedObj = nullptr;
     Object newObj;
 
-    bool AddObj = false;
-    bool DeleteObj = false;
-    bool DrawBackground = true;
-
     sf::Texture t;
     t.loadFromFile("background.png");
     sf::Sprite background;
     background.setScale(camera.getSize().x / t.getSize().x, camera.getSize().y / t.getSize().y);
     background.setTexture(t);
 
-    float timeSpeed = 1;
     int savedTimeSpeed = timeSpeed;;
-    bool timeStop = false;
 
 
 
@@ -107,8 +109,8 @@ int main()
         }
 
         /**************************************
-        Проблемы с движение мышью.
-        В будущем переделать*/
+        пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ.
+        пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ*/
         if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
 
             sf::Vector2f CurrentmousePos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
@@ -125,15 +127,17 @@ int main()
         
 
        EllapsedTime = clock.restart();
-       Simulation::update(EllapsedTime.asSeconds(),timeSpeed, timeStop);     
+       Simulation::update(EllapsedTime.asSeconds(), Flags::timeStop);     
 
-        if (selectedObj != nullptr)
+        if (selectedObj != nullptr) {
             camera.setCenter(selectedObj->pos);
+            Flags::Editing=true;
+        }
         ImGui::SFML::Update(App,EllapsedTime);
         ImGui::Begin("Menu:",nullptr,ImGuiWindowFlags_NoResize+ImGuiWindowFlags_NoMove);
         {
             ImGui::Separator();
-            if (selectedObj != nullptr) {
+            if (Flags::Editing) {
                 ImGui::Text("Selected object:");
                 ImGui::Separator();
                 ImGui::Text("Name:");
@@ -152,46 +156,46 @@ int main()
                 if (ImGui::Button("Delete this object")) {
                     Simulation::objects.erase(std::remove_if(Simulation::objects.begin(), Simulation::objects.end(), [selectedObj](const auto& i) {return &i == selectedObj; }), Simulation::objects.end());
                     selectedObj = nullptr;
+                    Flags::Editing=false;
                 }
                 ImGui::Separator();
                 if (ImGui::Button("Cancel"))
                     selectedObj = nullptr;
+                    Flags::Editing=false;
             }
-            else {
-                if (!AddObj && !DeleteObj) {
-                    if (ImGui::Button("Add new objects"))
-                        AddObj = true;
+            else if (!Flags::AddObj && !Flags::DeleteObj && !Flags::Editing) {
+                if (ImGui::Button("Add new objects"))
+                    Flags::AddObj = true;
 
-                    ImGui::Separator();
-                    if (ImGui::Button("Delete objects"))
-                        DeleteObj = true;
+                ImGui::Separator();
+                if (ImGui::Button("Delete objects"))
+                    Flags::DeleteObj = true;
 
-                    ImGui::Separator();
-                    ImGui::Text("Time Speed");
-                    ImGui::SliderFloat("", &timeSpeed, -5, 5);
-                    ImGui::Checkbox("Stop time\t\tPress Tab", &timeStop);
-                    ImGui::Separator();
-                    ImGui::Checkbox("Draw background", &DrawBackground);
-                    ImGui::Separator();
-                    ImGui::Text("Objects:");
-                    ImGui::ListBoxHeader("");
-                    for (auto& obj : Simulation::objects) {
-                        if (obj.name == "") continue;
-                        std::string& item_name = obj.name;
-                        if (ImGui::Selectable(obj.name.c_str())) {
-                            selectedObj = &obj;
-                        }
+                ImGui::Separator();
+                ImGui::Text("Time Speed");
+                ImGui::SliderFloat("", &Simulation::timeSpeed, -5, 5);
+                ImGui::Checkbox("Stop time\t\tPress Tab", &Flags::timeStop);
+                ImGui::Separator();
+                ImGui::Checkbox("Draw background", &Flags::DrawBackground);
+                ImGui::Separator();
+                ImGui::Text("Objects:");
+                ImGui::ListBoxHeader("");
+                for (auto& obj : Simulation::objects) {
+                    if (obj.name == "") continue;
+                    std::string& item_name = obj.name;
+                    if (ImGui::Selectable(obj.name.c_str())) {
+                        selectedObj = &obj;
                     }
-                    ImGui::ListBoxFooter();
                 }
-
-                if (AddObj) {
-                    ImGui::Text("New Object:");
-                    ImGui::Separator();
-                    ImGui::Text("Name:");
-                    ImGui::InputText("##Name", &newObj.name);
-                    /*if (std::find_if(Simulation::objects.begin(), Simulation::objects.end(), [&](auto i) {return i.name == newObj.name && i.name != "" && newObj.name != ""; }) != Simulation::objects.end())
-                          newObj.name += '_';*/
+                ImGui::ListBoxFooter();
+            }
+            else if (ImGui::AddObj) {
+                ImGui::Text("New Object:");
+                ImGui::Separator();
+                ImGui::Text("Name:");
+                ImGui::InputText("##Name", &newObj.name);
+                /*if (std::find_if(Simulation::objects.begin(), Simulation::objects.end(), [&](auto i) {return i.name == newObj.name && i.name != "" && newObj.name != ""; }) != Simulation::objects.end())
+                        newObj.name += '_';*/
                     ImGui::Separator();
                     ImGui::Text("Mass:");
                     ImGui::InputInt("##Mass", &newObj.mass);
@@ -207,20 +211,19 @@ int main()
                     if (ImGui::Button("Cancel"))
                         AddObj = false;
 
+            }
+            else if (ImGui::DeleteObj) {
+                if (ImGui::Button("Delete all objects")) {
+                    Simulation::objects.clear();
                 }
-                else if (DeleteObj) {
-                    if (ImGui::Button("Delete all objects")) {
-                        Simulation::objects.clear();
-                    }
-                    ImGui::Separator();
-                    if (ImGui::Button("Cancel"))
-                        DeleteObj = false;
-                }
+                ImGui::Separator();
+                if (ImGui::Button("Cancel"))
+                    ImGui::DeleteObj = false;
             }
         }
         ImGui::End();
         App.clear();
-        if (DrawBackground) {
+        if (Flags::DrawBackground) {
             App.setView(App.getDefaultView());
             App.draw(background);
         }
