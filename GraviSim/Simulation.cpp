@@ -30,5 +30,4 @@ void Simulation::update(float EllapsedTime, bool timeStop) {
 
 }
 std::vector<Object> Simulation::objects;
-
 float Simulation::timeSpeed=1;
