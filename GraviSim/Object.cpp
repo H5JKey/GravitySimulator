@@ -2,18 +2,21 @@
 #include <iostream>
 
 
-Object::Object(int mass, sf::Vector2f pos, sf::Vector2f speed, std::string name, sf::Color color) {
+Object::Object(int mass, sf::Vector2f pos, sf::Vector2f speed, std::string name, sf::Color color, bool fixed) {
 	this->pos = pos;
-	this->mass = mass;//� 10^12 ��
+	this->mass = mass;
 	this->speed = speed;
 	this->name = name;
+	this->fixed = fixed;
 	this->color[0] = color.r; this->color[1] = color.g; this->color[2] = color.b;
 	Object::UpdateGraphic();
 }
 
 void Object::UpdateParams(float EllapsedTime) {
-	this->speed+=this->boost*EllapsedTime;
-	this->pos+=this->speed*EllapsedTime;
+	if (!this->fixed) {
+		this->speed += this->boost * EllapsedTime;
+		this->pos += this->speed * EllapsedTime;
+	}
 	this->boost = sf::Vector2f(0,0);
 	
 }
@@ -32,6 +35,7 @@ void Object::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 
 Object::Object() {
 	this->mass = 0;
+	this->fixed = false;
 	this->name = "";
 	this->color[0] = this->color[1] = this->color[2] = 1;
 }

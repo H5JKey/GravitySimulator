@@ -29,7 +29,7 @@ int main()
     clock.restart();
 
     Simulation::objects.push_back(Object(100000, sf::Vector2f(App.getSize().x / 2, App.getSize().y / 2), sf::Vector2f(0, 0), "Sun"));
-    Simulation::objects.push_back(Object(300, sf::Vector2f(App.getSize().x / 2, App.getSize().y / 2-500), sf::Vector2f(320, 0)));
+    Simulation::objects.push_back(Object(300, sf::Vector2f(App.getSize().x / 2, App.getSize().y / 2-500), sf::Vector2f(320, 0),"Planet"));
 
     sf::Vector2f offset = sf::Vector2f(0, 0);
     float size = 1;
@@ -145,6 +145,9 @@ int main()
                 ImGui::Text("Color:");
                 ImGui::ColorEdit3("", selectedObj->color);
                 ImGui::Separator();
+                ImGui::Separator();
+                ImGui::Text("Fixed:");
+                ImGui::Checkbox("##Fixed", &selectedObj->fixed);
                 if (ImGui::Button("Delete this object")) {
                     Simulation::objects.erase(std::remove_if(Simulation::objects.begin(), Simulation::objects.end(), [selectedObj](const auto& i) {return &i == selectedObj; }), Simulation::objects.end());
                     selectedObj = nullptr;
@@ -160,8 +163,6 @@ int main()
                 ImGui::Separator();
                 ImGui::Text("Name:");
                 ImGui::InputText("##Name", &newObj.name);
-                /*if (std::find_if(Simulation::objects.begin(), Simulation::objects.end(), [&](auto i) {return i.name == newObj.name && i.name != "" && newObj.name != ""; }) != Simulation::objects.end())
-                        newObj.name += '_';*/
                 ImGui::Separator();
                 ImGui::Text("Mass:");
                 ImGui::InputInt("##Mass", &newObj.mass);
@@ -172,7 +173,9 @@ int main()
                 ImGui::Separator();
                 ImGui::Text("Color:");
                 ImGui::ColorEdit3("", newObj.color);
-
+                ImGui::Separator();
+                ImGui::Text("Fixed:");
+                ImGui::Checkbox("##Fixed", &newObj.fixed);
                 ImGui::Separator();
                 if (ImGui::Button("Cancel"))
                     Flags::AddObj = false;
@@ -203,11 +206,9 @@ int main()
                 ImGui::Text("Objects:");
                 ImGui::ListBoxHeader("##Objects list"); {
                     for (int i = 0; i < Simulation::objects.size(); i++) {
-                        Object* obj = &Simulation::objects[i];
-                        if (obj->name == "") continue;
-                        std::string& item_name = obj->name;
-                        if (ImGui::Selectable((obj->name + "##" + std::to_string(i)).c_str())) {
-                            selectedObj = obj;
+                        if (Simulation::objects[i].name == "") continue;
+                        if (ImGui::Selectable((Simulation::objects[i].name + "##" + std::to_string(i)).c_str())) {
+                            selectedObj = &Simulation::objects[i];
                         }
                     }
                 }
