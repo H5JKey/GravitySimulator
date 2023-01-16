@@ -1,4 +1,8 @@
 #include "Simulation.h"
+#include "ParticlesSystem.h"
+
+
+
 
 
 
@@ -20,6 +24,8 @@ void Simulation::update(float EllapsedTime, bool timeStop) {
 				if (i.mass < 0.1*anotherBody.mass) {
 					//anotherBody.speed = (float(anotherBody.mass) * anotherBody.speed + i.speed * float(i.mass))/float(anotherBody.mass);
 					//anotherBody.mass += i.mass;
+					ParticlesSystem::add(new Explosion(100,i.pos, sf::Vector3f(i.color[0], i.color[1], i.color[2])));
+					
 					return true;
 				}
 				
@@ -31,3 +37,4 @@ void Simulation::update(float EllapsedTime, bool timeStop) {
 }
 std::vector<Object> Simulation::objects;
 float Simulation::timeSpeed=1;
+

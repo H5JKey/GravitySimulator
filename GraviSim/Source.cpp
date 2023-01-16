@@ -4,6 +4,7 @@
 #include <ppl.h>
 #include <algorithm>
 #include <iostream>
+#include "ParticlesSystem.h"
 
 #include "lib/imgui/imgui.h"
 #include "lib/imgui/imgui-SFML.h"
@@ -119,7 +120,9 @@ int main()
         camera.move(-offset);
 
        EllapsedTime = clock.restart();
-       Simulation::update(EllapsedTime.asSeconds(), Flags::timeStop);     
+       Simulation::update(EllapsedTime.asSeconds(), Flags::timeStop);
+       if (!Flags::timeStop)
+          ParticlesSystem::update(EllapsedTime);
 
         if (selectedObj != nullptr) {
             camera.setCenter(selectedObj->pos);
@@ -146,8 +149,7 @@ int main()
                 ImGui::ColorEdit3("", selectedObj->color);
                 ImGui::Separator();
                 ImGui::Separator();
-                ImGui::Text("Fixed:");
-                ImGui::Checkbox("##Fixed", &selectedObj->fixed);
+                ImGui::Checkbox("Fixed", &selectedObj->fixed);
                 if (ImGui::Button("Delete this object")) {
                     Simulation::objects.erase(std::remove_if(Simulation::objects.begin(), Simulation::objects.end(), [selectedObj](const auto& i) {return &i == selectedObj; }), Simulation::objects.end());
                     selectedObj = nullptr;
@@ -224,6 +226,7 @@ int main()
         App.setView(camera);
         for (auto& body : Simulation::objects) 
             body.draw(App);
+        ParticlesSystem::draw(App);
         ImGui::SFML::Render(App);
         App.display();
     }

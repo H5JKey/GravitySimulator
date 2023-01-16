@@ -163,6 +163,7 @@
     <ClCompile Include="lib\imgui\imgui_tables.cpp" />
     <ClCompile Include="lib\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="ParticlesSystem.cpp" />
     <ClCompile Include="Simulation.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
@@ -178,6 +179,7 @@
     <ClInclude Include="lib\imgui\imstb_textedit.h" />
     <ClInclude Include="lib\imgui\imstb_truetype.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="ParticlesSystem.h" />
     <ClInclude Include="Simulation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

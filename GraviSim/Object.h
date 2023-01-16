@@ -28,5 +28,7 @@ public:
 
 
 	void UpdateBoost(Object& anotherBody);
+
+	~Object() {}
 };
 
