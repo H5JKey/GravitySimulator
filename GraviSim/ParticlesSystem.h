@@ -17,10 +17,11 @@ public:
         m_emitter(position)
         {
             for (std::size_t i = 0; i < m_particles.size(); ++i) {
-                m_vertices[i].color.r = color.x*255;
-                m_vertices[i].color.g = color.y*255;
-                m_vertices[i].color.b = color.z*255;
+                m_vertices[i].color.r = static_cast<sf::Uint8>(color.x*255);
+                m_vertices[i].color.g = static_cast<sf::Uint8>(color.y*255);
+                m_vertices[i].color.b = static_cast<sf::Uint8>(color.z*255);
             }
+            inProcess = true;
         }
 protected:
 
@@ -34,8 +35,8 @@ protected:
     sf::VertexArray m_vertices;
     sf::Time m_lifetime;
     sf::Vector2f m_emitter;
-
-
+public:
+    bool inProcess;
 };
 
 class Explosion :  public ParticleSource
@@ -58,6 +59,7 @@ public:
 
         virtual void update(sf::Time elapsed)
         {
+            bool flag = true;
             for (std::size_t i = 0; i < m_particles.size(); ++i)
             {
                 // update the particle lifetime
@@ -65,9 +67,10 @@ public:
                 p.lifetime -= elapsed;
 
                 // if the particle is dead, respawn it
-                if (p.lifetime <= sf::Time::Zero)
+                if (p.lifetime <= sf::Time::Zero) {
                     continue;
-                //m_particles.erase(m_particles.begin()+i, m_particles.begin() + i);
+                }
+                else flag = false;
 
             // update the position of the corresponding vertex
                 m_vertices[i].position += p.velocity * elapsed.asSeconds();
@@ -76,6 +79,8 @@ public:
                 float ratio = p.lifetime.asSeconds() / m_lifetime.asSeconds();
                 m_vertices[i].color.a = static_cast<sf::Uint8>(ratio * 255);
             }
+            if (flag)
+                inProcess = false;
         }
 
         virtual void draw(sf::RenderTarget& target, sf::RenderStates states=sf::RenderStates::Default) const

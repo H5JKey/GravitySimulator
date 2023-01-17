@@ -13,8 +13,13 @@ void ParticlesSystem::add(ParticleSource* source) {
 }
 
 void ParticlesSystem::update(sf::Time elapsed) {
-    for (auto& source : m_sources) {
-        source->update(elapsed);
+    for (int i = 0; i < m_sources.size(); ++i) {
+        m_sources[i]->update(elapsed);
+        if (!m_sources[i]->inProcess) {
+            delete(m_sources[i]);
+            m_sources.erase(m_sources.begin() + i);
+            
+        }
     }
 }
 
