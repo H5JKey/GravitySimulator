@@ -31,14 +31,6 @@ int main()
     sbMdh.loadFromFile("MadeInHeaven.wav");
     sf::Sound mdh(sbMdh);
 
-    sf::SoundBuffer sbBtd;
-    sbBtd.loadFromFile("BiteTheDust.wav");
-    sf::Sound btd(sbBtd);
-
-    sf::SoundBuffer sbTh;
-    sbTh.loadFromFile("TheHand.wav");
-    sf::Sound th(sbTh);
-
     sf::ContextSettings settings;
     settings.antialiasingLevel = 16;
     sf::RenderWindow App(sf::VideoMode(), "Gravity Simulator",sf::Style::Fullscreen,settings);
@@ -117,7 +109,6 @@ int main()
                         Simulation::objects.push_back(newObj);
                     }
                     if (Flags::DeleteObj && selectedObj!=nullptr) {
-                        th.play();
                         Simulation::objects.erase(std::remove_if(Simulation::objects.begin(), Simulation::objects.end(), [selectedObj](const auto& i) {return &i == selectedObj; }), Simulation::objects.end());
                         selectedObj = nullptr;
                     }
@@ -170,7 +161,6 @@ int main()
                 ImGui::Separator();
                 ImGui::Checkbox("Fixed", &selectedObj->fixed);
                 if (ImGui::Button("Delete this object")) {
-                    th.play();
                     Simulation::objects.erase(std::remove_if(Simulation::objects.begin(), Simulation::objects.end(), [selectedObj](const auto& i) {return &i == selectedObj; }), Simulation::objects.end());
                     selectedObj = nullptr;
                     Flags::Editing=false;
@@ -205,7 +195,6 @@ int main()
             else if (Flags::DeleteObj) {
                 if (ImGui::Button("Delete all objects")) {
                     Simulation::objects.clear();
-                    btd.play();
                 }
                 ImGui::Separator();
                 if (ImGui::Button("Cancel"))
