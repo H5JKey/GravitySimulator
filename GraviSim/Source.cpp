@@ -1,4 +1,5 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "Simulation.h"
 #include "Object.h"
 #include <ppl.h>
@@ -10,7 +11,27 @@
 #include "lib/imgui/imgui-SFML.h"
 #include "lib/imgui/imgui_stdlib.h"
 
-#include <SFML/Audio.hpp>
+
+
+
+namespace JojoSounds {
+    sf::SoundBuffer sbZw, sbMdh, sbBtd, sbTh;
+    sf::Sound zaWardo, madeInHeaven, theHand, biteTheDust;
+
+    void init() {
+        sbZw.loadFromFile("ZaWardo.wav");
+        zaWardo.setBuffer(sbZw);
+
+        sbMdh.loadFromFile("MadeInHeaven.wav");
+        madeInHeaven.setBuffer(sbMdh);
+
+        sbBtd.loadFromFile("BiteTheDust.wav");
+        biteTheDust.setBuffer(sbBtd);
+
+        sbTh.loadFromFile("TheHand.wav");
+        theHand.setBuffer(sbTh);
+    }
+}
 
 namespace Flags {
     bool timeStop=false;
@@ -21,23 +42,10 @@ namespace Flags {
 }
 
 
+
 int main()
 {
-    sf::SoundBuffer sbZw;
-    sbZw.loadFromFile("ZaWardo.wav");
-    sf::Sound zw(sbZw);
-
-    sf::SoundBuffer sbMdh;
-    sbMdh.loadFromFile("MadeInHeaven.wav");
-    sf::Sound mdh(sbMdh);
-
-    sf::SoundBuffer sbBtd;
-    sbBtd.loadFromFile("BiteTheDust.wav");
-    sf::Sound btd(sbBtd);
-
-    sf::SoundBuffer sbTh;
-    sbTh.loadFromFile("TheHand.wav");
-    sf::Sound th(sbTh);
+    JojoSounds::init();
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 16;
@@ -117,7 +125,7 @@ int main()
                         Simulation::objects.push_back(newObj);
                     }
                     if (Flags::DeleteObj && selectedObj!=nullptr) {
-                        th.play();
+                        JojoSounds::theHand.play();
                         Simulation::objects.erase(std::remove_if(Simulation::objects.begin(), Simulation::objects.end(), [selectedObj](const auto& i) {return &i == selectedObj; }), Simulation::objects.end());
                         selectedObj = nullptr;
                     }
@@ -170,7 +178,7 @@ int main()
                 ImGui::Separator();
                 ImGui::Checkbox("Fixed", &selectedObj->fixed);
                 if (ImGui::Button("Delete this object")) {
-                    th.play();
+                    JojoSounds::theHand.play();
                     Simulation::objects.erase(std::remove_if(Simulation::objects.begin(), Simulation::objects.end(), [selectedObj](const auto& i) {return &i == selectedObj; }), Simulation::objects.end());
                     selectedObj = nullptr;
                     Flags::Editing=false;
@@ -205,7 +213,7 @@ int main()
             else if (Flags::DeleteObj) {
                 if (ImGui::Button("Delete all objects")) {
                     Simulation::objects.clear();
-                    btd.play();
+                    JojoSounds::biteTheDust.play();
                 }
                 ImGui::Separator();
                 if (ImGui::Button("Cancel"))
@@ -224,9 +232,9 @@ int main()
                 float ts = Simulation::timeSpeed;
                 ImGui::SliderFloat("", &Simulation::timeSpeed, -5, 5);
                 if (ts <= 1 && Simulation::timeSpeed > 1)
-                    mdh.play();
+                    JojoSounds::madeInHeaven.play();
                 if (ImGui::Checkbox("Stop time\t\tPress Tab", &Flags::timeStop) && Flags::timeStop)
-                    zw.play();
+                    JojoSounds::zaWardo.play();
                 ImGui::Separator();
                 ImGui::Checkbox("Draw background", &Flags::DrawBackground);
                 ImGui::Separator();
