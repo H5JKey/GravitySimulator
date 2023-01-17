@@ -10,8 +10,6 @@
 #include "lib/imgui/imgui-SFML.h"
 #include "lib/imgui/imgui_stdlib.h"
 
-#include <SFML/Audio.hpp>
-
 namespace Flags {
     bool timeStop=false;
     bool DrawBackground=true;
@@ -23,14 +21,6 @@ namespace Flags {
 
 int main()
 {
-    sf::SoundBuffer sbZw;
-    sbZw.loadFromFile("ZaWardo.wav");
-    sf::Sound zw(sbZw);
-
-    sf::SoundBuffer sbMdh;
-    sbMdh.loadFromFile("MadeInHeaven.wav");
-    sf::Sound mdh(sbMdh);
-
     sf::ContextSettings settings;
     settings.antialiasingLevel = 16;
     sf::RenderWindow App(sf::VideoMode(), "Gravity Simulator",sf::Style::Fullscreen,settings);
@@ -210,12 +200,8 @@ int main()
 
                 ImGui::Separator();
                 ImGui::Text("Time Speed");
-                float ts = Simulation::timeSpeed;
                 ImGui::SliderFloat("", &Simulation::timeSpeed, -5, 5);
-                if (ts <= 1 && Simulation::timeSpeed > 1)
-                    mdh.play();
-                if (ImGui::Checkbox("Stop time\t\tPress Tab", &Flags::timeStop) && Flags::timeStop)
-                    zw.play();
+                ImGui::Checkbox("Stop time\t\tPress Tab", &Flags::timeStop);
                 ImGui::Separator();
                 ImGui::Checkbox("Draw background", &Flags::DrawBackground);
                 ImGui::Separator();
