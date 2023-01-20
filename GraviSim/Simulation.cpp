@@ -20,7 +20,7 @@ void Simulation::update(float EllapsedTime, bool timeStop) {
 	objects.erase(std::remove_if(objects.begin(), objects.end(), [&]( auto& i) {
 		for (auto& anotherBody : objects) {
 			if (&i == &anotherBody) continue;
-			if (anotherBody.sprite.getGlobalBounds().intersects(i.sprite.getGlobalBounds())) {
+			if ((anotherBody.pos.x-i.pos.x)*(anotherBody.pos.x - i.pos.x)+ (anotherBody.pos.y - i.pos.y) * (anotherBody.pos.y - i.pos.y)<=((anotherBody.mass+i.mass)/1000+8)*((anotherBody.mass + i.mass) / 1000 + 8)) {
 				if (i.mass <=anotherBody.mass) {
 					//anotherBody.speed = (float(anotherBody.mass) * anotherBody.speed + i.speed * float(i.mass))/float(anotherBody.mass);
 					//anotherBody.mass += i.mass;
