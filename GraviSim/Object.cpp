@@ -8,6 +8,7 @@ Object::Object(int mass, sf::Vector2f pos, sf::Vector2f speed, std::string name,
 	this->speed = speed;
 	this->name = name;
 	this->fixed = fixed;
+	this->radius = radius;
 	this->color[0] = color.r; this->color[1] = color.g; this->color[2] = color.b;
 	Object::UpdateGraphic();
 }
@@ -22,7 +23,7 @@ void Object::UpdateParams(float EllapsedTime) {
 }
 
 void Object::UpdateGraphic() {
-	sprite.setRadius(this->mass / 1000 + 4);
+	sprite.setRadius(radius);
 	sprite.setPosition(pos-sf::Vector2f(sprite.getRadius(),sprite.getRadius()));
 	sprite.setFillColor(sf::Color(static_cast<sf::Uint8>(this->color[0] * 255.f), static_cast<sf::Uint8>(this->color[1] * 255.f), static_cast<sf::Uint8>(this->color[2] * 255.f)));
 }

@@ -141,12 +141,15 @@ int main()
                 ImGui::Text("Mass:");
                 ImGui::InputInt("##Mass", &selectedObj->mass);
                 ImGui::Separator();
+                ImGui::Text("Radius");
+                ImGui::SliderFloat("##Radius",&selectedObj->radius,4,50);
+                ImGui::Separator();
                 ImGui::Text("Speed:");
                 float* speed[2] = { &selectedObj->speed.x, &selectedObj->speed.y };
                 ImGui::InputFloat2("", *speed);
                 ImGui::Separator();
                 ImGui::Text("Color:");
-                ImGui::ColorEdit3("", selectedObj->color);
+                ImGui::ColorEdit3("##Color", selectedObj->color);
                 ImGui::Separator();
                 ImGui::Separator();
                 ImGui::Checkbox("Fixed", &selectedObj->fixed);
@@ -169,12 +172,15 @@ int main()
                 ImGui::Text("Mass:");
                 ImGui::InputInt("##Mass", &newObj.mass);
                 ImGui::Separator();
+                ImGui::Text("Radius");
+                ImGui::SliderFloat("##Radius", &newObj.radius);
+                ImGui::Separator();
                 ImGui::Text("Speed:");
                 float* speed[2] = { &newObj.speed.x, &newObj.speed.y };
                 ImGui::InputFloat2("", *speed);
                 ImGui::Separator();
                 ImGui::Text("Color:");
-                ImGui::ColorEdit3("", newObj.color);
+                ImGui::ColorEdit3("##SelectColor", newObj.color);
                 ImGui::Separator();
                 ImGui::Text("Fixed:");
                 ImGui::Checkbox("##Fixed", &newObj.fixed);
@@ -200,13 +206,13 @@ int main()
 
                 ImGui::Separator();
                 ImGui::Text("Time Speed");
-                ImGui::SliderFloat("", &Simulation::timeSpeed, -5, 5);
+                ImGui::SliderFloat("##TimeSpeed", &Simulation::timeSpeed, -5, 5);
                 ImGui::Checkbox("Stop time\t\tPress Tab", &Flags::timeStop);
                 ImGui::Separator();
                 ImGui::Checkbox("Draw background", &Flags::DrawBackground);
                 ImGui::Separator();
                 ImGui::Text("Objects:");
-                ImGui::ListBoxHeader("##Objects list"); {
+                ImGui::ListBoxHeader("##ObjectsList"); {
                     for (int i = 0; i < Simulation::objects.size(); i++) {
                         if (Simulation::objects[i].name == "") continue;
                         if (ImGui::Selectable((Simulation::objects[i].name + "##" + std::to_string(i)).c_str())) {
