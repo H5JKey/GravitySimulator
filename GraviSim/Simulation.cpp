@@ -21,7 +21,7 @@ void Simulation::update(float EllapsedTime, bool timeStop) {
 		for (auto& anotherBody : objects) {
 			if (&i == &anotherBody) continue;
 			if (anotherBody.sprite.getGlobalBounds().intersects(i.sprite.getGlobalBounds())) {
-				if (i.mass < 0.1*anotherBody.mass) {
+				if (i.mass <=anotherBody.mass) {
 					//anotherBody.speed = (float(anotherBody.mass) * anotherBody.speed + i.speed * float(i.mass))/float(anotherBody.mass);
 					//anotherBody.mass += i.mass;
 					ParticlesSystem::add(new Explosion(1000,i.pos, sf::Vector3f(i.color[0], i.color[1], i.color[2])));
