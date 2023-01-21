@@ -173,7 +173,7 @@ int main()
                 ImGui::InputInt("##Mass", &newObj.mass);
                 ImGui::Separator();
                 ImGui::Text("Radius");
-                ImGui::SliderFloat("##Radius", &newObj.radius,4,750);
+                ImGui::SliderFloat("##Radius", &newObj.radius,1,750);
                 ImGui::Separator();
                 ImGui::Text("Speed:");
                 float* speed[2] = { &newObj.speed.x, &newObj.speed.y };
@@ -182,8 +182,7 @@ int main()
                 ImGui::Text("Color:");
                 ImGui::ColorEdit3("##SelectColor", newObj.color);
                 ImGui::Separator();
-                ImGui::Text("Fixed:");
-                ImGui::Checkbox("##Fixed", &newObj.fixed);
+                ImGui::Checkbox("Fixed", &newObj.fixed);
                 ImGui::Separator();
                 if (ImGui::Button("Cancel"))
                     Flags::AddObj = false;

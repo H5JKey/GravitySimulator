@@ -16,7 +16,7 @@ void Simulation::update(float EllapsedTime, bool timeStop) {
 				body.UpdateParams(EllapsedTime * Simulation::timeSpeed);
 			}
 		body.UpdateGraphic();
-	});
+		});
 		if (Simulation::timeSpeed != 0 && !timeStop) {
 			objects.erase(std::remove_if(objects.begin(), objects.end(), [&](auto& i) {
 				for (auto& anotherBody : objects) {

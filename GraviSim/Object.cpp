@@ -9,7 +9,7 @@ Object::Object(int mass, sf::Vector2f pos, sf::Vector2f speed, std::string name,
 	this->name = name;
 	this->fixed = fixed;
 	if (radius == -1)
-		this->radius = abs(this->mass) / 1000 + 4;
+		this->radius = std::max(1,std::min(750,abs(this->mass) / 1000 + 1));
 	else
 		this->radius = radius;
 	this->color[0] = color.r; this->color[1] = color.g; this->color[2] = color.b;
@@ -42,7 +42,7 @@ Object::Object() {
 	this->fixed = false;
 	this->name = "";
 	this->color[0] = this->color[1] = this->color[2] = 1;
-	this->radius = abs(this->mass) / 1000 + 4;;
+	this->radius = abs(this->mass) / 1000 + 1;;
 }
 
 void Object::UpdateBoost(Object& anotherBody) {
