@@ -142,7 +142,7 @@ int main()
                 ImGui::InputInt("##Mass", &selectedObj->mass);
                 ImGui::Separator();
                 ImGui::Text("Radius");
-                ImGui::SliderFloat("##Radius",&selectedObj->radius,4,750);
+                ImGui::SliderFloat("##Radius",&selectedObj->radius,1,750);
                 ImGui::Separator();
                 ImGui::Text("Speed:");
                 float* speed[2] = { &selectedObj->speed.x, &selectedObj->speed.y };
