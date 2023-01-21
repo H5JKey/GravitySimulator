@@ -4,7 +4,7 @@
 
 class ParticleSource: public sf::Drawable, public sf::Transformable {
 public:
-    virtual void update(sf::Time elapsed) = 0;
+    virtual void update(sf::Time elapsed, float timeSpeed=1) = 0;
     virtual void setEmitter(sf::Vector2f position) = 0;
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
     virtual void resetParticle(std::size_t index) = 0;
@@ -57,14 +57,14 @@ public:
             }
         }
 
-        virtual void update(sf::Time elapsed)
+        virtual void update(sf::Time elapsed, float timeSpeed)
         {
             bool flag = true;
             for (std::size_t i = 0; i < m_particles.size(); ++i)
             {
                 // update the particle lifetime
                 Particle& p = m_particles[i];
-                p.lifetime -= elapsed;
+                p.lifetime -= elapsed*timeSpeed;
 
                 // if the particle is dead, respawn it
                 if (p.lifetime <= sf::Time::Zero) {
@@ -73,7 +73,7 @@ public:
                 else flag = false;
 
             // update the position of the corresponding vertex
-                m_vertices[i].position += p.velocity * elapsed.asSeconds();
+                m_vertices[i].position += p.velocity * elapsed.asSeconds()*timeSpeed;
 
                 // update the alpha (transparency) of the particle according to its lifetime
                 float ratio = p.lifetime.asSeconds() / m_lifetime.asSeconds();
@@ -121,7 +121,7 @@ public:
 
     static void add(ParticleSource* source);
 
-    static void update(sf::Time elapsed);
+    static void update(sf::Time elapsed, float timeSpeed);
 
 private:
     static std::vector<ParticleSource*> m_sources;

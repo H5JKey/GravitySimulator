@@ -6,14 +6,14 @@
 
 
 
-void Simulation::update(float EllapsedTime, bool timeStop) {
+void Simulation::update(sf::Time EllapsedTime, bool timeStop) {
 		concurrency::parallel_for_each(objects.begin(), objects.end(), [&](auto& body) {
 			if (Simulation::timeSpeed != 0 && !timeStop) {
 				for (auto& anotherBody : objects) {
 					if (&body == &anotherBody) continue;
 					body.UpdateBoost(anotherBody);
 				}
-				body.UpdateParams(EllapsedTime * Simulation::timeSpeed);
+				body.UpdateParams(EllapsedTime.asSeconds() * Simulation::timeSpeed);
 			}
 		body.UpdateGraphic();
 		});
@@ -26,7 +26,6 @@ void Simulation::update(float EllapsedTime, bool timeStop) {
 							//anotherBody.speed = (float(anotherBody.mass) * anotherBody.speed + i.speed * float(i.mass))/float(anotherBody.mass);
 							//anotherBody.mass += i.mass;
 							ParticlesSystem::add(new Explosion(1000, i.pos, sf::Vector3f(i.color[0], i.color[1], i.color[2])));
-
 							return true;
 						}
 
@@ -34,9 +33,10 @@ void Simulation::update(float EllapsedTime, bool timeStop) {
 				}
 				return false;
 				}), objects.end());
+			ParticlesSystem::update(EllapsedTime, timeSpeed);
 		}
-
 }
+
 std::vector<Object> Simulation::objects;
 float Simulation::timeSpeed=1;
 

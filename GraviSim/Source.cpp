@@ -119,10 +119,8 @@ int main()
 
         camera.move(-offset);
 
-       EllapsedTime = clock.restart();
-       Simulation::update(EllapsedTime.asSeconds(), Flags::timeStop);
-       if (!Flags::timeStop)
-          ParticlesSystem::update(EllapsedTime);
+        sf::Time EllapsedTime = clock.restart();
+        Simulation::update(EllapsedTime, Flags::timeStop);
 
         if (selectedObj != nullptr) {
             camera.setCenter(selectedObj->pos);
@@ -205,7 +203,7 @@ int main()
 
                 ImGui::Separator();
                 ImGui::Text("Time Speed");
-                ImGui::SliderFloat("##TimeSpeed", &Simulation::timeSpeed, -5, 5);
+                ImGui::SliderFloat("##TimeSpeed", &Simulation::timeSpeed, 0, 7.5);
                 ImGui::Checkbox("Stop time\t\tPress Tab", &Flags::timeStop);
                 ImGui::Separator();
                 ImGui::Checkbox("Draw background", &Flags::DrawBackground);
