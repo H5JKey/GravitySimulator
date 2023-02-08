@@ -11,7 +11,7 @@ public:
 	sf::Vector2f boost;
 	std::string name;
 	sf::CircleShape sprite;
-	float radius;
+	int radius;
 	bool fixed;
 	float color[3];
 

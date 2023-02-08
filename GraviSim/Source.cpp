@@ -140,7 +140,8 @@ int main()
                 ImGui::InputInt("##Mass", &selectedObj->mass);
                 ImGui::Separator();
                 ImGui::Text("Radius");
-                ImGui::SliderFloat("##Radius",&selectedObj->radius,1,750);
+                ImGui::InputInt("##Radius",&selectedObj->radius);
+                selectedObj->radius = std::max(std::min(750, selectedObj->radius), 1);
                 ImGui::Separator();
                 ImGui::Text("Speed:");
                 float* speed[2] = { &selectedObj->speed.x, &selectedObj->speed.y };
@@ -171,7 +172,8 @@ int main()
                 ImGui::InputInt("##Mass", &newObj.mass);
                 ImGui::Separator();
                 ImGui::Text("Radius");
-                ImGui::SliderFloat("##Radius", &newObj.radius,1,750);
+                ImGui::InputInt("##Radius", &newObj.radius);
+                newObj.radius = std::max(std::min(750, newObj.radius), 1);
                 ImGui::Separator();
                 ImGui::Text("Speed:");
                 float* speed[2] = { &newObj.speed.x, &newObj.speed.y };
