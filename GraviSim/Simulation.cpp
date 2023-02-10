@@ -2,10 +2,6 @@
 #include "ParticlesSystem.h"
 
 
-
-
-
-
 void Simulation::update(sf::Time EllapsedTime, bool timeStop) {
 		concurrency::parallel_for_each(objects.begin(), objects.end(), [&](auto& body) {
 			if (Simulation::timeSpeed != 0 && !timeStop) {
@@ -38,5 +34,4 @@ void Simulation::update(sf::Time EllapsedTime, bool timeStop) {
 }
 
 std::vector<Object> Simulation::objects;
-float Simulation::timeSpeed=1;
-
+float Simulation::timeSpeed = 1;

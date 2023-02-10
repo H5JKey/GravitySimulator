@@ -4,6 +4,8 @@
 #include <ppl.h>
 #include <algorithm>
 #include <iostream>
+#include <filesystem>
+#include "Save.h"
 #include "ParticlesSystem.h"
 
 #include "lib/imgui/imgui.h"
@@ -16,6 +18,7 @@ namespace Flags {
     bool DeleteObj=false;
     bool AddObj=false;
     bool Editing=false;
+    bool Saving = false;
 }
 
 
@@ -54,7 +57,7 @@ int main()
 
     int savedTimeSpeed = Simulation::timeSpeed;;
 
-
+    std::string s;
 
     while (App.isOpen())
     {
@@ -63,9 +66,6 @@ int main()
             ImGui::SFML::ProcessEvent(event);
             if (event.type == sf::Event::Closed)
                 App.close();
-
-            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Escape))
-                    App.close();
 
             if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Tab))
                 Flags::timeStop = !Flags::timeStop;
@@ -99,7 +99,7 @@ int main()
                         Simulation::objects.push_back(newObj);
                     }
                     if (Flags::DeleteObj && selectedObj!=nullptr) {
-                        Simulation::objects.erase(std::remove_if(Simulation::objects.begin(), Simulation::objects.end(), [selectedObj](const auto& i) {return &i == selectedObj; }), Simulation::objects.end());
+                        Simulation::objects.erase(std::remove_if(Simulation::objects.begin(), Simulation::objects.end(), [selectedObj](const auto& obj) {return &obj == selectedObj; }), Simulation::objects.end());
                         selectedObj = nullptr;
                     }
                 }
@@ -141,7 +141,7 @@ int main()
                 ImGui::Separator();
                 ImGui::Text("Radius");
                 ImGui::InputInt("##Radius",&selectedObj->radius);
-                selectedObj->radius = std::max(std::min(750, selectedObj->radius), 1);
+                selectedObj->radius = std::clamp(selectedObj->radius, 1, 750);
                 ImGui::Separator();
                 ImGui::Text("Speed:");
                 float* speed[2] = { &selectedObj->speed.x, &selectedObj->speed.y };
@@ -153,12 +153,12 @@ int main()
                 ImGui::Separator();
                 ImGui::Checkbox("Fixed", &selectedObj->fixed);
                 if (ImGui::Button("Delete this object")) {
-                    Simulation::objects.erase(std::remove_if(Simulation::objects.begin(), Simulation::objects.end(), [selectedObj](const auto& i) {return &i == selectedObj; }), Simulation::objects.end());
+                    Simulation::objects.erase(std::remove_if(Simulation::objects.begin(), Simulation::objects.end(), [selectedObj](const auto& obj) {return &obj == selectedObj; }), Simulation::objects.end());
                     selectedObj = nullptr;
                     Flags::Editing=false;
                 }
                 ImGui::Separator();
-                if (ImGui::Button("Cancel"))
+                if (ImGui::Button("Exit"))
                     selectedObj = nullptr;
                     Flags::Editing=false;
             }
@@ -173,7 +173,7 @@ int main()
                 ImGui::Separator();
                 ImGui::Text("Radius");
                 ImGui::InputInt("##Radius", &newObj.radius);
-                newObj.radius = std::max(std::min(750, newObj.radius), 1);
+                newObj.radius = std::clamp(newObj.radius, 1, 750);
                 ImGui::Separator();
                 ImGui::Text("Speed:");
                 float* speed[2] = { &newObj.speed.x, &newObj.speed.y };
@@ -184,7 +184,7 @@ int main()
                 ImGui::Separator();
                 ImGui::Checkbox("Fixed", &newObj.fixed);
                 ImGui::Separator();
-                if (ImGui::Button("Cancel"))
+                if (ImGui::Button("Exit"))
                     Flags::AddObj = false;
             }
             else if (Flags::DeleteObj) {
@@ -192,8 +192,47 @@ int main()
                     Simulation::objects.clear();
                 }
                 ImGui::Separator();
-                if (ImGui::Button("Cancel"))
+                if (ImGui::Button("Exit"))
                     Flags::DeleteObj = false;
+            }
+            else if (Flags::Saving) {
+                ImGui::Separator();
+                ImGui::Text("Saves:");
+                ImGui::ListBoxHeader("##SavesList");
+                int i = 0;
+                {
+                    for (auto& p : std::filesystem::directory_iterator("saves")) {
+                        {// Для вызова деструктора(временное решение)
+                            std::filesystem::path path = p;
+                            Save save(p);
+                            save.readInfo();
+                            if (ImGui::Selectable((save.name+'\t').c_str(), false, 0, ImVec2(140, 15))) {
+                                camera.setCenter(save.readCameraInfo());
+                                save.loadWorld(Simulation::objects);
+                            }
+                        }
+                        ImGui::SameLine();
+                        if (ImGui::Button(("-##" + std::to_string(i++)).c_str()))
+                            std::filesystem::remove(p);
+                    }
+                }
+                ImGui::ListBoxFooter();
+                ImGui::Separator();
+                ImGui::Text("Enter new save name:");
+                ImGui::InputText("##EnterSaveName", &s);
+                ImGui::SameLine();
+                if (ImGui::Button("+")) {
+                    std::ofstream f("saves/" + s + ".wrld");
+                    f.close();
+                    Save save(std::filesystem::path("saves/" + s + ".wrld"));
+                    save.name = s;
+                    s = "";
+                   
+                    save.save(Simulation::objects, camera.getCenter());
+                }
+                ImGui::Separator();
+                if (ImGui::Button("Exit"))
+                    Flags::Saving = false;
             }
             else {
                 if (ImGui::Button("Add new objects"))
@@ -214,12 +253,20 @@ int main()
                 ImGui::ListBoxHeader("##ObjectsList"); {
                     for (int i = 0; i < Simulation::objects.size(); i++) {
                         if (Simulation::objects[i].name == "") continue;
-                        if (ImGui::Selectable((Simulation::objects[i].name + "##" + std::to_string(i)).c_str())) {
+                        if (ImGui::Selectable((Simulation::objects[i].name + "##" + std::to_string(i)).c_str(),false,0,ImVec2(140,15))) {
                             selectedObj = &Simulation::objects[i];
                         }
+                        ImGui::SameLine();
+                        if (ImGui::Button(("-##"+std::to_string(i)).c_str()))  
+                            Simulation::objects.erase(Simulation::objects.begin()+i);
+
                     }
                 }
                 ImGui::ListBoxFooter();
+                ImGui::Separator();
+                if (ImGui::Button("Save/Load")) Flags::Saving = true;
+                ImGui::Separator();
+                if (ImGui::Button("Exit")) App.close();
             }
         }
         ImGui::End();
