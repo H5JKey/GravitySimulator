@@ -32,8 +32,8 @@ public:
 		objects.clear();
 		while (!m_file->eof()) {
 			Object obj;
-			*m_file >> obj.name >> obj.pos.x >> obj.pos.y >> obj.mass >> obj.speed.x >> obj.speed.y >> obj.boost.x >> obj.boost.y >> obj.radius >> obj.color[1] >> obj.color[2] >> obj.color[3] >> obj.fixed;
-	
+			*m_file >> obj.name >> obj.pos.x >> obj.pos.y >> obj.mass >> obj.speed.x >> obj.speed.y >> obj.boost.x >> obj.boost.y >> obj.radius >> obj.color[0] >> obj.color[1] >> obj.color[2] >> obj.fixed;
+			if (obj.name == "##noName##") obj.name = "";
 			objects.push_back(obj);
 		}
 	}
@@ -47,7 +47,7 @@ public:
 		for (Object &obj : objects) {
 			std::string name = obj.name;
 			if (obj.name == "") name = "##noName##";
-			*m_file << name <<' '<< obj.pos.x <<' '<< obj.pos.y <<' '<< obj.mass <<' '<< obj.speed.x <<' '<< obj.speed.y <<' '<< obj.boost.x <<' '<< obj.boost.y <<' '<< obj.radius <<' '<< obj.color[1] <<' '<< obj.color[2] <<' '<< obj.color[3] <<' ' << obj.fixed;
+			*m_file << name <<' '<< obj.pos.x <<' '<< obj.pos.y <<' '<< obj.mass <<' '<< obj.speed.x <<' '<< obj.speed.y <<' '<< obj.boost.x <<' '<< obj.boost.y <<' '<< obj.radius <<' '<< obj.color[0] <<' '<< obj.color[1] <<' '<< obj.color[2] <<' ' << obj.fixed;
 			if (&obj != &*(objects.end() - 1))
 				*m_file << '\n';
 		}

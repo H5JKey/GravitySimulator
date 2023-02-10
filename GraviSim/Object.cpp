@@ -6,10 +6,7 @@ Object::Object(float mass, sf::Vector2f pos, sf::Vector2f speed, std::string nam
 	this->pos = pos;
 	this->mass = mass;
 	this->speed = speed;
-	if (name == "##noName##") 
-		this->name = "";
-	else
-		this->name = name;
+	this->name = name;
 	this->fixed = fixed;
 	if (radius == -1)
 		this->radius = std::max(1.f,std::min(750.f,abs(this->mass) / 1000 + 1));
