@@ -5,7 +5,7 @@
 class Object:sf::Drawable
 {
 public:
-	int mass;
+	float mass;
 	sf::Vector2f pos;
 	sf::Vector2f speed;
 	sf::Vector2f boost;
@@ -16,7 +16,7 @@ public:
 	float color[3];
 
 
-	Object(int mass, sf::Vector2f pos, sf::Vector2f speed=sf::Vector2f(0,0), std::string name="", sf::Color color=sf::Color(1,1,1), bool fixed=false, float radius=-1);
+	Object(float mass, sf::Vector2f pos, sf::Vector2f speed=sf::Vector2f(0,0), std::string name="", sf::Color color=sf::Color(1,1,1), bool fixed=false, float radius=-1);
 
 	Object();
 

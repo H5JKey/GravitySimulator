@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-Object::Object(int mass, sf::Vector2f pos, sf::Vector2f speed, std::string name, sf::Color color, bool fixed, float radius) {
+Object::Object(float mass, sf::Vector2f pos, sf::Vector2f speed, std::string name, sf::Color color, bool fixed, float radius) {
 	this->pos = pos;
 	this->mass = mass;
 	this->speed = speed;
@@ -12,7 +12,7 @@ Object::Object(int mass, sf::Vector2f pos, sf::Vector2f speed, std::string name,
 		this->name = name;
 	this->fixed = fixed;
 	if (radius == -1)
-		this->radius = std::max(1,std::min(750,abs(this->mass) / 1000 + 1));
+		this->radius = std::max(1.f,std::min(750.f,abs(this->mass) / 1000 + 1));
 	else
 		this->radius = radius;
 	this->color[0] = color.r; this->color[1] = color.g; this->color[2] = color.b;

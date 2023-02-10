@@ -19,8 +19,6 @@ void Simulation::update(sf::Time EllapsedTime, bool timeStop) {
 					if (&i == &anotherBody) continue;
 					if ((anotherBody.pos.x - i.pos.x) * (anotherBody.pos.x - i.pos.x) + (anotherBody.pos.y - i.pos.y) * (anotherBody.pos.y - i.pos.y) <= (i.radius + anotherBody.radius) * (i.radius + anotherBody.radius)) {
 						if (i.mass <= anotherBody.mass) {
-							//anotherBody.speed = (float(anotherBody.mass) * anotherBody.speed + i.speed * float(i.mass))/float(anotherBody.mass);
-							//anotherBody.mass += i.mass;
 							ParticlesSystem::add(new Explosion(1000, i.pos, sf::Vector3f(i.color[0], i.color[1], i.color[2])));
 							return true;
 						}

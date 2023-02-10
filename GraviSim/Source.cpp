@@ -137,7 +137,7 @@ int main()
                 ImGui::InputText("##Name", &selectedObj->name);
                 ImGui::Separator();
                 ImGui::Text("Mass:");
-                ImGui::InputInt("##Mass", &selectedObj->mass);
+                ImGui::InputFloat("##Mass", &selectedObj->mass);
                 ImGui::Separator();
                 ImGui::Text("Radius");
                 ImGui::InputInt("##Radius",&selectedObj->radius);
@@ -169,7 +169,7 @@ int main()
                 ImGui::InputText("##Name", &newObj.name);
                 ImGui::Separator();
                 ImGui::Text("Mass:");
-                ImGui::InputInt("##Mass", &newObj.mass);
+                ImGui::InputFloat("##Mass", &newObj.mass);
                 ImGui::Separator();
                 ImGui::Text("Radius");
                 ImGui::InputInt("##Radius", &newObj.radius);
