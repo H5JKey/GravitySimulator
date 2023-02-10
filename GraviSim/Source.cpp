@@ -22,6 +22,7 @@ namespace Flags {
     bool AddObj=false;
     bool Editing=false;
     bool Saving = false;
+    bool ShowFPS = false;
 }
 
 
@@ -60,6 +61,14 @@ int main()
 
     std::string s;//just a string variable
 
+    sf::Font font;
+    font.loadFromFile("C:/Windows/Fonts/arial.ttf");
+    sf::Text fpsTracker("", font);
+    fpsTracker.setCharacterSize(13);
+    fpsTracker.setStyle(sf::Text::Bold);
+    fpsTracker.setFillColor(sf::Color::White);
+    fpsTracker.setPosition(10, 7);
+
     while (App.isOpen())
     {
         sf::Event event;
@@ -68,7 +77,7 @@ int main()
             if (event.type == sf::Event::Closed)
                 App.close();
 
-            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Tab))
+            if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::LControl || event.key.code == sf::Keyboard::RControl))
                 Flags::timeStop = !Flags::timeStop;
 
             if (!ImGui::GetIO().WantCaptureMouse) {
@@ -117,6 +126,11 @@ int main()
         else {
             Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
         }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Tab))
+            Flags::ShowFPS = true;
+        else
+            Flags::ShowFPS = false;
 
         camera.move(-offset);
 
@@ -244,7 +258,7 @@ int main()
                 ImGui::Separator();
                 ImGui::Text("Time Speed");
                 ImGui::SliderFloat("##TimeSpeed", &Simulation::timeSpeed, 0, 7.5);
-                ImGui::Checkbox("Stop time\t\tPress Tab", &Flags::timeStop);
+                ImGui::Checkbox("Stop time\t\tPress Ctrl", &Flags::timeStop);
                 ImGui::Separator();
                 ImGui::Checkbox("Draw background", &Flags::DrawBackground);
                 ImGui::Separator();
@@ -263,7 +277,7 @@ int main()
                 }
                 ImGui::ListBoxFooter();
                 ImGui::Separator();
-                if (ImGui::Button("Save/Load")) Flags::Saving = true;
+                if (ImGui::Button("Save/Load configuration")) Flags::Saving = true;
                 ImGui::Separator();
                 if (ImGui::Button("Exit")) App.close();
             }
@@ -275,9 +289,17 @@ int main()
             App.draw(background);
         }
         App.setView(camera);
-        for (auto& body : Simulation::objects) 
-            body.draw(App);
+        for (auto& obj : Simulation::objects) 
+            obj.draw(App);
         ParticlesSystem::draw(App);
+
+        if (Flags::ShowFPS) {
+            App.setView(App.getDefaultView());
+            fpsTracker.setString(std::to_string(int(1 / EllapsedTime.asSeconds())));
+            App.draw(fpsTracker);
+            App.setView(camera);
+        }
+
         ImGui::SFML::Render(App);
         App.display();
     }
