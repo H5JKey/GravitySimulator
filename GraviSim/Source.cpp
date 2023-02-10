@@ -1,12 +1,15 @@
 #include <SFML/Graphics.hpp>
 #include "Simulation.h"
 #include "Object.h"
+#include "Save.h"
+#include "ParticlesSystem.h"
+
+
 #include <ppl.h>
 #include <algorithm>
 #include <iostream>
 #include <filesystem>
-#include "Save.h"
-#include "ParticlesSystem.h"
+
 
 #include "lib/imgui/imgui.h"
 #include "lib/imgui/imgui-SFML.h"
@@ -24,19 +27,17 @@ namespace Flags {
 
 int main()
 {
+    Simulation::setup();
+
     sf::ContextSettings settings;
     settings.antialiasingLevel = 16;
     sf::RenderWindow App(sf::VideoMode(), "Gravity Simulator",sf::Style::Fullscreen,settings);
     ImGui::SFML::Init(App);
 
-    sf::Clock clock, delta;
+    sf::Clock clock, delta; //delta is using for handling double clicks
     clock.restart();
 
-    Simulation::objects.push_back(Object(100000, sf::Vector2f(App.getSize().x / 2, App.getSize().y / 2), sf::Vector2f(0, 0), "Sun"));
-    Simulation::objects.push_back(Object(300, sf::Vector2f(App.getSize().x / 2, App.getSize().y / 2-500), sf::Vector2f(320, 0),"Planet"));
-
     sf::Vector2f offset = sf::Vector2f(0, 0);
-    float size = 1;
 
     sf::Time EllapsedTime;
     sf::Vector2f Pos;
@@ -57,7 +58,7 @@ int main()
 
     int savedTimeSpeed = Simulation::timeSpeed;;
 
-    std::string s;
+    std::string s;//just a string variable
 
     while (App.isOpen())
     {
@@ -130,7 +131,7 @@ int main()
         ImGui::Begin("Menu:",nullptr,ImGuiWindowFlags_NoResize+ImGuiWindowFlags_NoMove);
         {
             ImGui::Separator();
-            if (Flags::Editing) {
+            if (Flags::Editing) {//Editing selected object
                 ImGui::Text("Selected object:");
                 ImGui::Separator();
                 ImGui::Text("Name:");
@@ -162,7 +163,7 @@ int main()
                     selectedObj = nullptr;
                     Flags::Editing=false;
             }
-            else if (Flags::AddObj) {
+            else if (Flags::AddObj) {//Adding new object
                 ImGui::Text("New Object:");
                 ImGui::Separator();
                 ImGui::Text("Name:");
@@ -187,7 +188,7 @@ int main()
                 if (ImGui::Button("Exit"))
                     Flags::AddObj = false;
             }
-            else if (Flags::DeleteObj) {
+            else if (Flags::DeleteObj) {//Deleiting menu. Deleting selected object or deleting all objects
                 if (ImGui::Button("Delete all objects")) {
                     Simulation::objects.clear();
                 }
@@ -195,22 +196,20 @@ int main()
                 if (ImGui::Button("Exit"))
                     Flags::DeleteObj = false;
             }
-            else if (Flags::Saving) {
-                ImGui::Separator();
+            else if (Flags::Saving) {//Saving current configuration or loading another from file
                 ImGui::Text("Saves:");
                 ImGui::ListBoxHeader("##SavesList");
                 int i = 0;
                 {
-                    for (auto& p : std::filesystem::directory_iterator("saves")) {
-                        {// Для вызова деструктора(временное решение)
-                            std::filesystem::path path = p;
-                            Save save(p);
-                            save.readInfo();
-                            if (ImGui::Selectable((save.name+'\t').c_str(), false, 0, ImVec2(140, 15))) {
-                                camera.setCenter(save.readCameraInfo());
-                                save.loadWorld(Simulation::objects);
-                            }
+                    for (auto& p : std::filesystem::directory_iterator("worlds")) {
+                        std::filesystem::path path = p;
+                        Save saveFile(p);
+                        saveFile.readInfo();
+                        if (ImGui::Selectable(saveFile.name.c_str(), false, 0, ImVec2(140, 15))) {
+                            camera.setCenter(saveFile.readCameraInfo());
+                            saveFile.loadWorld(Simulation::objects);
                         }
+                        saveFile.close();
                         ImGui::SameLine();
                         if (ImGui::Button(("-##" + std::to_string(i++)).c_str()))
                             std::filesystem::remove(p);
@@ -222,19 +221,19 @@ int main()
                 ImGui::InputText("##EnterSaveName", &s);
                 ImGui::SameLine();
                 if (ImGui::Button("+")) {
-                    std::ofstream f("saves/" + s + ".wrld");
+                    std::ofstream f("worlds/" + s + ".wrld");
                     f.close();
-                    Save save(std::filesystem::path("saves/" + s + ".wrld"));
-                    save.name = s;
+                    Save newSaveFile(std::filesystem::path("worlds/" + s + ".wrld"));
+                    newSaveFile.name = s;
                     s = "";
                    
-                    save.save(Simulation::objects, camera.getCenter());
+                    newSaveFile.save(Simulation::objects, camera.getCenter());
                 }
                 ImGui::Separator();
                 if (ImGui::Button("Exit"))
                     Flags::Saving = false;
             }
-            else {
+            else {//Main menu
                 if (ImGui::Button("Add new objects"))
                     Flags::AddObj = true;
 
