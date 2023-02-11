@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
-#include <iostream>
+
 #include"Object.h"
 #include <SFML/Graphics.hpp>
 
@@ -19,7 +19,7 @@ public:
 	}
 
 	void readInfo() {
-		*m_file >> name;
+		std::getline(*m_file, name);
 	}
 
 	sf::Vector2f& readCameraInfo() {

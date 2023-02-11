@@ -127,10 +127,12 @@ int main()
             Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
         }
 
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Tab))
-            Flags::ShowFPS = true;
-        else
-            Flags::ShowFPS = false;
+        if (!ImGui::GetIO().WantCaptureKeyboard) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Tab))
+                Flags::ShowFPS = true;
+            else
+                Flags::ShowFPS = false;
+        }
 
         camera.move(-offset);
 
