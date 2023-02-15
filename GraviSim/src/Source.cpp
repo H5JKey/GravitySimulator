@@ -11,9 +11,9 @@
 #include <filesystem>
 
 
-#include "lib/imgui/imgui.h"
-#include "lib/imgui/imgui-SFML.h"
-#include "lib/imgui/imgui_stdlib.h"
+#include "../lib/imgui/imgui.h"
+#include "../lib/imgui/imgui-SFML.h"
+#include "../lib/imgui/imgui_stdlib.h"
 
 namespace Flags {
     bool timeStop=false;
