@@ -1,35 +1,296 @@
 #include "Simulation.h"
-#include "ParticlesSystem.h"
-
-
-void Simulation::update(sf::Time EllapsedTime, bool timeStop) {
-		concurrency::parallel_for_each(objects.begin(), objects.end(), [&](auto& body) {
-			if (Simulation::timeSpeed != 0 && !timeStop) {
-				for (auto& anotherBody : objects) {
-					if (&body == &anotherBody) continue;
-					body.UpdateBoost(anotherBody);
-				}
-				body.UpdateParams(EllapsedTime.asSeconds() * Simulation::timeSpeed);
-			}
-		body.UpdateGraphic();
-		});
-		if (Simulation::timeSpeed != 0 && !timeStop) {
-			objects.erase(std::remove_if(objects.begin(), objects.end(), [&](auto& i) {
-				for (auto& anotherBody : objects) {
-					if (&i == &anotherBody) continue;
-					if ((anotherBody.pos.x - i.pos.x) * (anotherBody.pos.x - i.pos.x) + (anotherBody.pos.y - i.pos.y) * (anotherBody.pos.y - i.pos.y) <= (i.radius + anotherBody.radius) * (i.radius + anotherBody.radius)) {
-						if (i.mass <= anotherBody.mass) {
-							ParticlesSystem::add(new Explosion(1000, i.pos, sf::Vector3f(i.color[0], i.color[1], i.color[2])));
-							return true;
-						}
-
-					}
-				}
-				return false;
-				}), objects.end());
-			ParticlesSystem::update(EllapsedTime, timeSpeed);
-		}
+namespace Flags {
+    bool timeStop = false;
+    bool DrawBackground = true;
+    bool AddObj = false;
+    bool Editing = false;
+    bool Saving = false;
+    bool ShowFPS = false;
 }
 
-std::vector<Object> Simulation::objects;
-float Simulation::timeSpeed = 1;
+Simulation::Simulation() {
+    Physics::objects.push_back(Object(100000, sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Sun"));
+    Physics::objects.push_back(Object(300, sf::Vector2f(960, 50), sf::Vector2f(320, 0), "Planet"));
+
+    selectedObj = nullptr;
+    savedTimeSpeed = 0;
+
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 16;
+    App.create(sf::VideoMode(), "Gravity Simulator", sf::Style::Fullscreen, settings);
+    ImGui::SFML::Init(App);
+    
+    clock.restart();
+
+    offset = sf::Vector2f(0, 0);
+
+    camera.reset(sf::FloatRect(0, 0, App.getSize().x, App.getSize().y));
+    camera.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
+
+    t.loadFromFile("background.png");
+    background.setScale(camera.getSize().x / t.getSize().x, camera.getSize().y / t.getSize().y);
+    background.setTexture(t);
+
+    font.loadFromFile("C:/Windows/Fonts/arial.ttf");
+    fpsTracker.setFont(font);
+    fpsTracker.setCharacterSize(13);
+    fpsTracker.setStyle(sf::Text::Bold);
+    fpsTracker.setFillColor(sf::Color::White);
+    fpsTracker.setPosition(10, 7);
+
+}
+
+void Simulation::start() {
+    while (App.isOpen()) {
+        update();
+    }
+}
+
+void Simulation::update() {
+    EllapsedTime = clock.restart();
+
+    updateGuiAndEvents();
+    updatePhysics();
+    updateGraphics();
+}
+
+
+void Simulation::updatePhysics() {
+    Physics::update(EllapsedTime, Flags::timeStop);
+}
+
+
+void Simulation::updateGraphics() {
+
+    App.clear();
+    if (Flags::DrawBackground) {
+        App.setView(App.getDefaultView());
+        App.draw(background);
+    }
+
+    App.setView(camera);
+    for (auto& obj : Physics::objects)
+        obj.draw(App);
+
+    ParticlesSystem::draw(App);
+
+    if (Flags::ShowFPS) {
+        App.setView(App.getDefaultView());
+        fpsTracker.setString(std::to_string(int(1 / EllapsedTime.asSeconds())));
+        App.draw(fpsTracker);
+        App.setView(camera);
+    }
+
+    ImGui::SFML::Render(App);
+    App.display();
+}
+
+
+
+void Simulation::updateGuiAndEvents(){
+    sf::Event event;
+    while (App.pollEvent(event)) {
+        ImGui::SFML::ProcessEvent(event);
+        if (event.type == sf::Event::Closed)
+            App.close();
+
+        if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::LControl || event.key.code == sf::Keyboard::RControl))
+            Flags::timeStop = !Flags::timeStop;
+
+        if (!ImGui::GetIO().WantCaptureMouse) {
+            if (event.type == sf::Event::MouseWheelMoved) {
+                if (event.mouseWheel.delta > 0)
+                    camera.zoom(1.1);
+
+                else
+                    camera.zoom(0.9);
+
+            }
+
+            if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+                auto mb = sf::Mouse::getPosition();
+                if (!Flags::AddObj) {
+                    for (auto& body : Physics::objects) {
+                        if (body.sprite.getGlobalBounds().contains(App.mapPixelToCoords(mb))) {
+                            if (delta.getElapsedTime().asMilliseconds() > 500) delta.restart();
+                            else {
+                                selectedObj = &body;
+                                delta.restart();
+                            }
+                            break;
+                        }
+                    }
+                }
+                else {
+                    newObj.pos = App.mapPixelToCoords(mb);
+                    Physics::objects.push_back(newObj);
+                }
+                
+            }
+        }
+    }
+
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
+
+        sf::Vector2f CurrentmousePos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
+
+        offset = (CurrentmousePos - Pos) * 0.7f;
+        Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
+    }
+    else {
+        Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
+    }
+
+    if (!ImGui::GetIO().WantCaptureKeyboard) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Tab))
+            Flags::ShowFPS = true;
+        else
+            Flags::ShowFPS = false;
+    }
+
+    camera.move(-offset);
+
+    sf::Time EllapsedTime = clock.restart();
+
+
+    if (selectedObj != nullptr) {
+        camera.setCenter(selectedObj->pos);
+        Flags::Editing = true;
+    }
+    ImGui::SFML::Update(App, EllapsedTime);
+    ImGui::Begin("Menu:", nullptr, ImGuiWindowFlags_NoResize + ImGuiWindowFlags_NoMove);
+    {
+        ImGui::Separator();
+        if (Flags::Editing) {//Editing selected object
+            ImGui::Text("Selected object:");
+            ImGui::Separator();
+            ImGui::Text("Name:");
+            ImGui::InputText("##Name", &selectedObj->name);
+            ImGui::Separator();
+            ImGui::Text("Mass:");
+            ImGui::InputFloat("##Mass", &selectedObj->mass);
+            ImGui::Separator();
+            ImGui::Text("Radius");
+            ImGui::InputInt("##Radius", &selectedObj->radius);
+            selectedObj->radius = std::clamp(selectedObj->radius, 1, 750);
+            ImGui::Separator();
+            ImGui::Text("Speed:");
+            float* speed[2] = { &selectedObj->speed.x, &selectedObj->speed.y };
+            ImGui::InputFloat2("", *speed);
+            ImGui::Separator();
+            ImGui::Text("Color:");
+            ImGui::ColorEdit3("##Color", selectedObj->color);
+            ImGui::Separator();
+            ImGui::Separator();
+            ImGui::Checkbox("Fixed", &selectedObj->fixed);
+            if (ImGui::Button("Delete this object")) {
+                Physics::objects.erase(std::remove_if(Physics::objects.begin(), Physics::objects.end(), [&](const auto& obj) {return &obj == selectedObj; }), Physics::objects.end());
+                selectedObj = nullptr;
+                Flags::Editing = false;
+            }
+            ImGui::Separator();
+            if (ImGui::Button("Exit"))
+                selectedObj = nullptr;
+            Flags::Editing = false;
+        }
+        else if (Flags::AddObj) {//Adding new object
+            ImGui::Text("New Object:");
+            ImGui::Separator();
+            ImGui::Text("Name:");
+            ImGui::InputText("##Name", &newObj.name);
+            ImGui::Separator();
+            ImGui::Text("Mass:");
+            ImGui::InputFloat("##Mass", &newObj.mass);
+            ImGui::Separator();
+            ImGui::Text("Radius");
+            ImGui::InputInt("##Radius", &newObj.radius);
+            newObj.radius = std::clamp(newObj.radius, 1, 750);
+            ImGui::Separator();
+            ImGui::Text("Speed:");
+            float* speed[2] = { &newObj.speed.x, &newObj.speed.y };
+            ImGui::InputFloat2("", *speed);
+            ImGui::Separator();
+            ImGui::Text("Color:");
+            ImGui::ColorEdit3("##SelectColor", newObj.color);
+            ImGui::Separator();
+            ImGui::Checkbox("Fixed", &newObj.fixed);
+            ImGui::Separator();
+            if (ImGui::Button("Exit"))
+                Flags::AddObj = false;
+        }
+        else if (Flags::Saving) {//Saving current configuration or loading another from file
+            ImGui::Text("Saves:");
+            ImGui::ListBoxHeader("##SavesList");
+            int i = 0;
+            {
+                for (auto& p : std::filesystem::directory_iterator("worlds")) {
+                    std::filesystem::path path = p;
+                    Save saveFile(p);
+                    saveFile.readInfo();
+                    if (ImGui::Selectable(saveFile.name.c_str(), false, 0, ImVec2(140, 15))) {
+                        camera.setCenter(saveFile.readCameraInfo());
+                        saveFile.loadWorld(Physics::objects);
+                    }
+                    saveFile.close();
+                    ImGui::SameLine();
+                    if (ImGui::Button(("-##"+ std::to_string(i)).c_str()))
+                        std::filesystem::remove(p);
+                }
+            }
+            ImGui::ListBoxFooter();
+            ImGui::Separator();
+            ImGui::Text("Enter new save name:");
+            ImGui::InputText("##EnterSaveName", &s);
+            ImGui::SameLine();
+            if (ImGui::Button("+")) {
+                std::ofstream f("worlds/" + s + ".wrld");
+                f.close();
+                Save newSaveFile(std::filesystem::path("worlds/" + s + ".wrld"));
+                newSaveFile.name = s;
+                s = "";
+
+                newSaveFile.save(Physics::objects, camera.getCenter());
+            }
+            ImGui::Separator();
+            if (ImGui::Button("Exit"))
+                Flags::Saving = false;
+        }
+        else {//Main menu
+
+            ImGui::Separator();
+            ImGui::Text("Time Speed");
+            ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 7.5);
+            ImGui::Checkbox("Stop time\t\tPress Ctrl", &Flags::timeStop);
+            ImGui::Separator();
+            ImGui::Checkbox("Draw background", &Flags::DrawBackground);
+            ImGui::Separator();
+            if (ImGui::Button("+"))
+                Flags::AddObj = true;
+            ImGui::SameLine();
+            ImGui::Text("Objects:");
+            ImGui::ListBoxHeader("##ObjectsList"); {
+                for (int i = 0; i < Physics::objects.size(); i++) {
+                    if (Physics::objects[i].name == "") continue;
+                    if (ImGui::Selectable((Physics::objects[i].name + "##" + std::to_string(i)).c_str(), false, 0, ImVec2(140, 15))) {
+                        selectedObj = &Physics::objects[i];
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button(("-##" + std::to_string(i)).c_str()))
+                        Physics::objects.erase(Physics::objects.begin() + i);
+
+                }
+            }
+            ImGui::ListBoxFooter();
+            ImGui::Separator();
+            if (ImGui::Button("Save/Load configuration")) Flags::Saving = true;
+            ImGui::Separator();
+            if (ImGui::Button("Exit")) App.close();
+        }
+    }
+    ImGui::End();
+}
+
+Simulation::~Simulation() {
+    ImGui::SFML::Shutdown();
+    delete(selectedObj);
+}

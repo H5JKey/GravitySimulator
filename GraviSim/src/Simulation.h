@@ -1,20 +1,53 @@
 #pragma once
-#include <vector>
+#include <SFML/Graphics.hpp>
+#include <SFML/Graphics.hpp>
+#include "Physics.h"
 #include "Object.h"
 #include "Save.h"
+#include "ParticlesSystem.h"
+
+
 #include <ppl.h>
+#include <algorithm>
+#include <iostream>
+#include <filesystem>
+
+
+#include "../lib/imgui/imgui.h"
+#include "../lib/imgui/imgui-SFML.h"
+#include "../lib/imgui/imgui_stdlib.h"
+
+
+
 
 class Simulation
 {
 public:
-	static float timeSpeed;
-	static std::vector<Object> objects;
+	Simulation();
+	void start();
+private:
 
-	static void update(sf::Time EllapsedTime, bool timeStop);
+	sf::RenderWindow App;
+	sf::View camera;
+	sf::Time EllapsedTime;
+	sf::Clock clock, delta;
+	sf::Vector2f offset;
+	sf::Vector2f Pos;
+	Object* selectedObj;
+	Object newObj;
+	sf::Texture t;
+	sf::Sprite background;
+	int savedTimeSpeed;
+	std::string s;
+	sf::Font font;
+	sf::Text fpsTracker;
 
-	static void setup() {
-		objects.push_back(Object(100000, sf::Vector2f(960,540), sf::Vector2f(0, 0), "Sun"));
-		objects.push_back(Object(300, sf::Vector2f(960, 50), sf::Vector2f(320, 0), "Planet"));
-	}
+	void updateGuiAndEvents();
+	void updateGraphics();
+	void updatePhysics();
+	void update();
 
+public:
+	~Simulation();
 };
+

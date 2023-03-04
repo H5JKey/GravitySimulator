@@ -165,6 +165,7 @@
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\ParticlesSystem.cpp" />
     <ClCompile Include="src\Save.cpp" />
+    <ClCompile Include="src\Physics.cpp" />
     <ClCompile Include="src\Simulation.cpp" />
     <ClCompile Include="src\Source.cpp" />
   </ItemGroup>
@@ -182,6 +183,7 @@
     <ClInclude Include="src\Object.h" />
     <ClInclude Include="src\ParticlesSystem.h" />
     <ClInclude Include="src\Save.h" />
+    <ClInclude Include="src\Physics.h" />
     <ClInclude Include="src\Simulation.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
