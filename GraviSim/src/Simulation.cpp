@@ -1,11 +1,16 @@
-#include "Simulation.h"
+﻿#include "Simulation.h"
 namespace Flags {
     bool timeStop = false;
-    bool DrawBackground = true;
-    bool AddObj = false;
-    bool Editing = false;
-    bool Saving = false;
-    bool ShowFPS = false;
+    bool addObj = false;
+    bool editing = false;
+    bool saving = false;
+    bool settings = false;
+}
+
+namespace Settings {
+    int MusicVolume=100;
+    bool showFPS = false;
+    bool drawBackground = true;
 }
 
 Simulation::Simulation() {
@@ -63,7 +68,7 @@ void Simulation::updatePhysics() {
 void Simulation::updateGraphics() {
 
     App.clear();
-    if (Flags::DrawBackground) {
+    if (Settings::drawBackground) {
         App.setView(App.getDefaultView());
         App.draw(background);
     }
@@ -74,7 +79,7 @@ void Simulation::updateGraphics() {
 
     ParticlesSystem::draw(App);
 
-    if (Flags::ShowFPS) {
+    if (Settings::showFPS) {
         App.setView(App.getDefaultView());
         fpsTracker.setString(std::to_string(int(1 / EllapsedTime.asSeconds())));
         App.draw(fpsTracker);
@@ -109,7 +114,7 @@ void Simulation::updateGuiAndEvents(){
 
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                 auto mb = sf::Mouse::getPosition();
-                if (!Flags::AddObj) {
+                if (!Flags::addObj) {
                     for (auto& body : Physics::objects) {
                         if (body.sprite.getGlobalBounds().contains(App.mapPixelToCoords(mb))) {
                             if (delta.getElapsedTime().asMilliseconds() > 500) delta.restart();
@@ -141,13 +146,6 @@ void Simulation::updateGuiAndEvents(){
         Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
     }
 
-    if (!ImGui::GetIO().WantCaptureKeyboard) {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Tab))
-            Flags::ShowFPS = true;
-        else
-            Flags::ShowFPS = false;
-    }
-
     camera.move(-offset);
 
     sf::Time EllapsedTime = clock.restart();
@@ -155,13 +153,13 @@ void Simulation::updateGuiAndEvents(){
 
     if (selectedObj != nullptr) {
         camera.setCenter(selectedObj->pos);
-        Flags::Editing = true;
+        Flags::editing = true;
     }
     ImGui::SFML::Update(App, EllapsedTime);
     ImGui::Begin("Menu:", nullptr, ImGuiWindowFlags_NoResize + ImGuiWindowFlags_NoMove);
     {
         ImGui::Separator();
-        if (Flags::Editing) {//Editing selected object
+        if (Flags::editing) {//Editing selected object
             ImGui::Text("Selected object:");
             ImGui::Separator();
             ImGui::Text("Name:");
@@ -186,14 +184,14 @@ void Simulation::updateGuiAndEvents(){
             if (ImGui::Button("Delete this object")) {
                 Physics::objects.erase(std::remove_if(Physics::objects.begin(), Physics::objects.end(), [&](const auto& obj) {return &obj == selectedObj; }), Physics::objects.end());
                 selectedObj = nullptr;
-                Flags::Editing = false;
+                Flags::editing = false;
             }
             ImGui::Separator();
             if (ImGui::Button("Exit"))
                 selectedObj = nullptr;
-            Flags::Editing = false;
+            Flags::editing = false;
         }
-        else if (Flags::AddObj) {//Adding new object
+        else if (Flags::addObj) {//Adding new object
             ImGui::Text("New Object:");
             ImGui::Separator();
             ImGui::Text("Name:");
@@ -216,9 +214,9 @@ void Simulation::updateGuiAndEvents(){
             ImGui::Checkbox("Fixed", &newObj.fixed);
             ImGui::Separator();
             if (ImGui::Button("Exit"))
-                Flags::AddObj = false;
+                Flags::addObj = false;
         }
-        else if (Flags::Saving) {//Saving current configuration or loading another from file
+        else if (Flags::saving) {//Saving current configuration or loading another from file
             ImGui::Text("Saves:");
             ImGui::ListBoxHeader("##SavesList");
             int i = 0;
@@ -253,19 +251,47 @@ void Simulation::updateGuiAndEvents(){
             }
             ImGui::Separator();
             if (ImGui::Button("Exit"))
-                Flags::Saving = false;
+                Flags::saving = false;
+        }
+        else if (Flags::settings) {//Settings menu
+            ImGui::Text("Music volume");
+            ImGui::SliderInt("##Nusic volume", &Settings::MusicVolume, 0, 100);
+            ImGui::Separator();
+            ImGui::Checkbox("Draw background", &Settings::drawBackground);
+            ImGui::Separator();
+            ImGui::Checkbox("Show FPS", &Settings::showFPS);
+            ImGui::Separator();
+            ImGui::Text("Set FPS limit");
+            if (ImGui::Button("30"))
+                App.setFramerateLimit(30);
+            ImGui::SameLine();
+            if (ImGui::Button("60"))
+                App.setFramerateLimit(60);
+            ImGui::SameLine();
+            if (ImGui::Button("120"))
+                App.setFramerateLimit(120);
+            ImGui::SameLine();
+            if (ImGui::Button("144"))
+                App.setFramerateLimit(144);
+            ImGui::SameLine();
+            if (ImGui::Button("No limit"))
+                App.setFramerateLimit(0);
+            ImGui::Separator();
+            if (ImGui::Button("Exit"))
+                Flags::settings = false;
+
         }
         else {//Main menu
-
+            if (ImGui::Button("Settings"))
+                Flags::settings = true;
             ImGui::Separator();
             ImGui::Text("Time Speed");
             ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 7.5);
             ImGui::Checkbox("Stop time\t\tPress Ctrl", &Flags::timeStop);
-            ImGui::Separator();
-            ImGui::Checkbox("Draw background", &Flags::DrawBackground);
+
             ImGui::Separator();
             if (ImGui::Button("+"))
-                Flags::AddObj = true;
+                Flags::addObj = true;
             ImGui::SameLine();
             ImGui::Text("Objects:");
             ImGui::ListBoxHeader("##ObjectsList"); {
@@ -282,7 +308,7 @@ void Simulation::updateGuiAndEvents(){
             }
             ImGui::ListBoxFooter();
             ImGui::Separator();
-            if (ImGui::Button("Save/Load configuration")) Flags::Saving = true;
+            if (ImGui::Button("Save/Load configuration")) Flags::saving = true;
             ImGui::Separator();
             if (ImGui::Button("Exit")) App.close();
         }
