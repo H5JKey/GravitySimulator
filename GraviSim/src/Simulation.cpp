@@ -344,7 +344,6 @@ void Simulation::updateGui(){
             ImGui::Separator();
             ImGui::Checkbox("Show FPS", &showFPS);
             ImGui::Separator();
-            ImGui::Text("Set FPS limit");
             ImGui::Checkbox("Show orbits", &showOrbits);
             ImGui::Separator();
             ImGui::Separator();
