@@ -44,9 +44,3 @@ Object::Object() {
 	this->color[0] = this->color[1] = this->color[2] = 1;
 	this->radius = abs(this->mass) / 1000 + 1;;
 }
-
-void Object::UpdateBoost(Object& anotherBody) {
-	float r = std::max(sqrtf((pos.x - anotherBody.pos.x) * (pos.x - anotherBody.pos.x) + (pos.y - anotherBody.pos.y) * (pos.y - anotherBody.pos.y)),float(0.1));
-	float mod = pow(6.67, -11) * ((anotherBody.mass*pow(10,12)) / (r * r));
-	boost += mod * ((anotherBody.pos - pos) / r);
-}

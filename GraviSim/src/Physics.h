@@ -12,4 +12,5 @@ public:
 
 	static void update(sf::Time EllapsedTime, bool timeStop);
 
+	static void calculateForce(Object &obj1, Object &obj2);
 };

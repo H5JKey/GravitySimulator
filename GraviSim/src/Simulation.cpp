@@ -1,19 +1,69 @@
 ﻿#include "Simulation.h"
-namespace Flags {
-    bool timeStop = false;
-    bool addObj = false;
-    bool editing = false;
-    bool saving = false;
-    bool settings = false;
-}
 
-namespace Settings {
-    int MusicVolume=100;
-    bool showFPS = false;
-    bool drawBackground = true;
+namespace ImGui {
+    bool addObjMenu = false;
+    bool editingMenu = false;
+    bool savingMenu = false;
+    bool settingsMenu = false;
+    bool objectsMenu = false;
+
+    void setStyle() {
+        ImGuiStyle& style = ImGui::GetStyle();
+        style.Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
+        style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
+        style.Colors[ImGuiCol_WindowBg] = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
+        style.Colors[ImGuiCol_ChildBg] = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
+        style.Colors[ImGuiCol_PopupBg] = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
+        style.Colors[ImGuiCol_Border] = ImVec4(0.43f, 0.43f, 0.50f, 0.50f);
+        style.Colors[ImGuiCol_BorderShadow] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+        style.Colors[ImGuiCol_FrameBg] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
+        style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.38f, 0.38f, 0.38f, 1.00f);
+        style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.67f, 0.67f, 0.67f, 0.39f);
+        style.Colors[ImGuiCol_TitleBg] = ImVec4(0.08f, 0.08f, 0.09f, 1.00f);
+        style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.08f, 0.08f, 0.09f, 1.00f);
+        style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.00f, 0.00f, 0.00f, 0.51f);
+        style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.14f, 0.14f, 0.14f, 1.00f);
+        style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.02f, 0.02f, 0.02f, 0.53f);
+        style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.31f, 0.31f, 0.31f, 1.00f);
+        style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.41f, 0.41f, 0.41f, 1.00f);
+        style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.51f, 0.51f, 0.51f, 1.00f);
+        style.Colors[ImGuiCol_CheckMark] = ImVec4(0.11f, 0.64f, 0.92f, 1.00f);
+        style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.11f, 0.64f, 0.92f, 1.00f);
+        style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.08f, 0.50f, 0.72f, 1.00f);
+        style.Colors[ImGuiCol_Button] = ImVec4(0.25f, 0.25f, 0.25f, 1.00f);
+        style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.38f, 0.38f, 0.38f, 1.00f);
+        style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.67f, 0.67f, 0.67f, 0.39f);
+        style.Colors[ImGuiCol_Header] = ImVec4(0.22f, 0.22f, 0.22f, 1.00f);
+        style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.35f, 0.35f, 0.35f, 1.00f);
+        style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.67f, 0.67f, 0.67f, 0.39f);
+        style.Colors[ImGuiCol_Separator] = style.Colors[ImGuiCol_Border];
+        style.Colors[ImGuiCol_SeparatorHovered] = ImVec4(0.41f, 0.42f, 0.44f, 1.00f);
+        style.Colors[ImGuiCol_SeparatorActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+        style.Colors[ImGuiCol_ResizeGrip] = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+        style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.29f, 0.30f, 0.31f, 0.67f);
+        style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+        style.Colors[ImGuiCol_Tab] = ImVec4(0.08f, 0.08f, 0.09f, 0.83f);
+        style.Colors[ImGuiCol_TabHovered] = ImVec4(0.33f, 0.34f, 0.36f, 0.83f);
+        style.Colors[ImGuiCol_TabActive] = ImVec4(0.23f, 0.23f, 0.24f, 1.00f);
+        style.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.08f, 0.08f, 0.09f, 1.00f);
+        style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.13f, 0.14f, 0.15f, 1.00f);
+
+        style.Colors[ImGuiCol_PlotLines] = ImVec4(0.61f, 0.61f, 0.61f, 1.00f);
+        style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
+        style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
+        style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
+        style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+        style.Colors[ImGuiCol_DragDropTarget] = ImVec4(0.11f, 0.64f, 0.92f, 1.00f);
+        style.Colors[ImGuiCol_NavHighlight] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+        style.Colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
+        style.Colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
+        style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
+        style.GrabRounding = style.FrameRounding = 2.3f;
+    }
 }
 
 Simulation::Simulation() {
+
     Physics::objects.push_back(Object(100000, sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Sun"));
     Physics::objects.push_back(Object(300, sf::Vector2f(960, 50), sf::Vector2f(320, 0), "Planet"));
 
@@ -24,6 +74,7 @@ Simulation::Simulation() {
     settings.antialiasingLevel = 16;
     App.create(sf::VideoMode(), "Gravity Simulator", sf::Style::Fullscreen, settings);
     ImGui::SFML::Init(App);
+    ImGui::setStyle();
     
     clock.restart();
 
@@ -43,6 +94,8 @@ Simulation::Simulation() {
     fpsTracker.setFillColor(sf::Color::White);
     fpsTracker.setPosition(10, 7);
 
+    loadSettings();
+
 }
 
 void Simulation::start() {
@@ -54,21 +107,53 @@ void Simulation::start() {
 void Simulation::update() {
     EllapsedTime = clock.restart();
 
-    updateGuiAndEvents();
+    updateEvents();
+    updateGui();
     updatePhysics();
+    camera.move(-offset);
     updateGraphics();
 }
 
+void Simulation::saveSettings() {
+    std::ofstream ofs("settings.ini");
+    ofs << "[Settings]\n";
+    ofs << "MusicVolume="+std::to_string(musicVolume)<<'\n';
+    ofs << "DrawBackground=" + std::to_string(drawBackground) << '\n';
+    ofs << "ShowFPS=" + std::to_string(showFPS) << '\n';
+    ofs << "FrameLimit=" + std::to_string(frameLimit) << '\n';
+}
+
+void Simulation::loadSettings() {
+    std::ifstream ifs("settings.ini");
+    if (!ifs.bad()) {
+        std::string s;
+        ifs >> s;
+        ifs >> s;
+        musicVolume = stoi(s.substr(s.find('=') + 1));
+        ifs >> s;
+        drawBackground = bool(stoi(s.substr(s.find('=') + 1)));
+        ifs >> s;
+        showFPS = bool(stoi(s.substr(s.find('=') + 1)));
+        ifs >> s;
+        App.setFramerateLimit(stoi(s.substr(s.find('=') + 1)));
+    }
+    else {
+        showFPS = false;
+        musicVolume = 100;
+        App.setFramerateLimit(0);
+        drawBackground = true;
+    }
+}
 
 void Simulation::updatePhysics() {
-    Physics::update(EllapsedTime, Flags::timeStop);
+    Physics::update(EllapsedTime, timeStop);
 }
 
 
 void Simulation::updateGraphics() {
 
     App.clear();
-    if (Settings::drawBackground) {
+    if (drawBackground) {
         App.setView(App.getDefaultView());
         App.draw(background);
     }
@@ -79,7 +164,7 @@ void Simulation::updateGraphics() {
 
     ParticlesSystem::draw(App);
 
-    if (Settings::showFPS) {
+    if (showFPS) {
         App.setView(App.getDefaultView());
         fpsTracker.setString(std::to_string(int(1 / EllapsedTime.asSeconds())));
         App.draw(fpsTracker);
@@ -90,9 +175,7 @@ void Simulation::updateGraphics() {
     App.display();
 }
 
-
-
-void Simulation::updateGuiAndEvents(){
+void Simulation::updateEvents() {
     sf::Event event;
     while (App.pollEvent(event)) {
         ImGui::SFML::ProcessEvent(event);
@@ -100,7 +183,7 @@ void Simulation::updateGuiAndEvents(){
             App.close();
 
         if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::LControl || event.key.code == sf::Keyboard::RControl))
-            Flags::timeStop = !Flags::timeStop;
+            timeStop = !timeStop;
 
         if (!ImGui::GetIO().WantCaptureMouse) {
             if (event.type == sf::Event::MouseWheelMoved) {
@@ -114,7 +197,7 @@ void Simulation::updateGuiAndEvents(){
 
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                 auto mb = sf::Mouse::getPosition();
-                if (!Flags::addObj) {
+                if (!ImGui::addObjMenu) {
                     for (auto& body : Physics::objects) {
                         if (body.sprite.getGlobalBounds().contains(App.mapPixelToCoords(mb))) {
                             if (delta.getElapsedTime().asMilliseconds() > 500) delta.restart();
@@ -130,15 +213,12 @@ void Simulation::updateGuiAndEvents(){
                     newObj.pos = App.mapPixelToCoords(mb);
                     Physics::objects.push_back(newObj);
                 }
-                
             }
         }
     }
 
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
-
         sf::Vector2f CurrentmousePos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
-
         offset = (CurrentmousePos - Pos) * 0.7f;
         Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
     }
@@ -146,20 +226,20 @@ void Simulation::updateGuiAndEvents(){
         Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
     }
 
-    camera.move(-offset);
-
     sf::Time EllapsedTime = clock.restart();
-
-
     if (selectedObj != nullptr) {
         camera.setCenter(selectedObj->pos);
-        Flags::editing = true;
+        ImGui::editingMenu = true;
     }
+}
+
+void Simulation::updateGui(){
+    
     ImGui::SFML::Update(App, EllapsedTime);
-    ImGui::Begin("Menu:", nullptr, ImGuiWindowFlags_NoResize + ImGuiWindowFlags_NoMove);
+    ImGui::Begin("Gravity simulation", nullptr, ImGuiWindowFlags_NoMove+ ImGuiWindowFlags_NoResize);
     {
         ImGui::Separator();
-        if (Flags::editing) {//Editing selected object
+        if (ImGui::editingMenu) {//Editing selected object
             ImGui::Text("Selected object:");
             ImGui::Separator();
             ImGui::Text("Name:");
@@ -184,14 +264,14 @@ void Simulation::updateGuiAndEvents(){
             if (ImGui::Button("Delete this object")) {
                 Physics::objects.erase(std::remove_if(Physics::objects.begin(), Physics::objects.end(), [&](const auto& obj) {return &obj == selectedObj; }), Physics::objects.end());
                 selectedObj = nullptr;
-                Flags::editing = false;
+                ImGui::editingMenu = false;
             }
             ImGui::Separator();
             if (ImGui::Button("Exit"))
                 selectedObj = nullptr;
-            Flags::editing = false;
+            ImGui::editingMenu = false;
         }
-        else if (Flags::addObj) {//Adding new object
+        else if (ImGui::addObjMenu) {//Adding new object
             ImGui::Text("New Object:");
             ImGui::Separator();
             ImGui::Text("Name:");
@@ -214,18 +294,18 @@ void Simulation::updateGuiAndEvents(){
             ImGui::Checkbox("Fixed", &newObj.fixed);
             ImGui::Separator();
             if (ImGui::Button("Exit"))
-                Flags::addObj = false;
+                ImGui::addObjMenu = false;
         }
-        else if (Flags::saving) {//Saving current configuration or loading another from file
+        else if (ImGui::savingMenu) {//Saving current configuration or loading another from file
             ImGui::Text("Saves:");
             ImGui::ListBoxHeader("##SavesList");
             int i = 0;
             {
-                for (auto& p : std::filesystem::directory_iterator("worlds")) {
+                for (auto& p : std::filesystem::directory_iterator("saves")) {
                     std::filesystem::path path = p;
                     Save saveFile(p);
                     saveFile.readInfo();
-                    if (ImGui::Selectable(saveFile.name.c_str(), false, 0, ImVec2(140, 15))) {
+                    if (ImGui::Selectable(saveFile.name.c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 20, 15))) {
                         camera.setCenter(saveFile.readCameraInfo());
                         saveFile.loadWorld(Physics::objects);
                     }
@@ -241,9 +321,9 @@ void Simulation::updateGuiAndEvents(){
             ImGui::InputText("##EnterSaveName", &s);
             ImGui::SameLine();
             if (ImGui::Button("+")) {
-                std::ofstream f("worlds/" + s + ".wrld");
+                std::ofstream f("saves/" + s + ".wrld");
                 f.close();
-                Save newSaveFile(std::filesystem::path("worlds/" + s + ".wrld"));
+                Save newSaveFile(std::filesystem::path("saves/" + s + ".wrld"));
                 newSaveFile.name = s;
                 s = "";
 
@@ -251,53 +331,55 @@ void Simulation::updateGuiAndEvents(){
             }
             ImGui::Separator();
             if (ImGui::Button("Exit"))
-                Flags::saving = false;
+                ImGui::savingMenu = false;
         }
-        else if (Flags::settings) {//Settings menu
+        else if (ImGui::settingsMenu) {//Settings menu
             ImGui::Text("Music volume");
-            ImGui::SliderInt("##Nusic volume", &Settings::MusicVolume, 0, 100);
+            ImGui::SliderInt("##Nusic volume", &musicVolume, 0, 100);
             ImGui::Separator();
-            ImGui::Checkbox("Draw background", &Settings::drawBackground);
+            ImGui::Checkbox("Draw background", &drawBackground);
             ImGui::Separator();
-            ImGui::Checkbox("Show FPS", &Settings::showFPS);
+            ImGui::Checkbox("Show FPS", &showFPS);
             ImGui::Separator();
             ImGui::Text("Set FPS limit");
-            if (ImGui::Button("30"))
-                App.setFramerateLimit(30);
+
+            if (ImGui::Button("30")) {
+                frameLimit = 30;
+                App.setFramerateLimit(frameLimit);
+            }
             ImGui::SameLine();
-            if (ImGui::Button("60"))
-                App.setFramerateLimit(60);
+            if (ImGui::Button("60")) {
+                frameLimit = 60;
+                App.setFramerateLimit(frameLimit);
+            }
             ImGui::SameLine();
-            if (ImGui::Button("120"))
-                App.setFramerateLimit(120);
+            if (ImGui::Button("120")) {
+                frameLimit = 120;
+                App.setFramerateLimit(frameLimit);
+            }
             ImGui::SameLine();
-            if (ImGui::Button("144"))
-                App.setFramerateLimit(144);
+            if (ImGui::Button("144")) {
+                frameLimit = 144;
+                App.setFramerateLimit(frameLimit);
+            }
             ImGui::SameLine();
-            if (ImGui::Button("No limit"))
-                App.setFramerateLimit(0);
+            if (ImGui::Button("No limit")) {
+                frameLimit = 0;
+                App.setFramerateLimit(frameLimit);
+            }
             ImGui::Separator();
             if (ImGui::Button("Exit"))
-                Flags::settings = false;
+                ImGui::settingsMenu = false;
 
-        }
-        else {//Main menu
-            if (ImGui::Button("Settings"))
-                Flags::settings = true;
-            ImGui::Separator();
-            ImGui::Text("Time Speed");
-            ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 7.5);
-            ImGui::Checkbox("Stop time\t\tPress Ctrl", &Flags::timeStop);
-
-            ImGui::Separator();
-            if (ImGui::Button("+"))
-                Flags::addObj = true;
-            ImGui::SameLine();
+        } 
+        else if (ImGui::objectsMenu) {//Objects Menu
             ImGui::Text("Objects:");
+            if (ImGui::Button("+"))
+                ImGui::addObjMenu = true;
             ImGui::ListBoxHeader("##ObjectsList"); {
                 for (int i = 0; i < Physics::objects.size(); i++) {
                     if (Physics::objects[i].name == "") continue;
-                    if (ImGui::Selectable((Physics::objects[i].name + "##" + std::to_string(i)).c_str(), false, 0, ImVec2(140, 15))) {
+                    if (ImGui::Selectable((Physics::objects[i].name + "##" + std::to_string(i)).c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth()-20, 15))) {
                         selectedObj = &Physics::objects[i];
                     }
                     ImGui::SameLine();
@@ -307,8 +389,22 @@ void Simulation::updateGuiAndEvents(){
                 }
             }
             ImGui::ListBoxFooter();
+            if (ImGui::Button("Exit"))
+                ImGui::objectsMenu = false;
+        }
+        else {//Main menu
+            if (ImGui::Button("Settings"))
+                ImGui::settingsMenu = true;
+            ImGui::SameLine();
+            if (ImGui::Button("Objects")) { ImGui::objectsMenu = true; }
+            ImGui::SameLine();
+            if (ImGui::Button("Save/Load")) { ImGui::savingMenu = true; }
+
             ImGui::Separator();
-            if (ImGui::Button("Save/Load configuration")) Flags::saving = true;
+            ImGui::Text("Time Speed");
+            ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 7.5);
+            ImGui::Checkbox("Stop time\t\tPress Ctrl", &timeStop);
+
             ImGui::Separator();
             if (ImGui::Button("Exit")) App.close();
         }
@@ -319,4 +415,5 @@ void Simulation::updateGuiAndEvents(){
 Simulation::~Simulation() {
     ImGui::SFML::Shutdown();
     delete(selectedObj);
+    saveSettings();
 }

@@ -42,7 +42,17 @@ private:
 	sf::Font font;
 	sf::Text fpsTracker;
 
-	void updateGuiAndEvents();
+	bool timeStop = false;
+
+	int musicVolume = 100;
+	int frameLimit = 0;
+	bool showFPS = false;
+	bool drawBackground = true;
+
+	void loadSettings();
+	void saveSettings();
+	void updateGui();
+	void updateEvents();
 	void updateGraphics();
 	void updatePhysics();
 	void update();

@@ -81,6 +81,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <ExecutablePath>C:\Users\user\source\repos\H5JKey\GravitySimulator\GraviSim\dlls;$(ExecutablePath)</ExecutablePath>
+    <IncludePath>C:\Users\user\source\repos\H5JKey\GravitySimulator\GraviSim\dlls;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

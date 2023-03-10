@@ -26,8 +26,6 @@ public:
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const;
 
-	void UpdateBoost(Object& anotherBody);
-
 	~Object() {}
 };
 

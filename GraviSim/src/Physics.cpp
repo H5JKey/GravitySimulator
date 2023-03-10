@@ -7,7 +7,7 @@ void Physics::update(sf::Time EllapsedTime, bool timeStop) {
 			if (timeSpeed != 0 && !timeStop) {
 				for (auto& anotherBody : objects) {
 					if (&body == &anotherBody) continue;
-					body.UpdateBoost(anotherBody);
+					calculateForce(body, anotherBody);
 				}
 				body.UpdateParams(EllapsedTime.asSeconds() * Physics::timeSpeed);
 			}
@@ -29,6 +29,12 @@ void Physics::update(sf::Time EllapsedTime, bool timeStop) {
 				}), objects.end());
 			ParticlesSystem::update(EllapsedTime, timeSpeed);
 		}
+}
+
+void Physics::calculateForce(Object& obj1, Object& obj2) {
+	float r = sqrtf((obj1.pos.x - obj2.pos.x) * (obj1.pos.x - obj2.pos.x) + (obj1.pos.y - obj2.pos.y) * (obj1.pos.y - obj2.pos.y));
+	float mod = pow(6.67, -11) * ((obj2.mass * pow(10, 12)) / (r * r));
+	obj1.boost += mod * ((obj2.pos - obj1.pos) / r);
 }
 
 std::vector<Object> Physics::objects;
