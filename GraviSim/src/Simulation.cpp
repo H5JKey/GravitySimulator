@@ -120,7 +120,7 @@ void Simulation::saveSettings() {
     ofs << "MusicVolume="+std::to_string(musicVolume)<<'\n';
     ofs << "DrawBackground=" + std::to_string(drawBackground) << '\n';
     ofs << "ShowFPS=" + std::to_string(showFPS) << '\n';
-    ofs << "FrameLimit=" + std::to_string(frameLimit) << '\n';
+    ofs << "ShowOrbits=" + std::to_string(showOrbits) << '\n';
 }
 
 void Simulation::loadSettings() {
@@ -135,12 +135,12 @@ void Simulation::loadSettings() {
         ifs >> s;
         showFPS = bool(stoi(s.substr(s.find('=') + 1)));
         ifs >> s;
-        App.setFramerateLimit(stoi(s.substr(s.find('=') + 1)));
+        showOrbits = bool(stoi(s.substr(s.find('=') + 1)));
     }
     else {
         showFPS = false;
         musicVolume = 100;
-        App.setFramerateLimit(0);
+        showOrbits = true;
         drawBackground = true;
     }
 }
@@ -159,8 +159,11 @@ void Simulation::updateGraphics() {
     }
 
     App.setView(camera);
-    for (auto& obj : Physics::objects)
+    for (auto& obj : Physics::objects) {
         obj.draw(App);
+        if (!timeStop && Physics::timeSpeed!=0 && showOrbits)
+            ParticlesSystem::add(new Pixel(obj.pos, sf::Vector3f(obj.color[0], obj.color[1], obj.color[2])));
+    }
 
     ParticlesSystem::draw(App);
 
@@ -342,31 +345,8 @@ void Simulation::updateGui(){
             ImGui::Checkbox("Show FPS", &showFPS);
             ImGui::Separator();
             ImGui::Text("Set FPS limit");
-
-            if (ImGui::Button("30")) {
-                frameLimit = 30;
-                App.setFramerateLimit(frameLimit);
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("60")) {
-                frameLimit = 60;
-                App.setFramerateLimit(frameLimit);
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("120")) {
-                frameLimit = 120;
-                App.setFramerateLimit(frameLimit);
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("144")) {
-                frameLimit = 144;
-                App.setFramerateLimit(frameLimit);
-            }
-            ImGui::SameLine();
-            if (ImGui::Button("No limit")) {
-                frameLimit = 0;
-                App.setFramerateLimit(frameLimit);
-            }
+            ImGui::Checkbox("Show orbits", &showOrbits);
+            ImGui::Separator();
             ImGui::Separator();
             if (ImGui::Button("Exit"))
                 ImGui::settingsMenu = false;

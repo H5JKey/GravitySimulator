@@ -44,10 +44,10 @@ private:
 
 	bool timeStop = false;
 
-	int musicVolume = 100;
-	int frameLimit = 0;
-	bool showFPS = false;
-	bool drawBackground = true;
+	int musicVolume;
+	bool showOrbits;
+	bool showFPS;
+	bool drawBackground;
 
 	void loadSettings();
 	void saveSettings();

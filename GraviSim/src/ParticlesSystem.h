@@ -5,9 +5,7 @@
 class ParticleSource: public sf::Drawable, public sf::Transformable {
 public:
     virtual void update(sf::Time elapsed, float timeSpeed=1) = 0;
-    virtual void setEmitter(sf::Vector2f position) = 0;
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
-    virtual void resetParticle(std::size_t index) = 0;
     
 
     ParticleSource(unsigned int count, sf::Vector2f position, sf::Vector3f color) : 
@@ -45,15 +43,7 @@ public:
         Explosion(unsigned int count, sf::Vector2f position, sf::Vector3f color) : ParticleSource(count,position, color)
         {
             for (int i = 0; i < m_particles.size(); i++) {
-                resetParticle(i);
-            }
-        }
-
-        virtual void setEmitter(sf::Vector2f position)
-        {
-            m_emitter = position;
-            for (int i = 0; i < m_particles.size(); i++) {
-                resetParticle(i);
+                set(i);
             }
         }
 
@@ -80,7 +70,7 @@ public:
                 m_vertices[i].color.a = static_cast<sf::Uint8>(ratio * 255);
             }
             if (flag)
-                inProcess = false;
+                inProcess = true;
         }
 
         virtual void draw(sf::RenderTarget& target, sf::RenderStates states=sf::RenderStates::Default) const
@@ -97,7 +87,7 @@ public:
 
 
 
-        virtual void resetParticle(std::size_t index)
+        virtual void set(std::size_t index)
         {
             // give a random velocity and lifetime to the particle
             float angle = (std::rand() % 360) * 3.14f / 180.f;
@@ -108,6 +98,46 @@ public:
             // reset the position of the corresponding vertex
             m_vertices[index].position = m_emitter;
         }
+
+};
+
+class Pixel : public ParticleSource {
+public:
+    Pixel(sf::Vector2f position, sf::Vector3f color) : ParticleSource(1, position, color)
+    {
+       m_particles[0].lifetime = sf::milliseconds(500);
+       m_vertices[0].position = m_emitter;
+    }
+
+    virtual void update(sf::Time elapsed, float timeSpeed)
+    {
+        bool flag = true;
+        // update the particle lifetime
+        Particle& p = m_particles[0];
+        p.lifetime -= elapsed * timeSpeed;
+
+       // if the particle is dead, respawn it
+       if (p.lifetime <= sf::Time::Zero) 
+           inProcess = false;
+
+       // update the position of the corresponding vertex
+
+       // update the alpha (transparency) of the particle according to its lifetime
+      float ratio = p.lifetime.asSeconds() / m_lifetime.asSeconds();
+      m_vertices[0].color.a = static_cast<sf::Uint8>(ratio * 255);
+    }
+
+    virtual void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const
+    {
+        // apply the transform
+        states.transform *= getTransform();
+
+        // our particles don't use a texture
+        states.texture = NULL;
+
+        // draw the vertex array
+        target.draw(m_vertices, states);
+    }
 
 };
 
