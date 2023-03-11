@@ -27,7 +27,6 @@ void Physics::update(sf::Time EllapsedTime, bool timeStop) {
 				}
 				return false;
 				}), objects.end());
-			ParticlesSystem::update(EllapsedTime, timeSpeed);
 		}
 }
 

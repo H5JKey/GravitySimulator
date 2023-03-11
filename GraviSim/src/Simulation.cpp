@@ -106,7 +106,7 @@ void Simulation::start() {
 
 void Simulation::update() {
     EllapsedTime = clock.restart();
-
+    ParticlesSystem::update(EllapsedTime,Physics::timeSpeed);
     updateEvents();
     updateGui();
     updatePhysics();
@@ -368,6 +368,8 @@ void Simulation::updateGui(){
                 }
             }
             ImGui::ListBoxFooter();
+            if (ImGui::Button("Clear"))
+                Physics::objects.clear();
             if (ImGui::Button("Exit"))
                 ImGui::objectsMenu = false;
         }

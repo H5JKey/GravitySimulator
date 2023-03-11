@@ -70,7 +70,7 @@ public:
                 m_vertices[i].color.a = static_cast<sf::Uint8>(ratio * 255);
             }
             if (flag)
-                inProcess = true;
+                inProcess = false;
         }
 
         virtual void draw(sf::RenderTarget& target, sf::RenderStates states=sf::RenderStates::Default) const

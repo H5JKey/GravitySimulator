@@ -13,6 +13,7 @@ void ParticlesSystem::add(ParticleSource* source) {
 }
 
 void ParticlesSystem::update(sf::Time elapsed, float timeSpeed) {
+    std::cout << m_sources.size() << '\n';
     for (int i = 0; i < m_sources.size(); ++i) {
         m_sources[i]->update(elapsed, timeSpeed);
         if (!m_sources[i]->inProcess) {
