@@ -32,8 +32,9 @@ void Physics::update(sf::Time EllapsedTime, bool timeStop) {
 
 void Physics::calculateForce(Object& obj1, Object& obj2) {
 	float r = sqrtf((obj1.pos.x - obj2.pos.x) * (obj1.pos.x - obj2.pos.x) + (obj1.pos.y - obj2.pos.y) * (obj1.pos.y - obj2.pos.y));
-	float mod = pow(6.67, -11) * ((obj2.mass * pow(10, 12)) / (r * r));
-	obj1.boost += mod * ((obj2.pos - obj1.pos) / r);
+	r = std::max(r, 0.1f);
+	float len = 6.67*pow(10, -11) * ((obj2.mass * pow(10, 12)) / (r * r));
+	obj1.boost += len * ((obj2.pos - obj1.pos) / r);
 }
 
 std::vector<Object> Physics::objects;

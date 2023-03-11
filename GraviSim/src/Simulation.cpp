@@ -64,7 +64,7 @@ namespace ImGui {
 
 Simulation::Simulation() {
 
-    Physics::objects.push_back(Object(100000, sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Sun"));
+    Physics::objects.push_back(Object(1000000, sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Sun",sf::Color(1,1,1),true,20));
     Physics::objects.push_back(Object(300, sf::Vector2f(960, 50), sf::Vector2f(320, 0), "Planet"));
 
     selectedObj = nullptr;
@@ -106,6 +106,7 @@ void Simulation::start() {
 
 void Simulation::update() {
     EllapsedTime = clock.restart();
+    if (!timeStop && Physics::timeSpeed>0)
     ParticlesSystem::update(EllapsedTime,Physics::timeSpeed);
     updateEvents();
     updateGui();
