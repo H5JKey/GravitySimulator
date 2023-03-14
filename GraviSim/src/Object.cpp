@@ -16,13 +16,16 @@ Object::Object(float mass, sf::Vector2f pos, sf::Vector2f speed, std::string nam
 	Object::UpdateGraphic();
 }
 
-void Object::UpdateParams(float EllapsedTime) {
+void Object::UpdatePosition(float EllapsedTime) {
 	if (!this->fixed) {
-		this->speed += this->boost * EllapsedTime;
-		this->pos += this->speed * EllapsedTime;
+		this->pos += this->speed * EllapsedTime+0.5*this->boost*EllapsedTime*EllapsedTime;
 	}
-	this->boost = sf::Vector2f(0,0);
-	
+}
+
+void Object::UpdateSpeed(float EllapsedTime) {
+	if (!speed->fixed) {
+		this->speed+=EllapsedTime*0.5(this->boost+this->d_boost);
+	}
 }
 
 void Object::UpdateGraphic() {

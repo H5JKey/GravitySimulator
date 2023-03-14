@@ -8,7 +8,7 @@ public:
 	float mass;
 	sf::Vector2f pos;
 	sf::Vector2f speed;
-	sf::Vector2f boost;
+	sf::Vector2f boost, d_boost;
 	std::string name;
 	sf::CircleShape sprite;
 	int radius;
@@ -20,7 +20,8 @@ public:
 
 	Object();
 
-	void UpdateParams(float EllapsedTime);
+	void UpdatePosition(float EllapsedTime);
+	void UpdateSpeed(float EllapsedTime)
 
 	void UpdateGraphic();
 

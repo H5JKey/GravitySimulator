@@ -5,11 +5,14 @@
 void Physics::update(sf::Time EllapsedTime, bool timeStop) {
 		concurrency::parallel_for_each(objects.begin(), objects.end(), [&](auto& body) {
 			if (timeSpeed != 0 && !timeStop) {
+				body.updatePosition(EllapsedTime.asSeconds())
+				body.d_boost=body.boost;
+				body.boost={0,0};
 				for (auto& anotherBody : objects) {
 					if (&body == &anotherBody) continue;
 					calculateForce(body, anotherBody);
 				}
-				body.UpdateParams(EllapsedTime.asSeconds() * Physics::timeSpeed);
+				body.UpdateBoost(EllapsedTime.asSeconds())
 			}
 		body.UpdateGraphic();
 		});
