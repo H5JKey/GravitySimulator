@@ -20,10 +20,10 @@ public:
 
 	Object();
 
-	void UpdatePosition(float EllapsedTime);
-	void UpdateSpeed(float EllapsedTime)
+	void updatePosition(float EllapsedTime);
+	void updateSpeed(float EllapsedTime);
 
-	void UpdateGraphic();
+	void updateGraphic();
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const;
 

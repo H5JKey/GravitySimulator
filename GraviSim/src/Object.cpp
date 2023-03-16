@@ -13,22 +13,22 @@ Object::Object(float mass, sf::Vector2f pos, sf::Vector2f speed, std::string nam
 	else
 		this->radius = radius;
 	this->color[0] = color.r; this->color[1] = color.g; this->color[2] = color.b;
-	Object::UpdateGraphic();
+	Object::updateGraphic();
 }
 
-void Object::UpdatePosition(float EllapsedTime) {
+void Object::updatePosition(float EllapsedTime) {
 	if (!this->fixed) {
-		this->pos += this->speed * EllapsedTime+0.5*this->boost*EllapsedTime*EllapsedTime;
+		this->pos += this->speed * EllapsedTime+0.5f*this->boost*EllapsedTime*EllapsedTime;
 	}
 }
 
-void Object::UpdateSpeed(float EllapsedTime) {
-	if (!speed->fixed) {
-		this->speed+=EllapsedTime*0.5(this->boost+this->d_boost);
+void Object::updateSpeed(float EllapsedTime) {
+	if (!this->fixed) {
+		this->speed+=EllapsedTime*0.5f*(this->boost+this->d_boost);
 	}
 }
 
-void Object::UpdateGraphic() {
+void Object::updateGraphic() {
 	sprite.setRadius(radius);
 	sprite.setPosition(pos-sf::Vector2f(sprite.getRadius(),sprite.getRadius()));
 	sprite.setFillColor(sf::Color(static_cast<sf::Uint8>(this->color[0] * 255.f), static_cast<sf::Uint8>(this->color[1] * 255.f), static_cast<sf::Uint8>(this->color[2] * 255.f)));
