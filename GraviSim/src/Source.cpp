@@ -6,5 +6,5 @@ int main()
     Simulation sim;
     sim.start();
 
-    return 0;
+    return EXIT_SUCCESS;
 }
