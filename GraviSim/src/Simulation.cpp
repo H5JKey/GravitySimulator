@@ -231,13 +231,21 @@ void Simulation::updateEvents() {
             }
         }
     }
+    if (selectedObj == nullptr) {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
+            offset = (App.mapPixelToCoords(sf::Mouse::getPosition()) - Pos) * 0.7f;
+        else
+            offset = { 0,0 };
+    }
 
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) 
-        offset = (App.mapPixelToCoords(sf::Mouse::getPosition()) - Pos) * 0.7f;
-    else 
-        offset = { 0,0 };
-    
-    Pos = App.mapPixelToCoords(sf::Mouse::getPosition());
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
+        sf::Vector2f CurrentmousePos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
+        offset = (CurrentmousePos - Pos) * 0.7f;
+        Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
+    }
+    else {
+        Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
+    }
 
     sf::Time EllapsedTime = clock.restart();
     if (selectedObj != nullptr) {
