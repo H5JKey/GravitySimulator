@@ -179,6 +179,17 @@ void Simulation::updateGraphics() {
     App.display();
 }
 
+void zoomViewAt(sf::Vector2i pixel, sf::View& view, sf::RenderWindow& window, float zoom)
+{
+    const sf::Vector2f beforeCoord{ window.mapPixelToCoords(pixel) };
+    view.zoom(zoom);
+    window.setView(view);
+    const sf::Vector2f afterCoord{ window.mapPixelToCoords(pixel) };
+    const sf::Vector2f offsetCoords{ beforeCoord - afterCoord };
+    view.move(offsetCoords);    
+    window.setView(view);
+}
+
 void Simulation::updateEvents() {
     sf::Event event;
     while (App.pollEvent(event)) {
@@ -191,19 +202,19 @@ void Simulation::updateEvents() {
 
         if (!ImGui::GetIO().WantCaptureMouse) {
             if (event.type == sf::Event::MouseWheelMoved) {
-                if (event.mouseWheel.delta > 0)
-                    camera.zoom(1.1);
+                if (event.mouseWheel.delta < 0)
+                    zoomViewAt(sf::Mouse::getPosition(),camera,App,0.9);
 
                 else
-                    camera.zoom(0.9);
+                    camera.zoom(1.1);
 
             }
 
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                auto mb = sf::Mouse::getPosition();
+                sf::Vector2f mb = App.mapPixelToCoords(sf::Mouse::getPosition());
                 if (!ImGui::addObjMenu) {
                     for (auto& body : Physics::objects) {
-                        if (body.sprite.getGlobalBounds().contains(App.mapPixelToCoords(mb))) {
+                        if (body.sprite.getGlobalBounds().contains(mb)) {
                             if (delta.getElapsedTime().asMilliseconds() > 500) delta.restart();
                             else {
                                 selectedObj = &body;
@@ -214,21 +225,19 @@ void Simulation::updateEvents() {
                     }
                 }
                 else {
-                    newObj.pos = App.mapPixelToCoords(mb);
+                    newObj.pos = mb;
                     Physics::objects.push_back(newObj);
                 }
             }
         }
     }
 
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
-        sf::Vector2f CurrentmousePos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
-        offset = (CurrentmousePos - Pos) * 0.7f;
-        Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
-    }
-    else {
-        Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
-    }
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) 
+        offset = (App.mapPixelToCoords(sf::Mouse::getPosition()) - Pos) * 0.7f;
+    else 
+        offset = { 0,0 };
+    
+    Pos = App.mapPixelToCoords(sf::Mouse::getPosition());
 
     sf::Time EllapsedTime = clock.restart();
     if (selectedObj != nullptr) {
