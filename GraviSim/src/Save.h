@@ -23,9 +23,9 @@ public:
 	}
 
 	sf::Vector2f& readCameraInfo() {
-		sf::Vector2f pos;
-		*m_file >> pos.x >> pos.y;
-		return pos;
+		sf::Vector2f info;
+		*m_file >> info.x >> info.y;
+		return info;
 	}
 	
 	void loadWorld(std::vector<Object>& objects) {

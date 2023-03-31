@@ -182,6 +182,7 @@
     <ClInclude Include="lib\imgui\imstb_rectpack.h" />
     <ClInclude Include="lib\imgui\imstb_textedit.h" />
     <ClInclude Include="lib\imgui\imstb_truetype.h" />
+    <ClInclude Include="src\ParticleSources.h" />
     <ClInclude Include="src\Object.h" />
     <ClInclude Include="src\ParticlesSystem.h" />
     <ClInclude Include="src\Save.h" />

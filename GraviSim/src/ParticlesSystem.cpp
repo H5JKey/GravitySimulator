@@ -1,6 +1,7 @@
 #include "ParticlesSystem.h"
 
 
+
 void ParticlesSystem::draw(sf::RenderTarget& target, sf::RenderStates states) {
     for (auto& source : m_sources) {
         source->draw(target, states);
@@ -22,4 +23,9 @@ void ParticlesSystem::update(sf::Time elapsed, float timeSpeed) {
     }
 }
 
+void ParticlesSystem::clear() {
+    m_sources.clear();
+}
+
 std::vector<ParticleSource*> ParticlesSystem::m_sources(0);
+sf::Time ParticlesSystem::orbitLifeTime = sf::milliseconds(500);

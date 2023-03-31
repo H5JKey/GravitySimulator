@@ -122,6 +122,7 @@ void Simulation::saveSettings() {
     ofs << "DrawBackground=" + std::to_string(drawBackground) << '\n';
     ofs << "ShowFPS=" + std::to_string(showFPS) << '\n';
     ofs << "ShowOrbits=" + std::to_string(showOrbits) << '\n';
+    ofs << "OrbitLifeTime=" + std::to_string(ParticlesSystem::orbitLifeTime.asMilliseconds()) << '\n';
 }
 
 void Simulation::loadSettings() {
@@ -137,6 +138,8 @@ void Simulation::loadSettings() {
         showFPS = bool(stoi(s.substr(s.find('=') + 1)));
         ifs >> s;
         showOrbits = bool(stoi(s.substr(s.find('=') + 1)));
+        ifs >> s;
+        ParticlesSystem::orbitLifeTime = sf::milliseconds(stoi(s.substr(s.find('=') + 1)));
     }
     else {
         showFPS = false;
@@ -163,7 +166,7 @@ void Simulation::updateGraphics() {
     for (auto& obj : Physics::objects) {
         obj.draw(App);
         if (!timeStop && Physics::timeSpeed!=0 && showOrbits)
-            ParticlesSystem::add(new Pixel(obj.pos, sf::Vector3f(obj.color[0], obj.color[1], obj.color[2])));
+            ParticlesSystem::add(new Pixel(obj.pos, sf::Vector3f(obj.color[0], obj.color[1], obj.color[2]),ParticlesSystem::orbitLifeTime));
     }
 
     ParticlesSystem::draw(App);
@@ -202,7 +205,7 @@ void Simulation::updateEvents() {
 
         if (!ImGui::GetIO().WantCaptureMouse) {
             if (event.type == sf::Event::MouseWheelMoved) {
-                if (event.mouseWheel.delta < 0)
+                if (event.mouseWheel.delta > 0)
                     zoomViewAt(sf::Mouse::getPosition(),camera,App,0.9);
 
                 else
@@ -327,8 +330,10 @@ void Simulation::updateGui(){
                     Save saveFile(p);
                     saveFile.readInfo();
                     if (ImGui::Selectable(saveFile.name.c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 20, 15))) {
-                        camera.setCenter(saveFile.readCameraInfo());
+                        sf::Vector2f cameraInfo = saveFile.readCameraInfo();
+                        camera.setCenter(cameraInfo.x, cameraInfo.y);
                         saveFile.loadWorld(Physics::objects);
+                        ParticlesSystem::clear();
                     }
                     saveFile.close();
                     ImGui::SameLine();
@@ -363,6 +368,9 @@ void Simulation::updateGui(){
             ImGui::Checkbox("Show FPS", &showFPS);
             ImGui::Separator();
             ImGui::Checkbox("Show orbits", &showOrbits);
+            int orbitLifeTime = ParticlesSystem::orbitLifeTime.asMilliseconds();
+            ImGui::SliderInt("Orbit life time", &orbitLifeTime, 200, 7500);
+            ParticlesSystem::orbitLifeTime = sf::milliseconds(orbitLifeTime);
             ImGui::Separator();
             ImGui::Separator();
             if (ImGui::Button("Exit"))
