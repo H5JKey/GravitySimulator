@@ -122,7 +122,7 @@ void Simulation::saveSettings() {
     ofs << "DrawBackground=" + std::to_string(drawBackground) << '\n';
     ofs << "ShowFPS=" + std::to_string(showFPS) << '\n';
     ofs << "ShowOrbits=" + std::to_string(showOrbits) << '\n';
-    ofs << "OrbitLifeTime=" + std::to_string(ParticlesSystem::orbitLifeTime.asMilliseconds()) << '\n';
+    ofs << "OrbitLifeTime=" + std::to_string(ParticlesSystem::getOrbitLifeTime().asMilliseconds()) << '\n';
 }
 
 void Simulation::loadSettings() {
@@ -139,7 +139,7 @@ void Simulation::loadSettings() {
         ifs >> s;
         showOrbits = bool(stoi(s.substr(s.find('=') + 1)));
         ifs >> s;
-        ParticlesSystem::orbitLifeTime = sf::milliseconds(stoi(s.substr(s.find('=') + 1)));
+        ParticlesSystem::setOrbitLifeTime(sf::milliseconds(stoi(s.substr(s.find('=') + 1))));
     }
     else {
         showFPS = false;
@@ -166,7 +166,7 @@ void Simulation::updateGraphics() {
     for (auto& obj : Physics::objects) {
         obj.draw(App);
         if (!timeStop && Physics::timeSpeed!=0 && showOrbits)
-            ParticlesSystem::add(new Pixel(obj.pos, sf::Vector3f(obj.color[0], obj.color[1], obj.color[2]),ParticlesSystem::orbitLifeTime));
+            ParticlesSystem::add(new Pixel(obj.pos, sf::Vector3f(obj.color[0], obj.color[1], obj.color[2]),ParticlesSystem::getOrbitLifeTime()));
     }
 
     ParticlesSystem::draw(App);
@@ -368,9 +368,10 @@ void Simulation::updateGui(){
             ImGui::Checkbox("Show FPS", &showFPS);
             ImGui::Separator();
             ImGui::Checkbox("Show orbits", &showOrbits);
-            int orbitLifeTime = ParticlesSystem::orbitLifeTime.asMilliseconds();
-            ImGui::SliderInt("Orbit life time", &orbitLifeTime, 200, 7500);
-            ParticlesSystem::orbitLifeTime = sf::milliseconds(orbitLifeTime);
+            int orbitLifeTime = ParticlesSystem::getOrbitLifeTime().asMilliseconds();
+            if (ImGui::SliderInt("Orbit life time", &orbitLifeTime, 200, 7500)) {
+                ParticlesSystem::setOrbitLifeTime(sf::milliseconds(orbitLifeTime));
+            }
             ImGui::Separator();
             ImGui::Separator();
             if (ImGui::Button("Exit"))

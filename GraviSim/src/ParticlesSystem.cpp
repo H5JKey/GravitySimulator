@@ -27,5 +27,18 @@ void ParticlesSystem::clear() {
     m_sources.clear();
 }
 
+void ParticlesSystem::setOrbitLifeTime(sf::Time newLifeTime) {
+    orbitLifeTime = newLifeTime;
+    for (auto& source : m_sources) {
+        source->remove(orbitLifeTime);
+    }
+}
+
+sf::Time ParticlesSystem::getOrbitLifeTime() {
+    return orbitLifeTime;
+}
+
+
+
 std::vector<ParticleSource*> ParticlesSystem::m_sources(0);
 sf::Time ParticlesSystem::orbitLifeTime = sf::milliseconds(500);

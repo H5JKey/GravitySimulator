@@ -1,8 +1,10 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 class ParticleSource : public sf::Drawable, public sf::Transformable {
 public:
+
     virtual void update(sf::Time elapsed, float timeSpeed = 1) = 0;
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
 
@@ -19,6 +21,12 @@ public:
         }
         inProcess = true;
     }
+
+    void remove(sf::Time newLifeTime) {
+        m_particles.erase(std::remove_if(m_particles.begin(), m_particles.end(), [&](Particle particle) { particle.lefttime = sf::Time::Zero; return true; }), m_particles.end());
+    }
+
+
 protected:
 
     struct Particle
@@ -120,5 +128,7 @@ public:
 
         target.draw(m_vertices, states);
     }
+
+
 
 };
