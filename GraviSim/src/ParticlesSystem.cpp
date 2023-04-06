@@ -29,9 +29,7 @@ void ParticlesSystem::clear() {
 
 void ParticlesSystem::setOrbitLifeTime(sf::Time newLifeTime) {
     orbitLifeTime = newLifeTime;
-    for (auto& source : m_sources) {
-        source->remove(orbitLifeTime);
-    }
+
 }
 
 sf::Time ParticlesSystem::getOrbitLifeTime() {

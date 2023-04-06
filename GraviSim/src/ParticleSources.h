@@ -22,9 +22,6 @@ public:
         inProcess = true;
     }
 
-    void remove(sf::Time newLifeTime) {
-        m_particles.erase(std::remove_if(m_particles.begin(), m_particles.end(), [&](Particle particle) { particle.lefttime = sf::Time::Zero; return true; }), m_particles.end());
-    }
 
 
 protected:
