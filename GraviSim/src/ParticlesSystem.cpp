@@ -41,4 +41,4 @@ sf::Time ParticlesSystem::getOrbitLifeTime() {
 
 
 std::vector<ParticleSource*> ParticlesSystem::m_sources(0);
-sf::Time ParticlesSystem::orbitLifeTime = sf::milliseconds(500);
+sf::Time ParticlesSystem::orbitLifeTime = sf::milliseconds(2000);
