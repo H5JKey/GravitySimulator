@@ -64,7 +64,7 @@ namespace ImGui {
 
 Simulation::Simulation() {
 
-    Physics::objects.push_back(Object(1000000, sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Sun",sf::Color(1,1,1),true,20));
+    Physics::objects.push_back(Object(2000000, sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Sun",sf::Color(1,1,1),true,20));
     Physics::objects.push_back(Object(300, sf::Vector2f(960, 50), sf::Vector2f(320, 0), "Planet"));
 
     selectedObj = nullptr;
@@ -275,7 +275,7 @@ void Simulation::updateGui(){
             ImGui::Separator();
             ImGui::Text("Speed:");
             float* speed[2] = { &selectedObj->speed.x, &selectedObj->speed.y };
-            ImGui::InputFloat2("", *speed);
+            ImGui::InputFloat2("##Speed", *speed);
             ImGui::Separator();
             ImGui::Text("Color:");
             ImGui::ColorEdit3("##Color", selectedObj->color);
@@ -305,14 +305,20 @@ void Simulation::updateGui(){
             ImGui::InputInt("##Radius", &newObj.radius);
             newObj.radius = std::clamp(newObj.radius, 1, 750);
             ImGui::Separator();
+            ImGui::Text("Position:");
+            float* position[2] = { &newObj.pos.x, &newObj.pos.y };
+            ImGui::InputFloat2("##Position", *position);
             ImGui::Text("Speed:");
             float* speed[2] = { &newObj.speed.x, &newObj.speed.y };
-            ImGui::InputFloat2("", *speed);
+            ImGui::InputFloat2("##Speed", *speed);
             ImGui::Separator();
             ImGui::Text("Color:");
             ImGui::ColorEdit3("##SelectColor", newObj.color);
             ImGui::Separator();
             ImGui::Checkbox("Fixed", &newObj.fixed);
+            ImGui::Separator();
+            if (ImGui::Button("Create"))
+                Physics::objects.push_back(newObj);
             ImGui::Separator();
             if (ImGui::Button("Exit"))
                 ImGui::addObjMenu = false;
@@ -403,7 +409,7 @@ void Simulation::updateGui(){
 
             ImGui::Separator();
             ImGui::Text("Time Speed");
-            ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 7.5);
+            ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 700.5);
             ImGui::Checkbox("Stop time\t\tPress Ctrl", &timeStop);
 
             ImGui::Separator();
