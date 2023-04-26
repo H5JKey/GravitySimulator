@@ -148,6 +148,8 @@ void Simulation::loadSettings() {
 
 void Simulation::updatePhysics() {
     Physics::update(EllapsedTime, timeStop);
+    if (centerOfGravity.show)
+        centerOfGravity=Physics::calculateCenterOfGravity();
 }
 
 
@@ -165,8 +167,14 @@ void Simulation::updateGraphics() {
         if (!timeStop && Physics::timeSpeed!=0 && showOrbits)
             ParticlesSystem::add(new Pixel(obj.pos, sf::Vector3f(obj.color[0], obj.color[1], obj.color[2]),ParticlesSystem::getOrbitLifeTime()));
     }
+    if (centerOfGravity.show)
+        centerOfGravity.draw(App);
 
     ParticlesSystem::draw(App);
+
+    if (centerOfGravity.show) {
+        centerOfGravity.draw(App);
+    }
 
     if (showFPS) {
         App.setView(App.getDefaultView());
@@ -284,6 +292,7 @@ void Simulation::updateGui(){
             ImGui::Checkbox("Fixed", &selectedObj->fixed);
             if (ImGui::Button("Delete this object")) {
                 Physics::objects.erase(std::remove_if(Physics::objects.begin(), Physics::objects.end(), [&](const auto& obj) {return &obj == selectedObj; }), Physics::objects.end());
+                Physics::forGravityCenter.erase(std::remove_if(Physics::forGravityCenter.begin(), Physics::forGravityCenter.end(), [&](const auto& obj) {return obj == selectedObj; }), Physics::forGravityCenter.end());
                 selectedObj = nullptr;
                 ImGui::editingMenu = false;
             }
@@ -379,17 +388,39 @@ void Simulation::updateGui(){
         } 
         else if (ImGui::objectsMenu) {//Objects Menu
             ImGui::Text("Objects:");
+            ImGui::Checkbox("Show center of gravity", &centerOfGravity.show);
             if (ImGui::Button("+"))
                 ImGui::addObjMenu = true;
             ImGui::ListBoxHeader("##ObjectsList"); {
+
                 for (int i = 0; i < Physics::objects.size(); i++) {
                     if (Physics::objects[i].name == "") continue;
                     if (ImGui::Selectable((Physics::objects[i].name + "##" + std::to_string(i)).c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth()-20, 15))) {
                         selectedObj = &Physics::objects[i];
                     }
                     ImGui::SameLine();
-                    if (ImGui::Button(("-##" + std::to_string(i)).c_str()))
-                        Physics::objects.erase(Physics::objects.begin() + i);
+                    if (centerOfGravity.show) {
+                        bool flag;
+
+                        if (std::find(Physics::forGravityCenter.begin(), Physics::forGravityCenter.end(), &Physics::objects[i]) != Physics::forGravityCenter.end()) 
+                            flag = true;
+                        else
+                            flag = false;
+                        bool wantAdd = flag;
+                        ImGui::Checkbox(std::to_string(i).c_str(), &wantAdd);
+                        if (flag != wantAdd) {
+                            if (wantAdd) 
+                                Physics::forGravityCenter.push_back(&Physics::objects[i]);
+                            else 
+                                Physics::forGravityCenter.erase(std::remove_if(Physics::forGravityCenter.begin(), Physics::forGravityCenter.end(), [&](const auto& obj) {return obj == &Physics::objects[i]; }), Physics::forGravityCenter.end());
+                        }
+                    }
+                    else {
+                        if (ImGui::Button(("-##" + std::to_string(i)).c_str())) {
+                            Physics::objects.erase(Physics::objects.begin() + i);
+                            Physics::forGravityCenter.erase(std::remove_if(Physics::forGravityCenter.begin(), Physics::forGravityCenter.end(), [&](const auto& obj) {return obj == &Physics::objects[i]; }), Physics::forGravityCenter.end());
+                        }
+                    }
 
                 }
             }
@@ -409,7 +440,7 @@ void Simulation::updateGui(){
 
             ImGui::Separator();
             ImGui::Text("Time Speed");
-            ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 700.5);
+            ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 15);
             ImGui::Checkbox("Stop time\t\tPress Ctrl", &timeStop);
 
             ImGui::Separator();

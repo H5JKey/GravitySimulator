@@ -18,11 +18,13 @@ void Physics::update(sf::Time EllapsedTime, bool timeStop) {
 		});
 		if (Physics::timeSpeed != 0 && !timeStop) {
 			objects.erase(std::remove_if(objects.begin(), objects.end(), [&](auto& i) {
+				
 				for (auto& anotherBody : objects) {
 					if (&i == &anotherBody) continue;
 					if ((anotherBody.pos.x - i.pos.x) * (anotherBody.pos.x - i.pos.x) + (anotherBody.pos.y - i.pos.y) * (anotherBody.pos.y - i.pos.y) <= (i.radius + anotherBody.radius) * (i.radius + anotherBody.radius)) {
 						if (i.mass <= anotherBody.mass) {
 							ParticlesSystem::add(new Explosion(1000, i.pos, sf::Vector3f(i.color[0], i.color[1], i.color[2])));
+							Physics::forGravityCenter.erase(std::remove_if(Physics::forGravityCenter.begin(), Physics::forGravityCenter.end(), [&](const auto& obj) {return obj == &i; }), Physics::forGravityCenter.end());
 							return true;
 						}
 
@@ -41,5 +43,17 @@ void Physics::calculateForce(Object& obj1, Object& obj2) {
 	obj1.boost += len * ((obj2.pos - obj1.pos) / r);
 }
 
+
+sf::Vector2f Physics::calculateCenterOfGravity() {
+	int m = 0;
+	sf::Vector2f rm;
+	for (Object* obj : forGravityCenter) {
+		rm += obj->mass * obj->pos;
+		m += obj->mass;
+	}
+	return rm / float(m);
+}
+
 std::vector<Object> Physics::objects;
+std::vector<Object*> Physics::forGravityCenter;
 float Physics::timeSpeed = 1;
