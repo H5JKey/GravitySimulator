@@ -8,7 +8,7 @@ public:
 	float mass;
 	sf::Vector2f pos;
 	sf::Vector2f speed;
-	sf::Vector2f boost, d_boost;
+	sf::Vector2f boost;
 	std::string name;
 	sf::CircleShape sprite;
 	int radius;
