@@ -27,22 +27,63 @@ public:
 	void start();
 private:
 
-	sf::RenderWindow App;
+	sf::RenderWindow app;
 	sf::View camera;
-	sf::Time EllapsedTime;
+	sf::Time ellapsedTime;
 	sf::Clock clock, delta;
-	sf::Vector2f offset;
-	sf::Vector2f Pos;
+	sf::Vector2f offset; //camera offset
 	Object* selectedObj;
 	Object newObj;
-	sf::Texture t;
-	sf::Sprite background;
-	int savedTimeSpeed;
-	std::string s;
-	sf::Font font;
-	sf::Text fpsTracker;
 
-	class CenterOfGravity : sf::Drawable {
+	int savedTimeSpeed;
+
+	struct FpsTracker : sf::Drawable{
+	private:
+		sf::Font font;
+		sf::Text str;
+	public:
+		bool show;
+		FpsTracker() {
+			show = false;
+			font.loadFromFile("C:/Windows/Fonts/arial.ttf");
+			str.setFont(font);
+			str.setCharacterSize(13);
+			str.setStyle(sf::Text::Bold);
+			str.setFillColor(sf::Color::White);
+			str.setPosition(10, 7);
+		}
+
+		void calculate(sf::Time ellapsedTime) {
+			str.setString(std::to_string(int(1 / ellapsedTime.asSeconds())));
+		}
+
+		virtual void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const {
+			target.draw(str);
+		}
+	};
+
+	struct BackGround : sf::Drawable {
+	private:
+		sf::Texture texture;
+		sf::Sprite sprite;
+	public:
+		bool show;
+		BackGround(const std::string filePath, sf::View& view) {
+			show = false;
+			texture.loadFromFile(filePath);
+			sprite.setScale(view.getSize().x / texture.getSize().x, view.getSize().y / texture.getSize().y);
+			sprite.setTexture(texture);
+		}
+
+
+
+		virtual void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const {
+			target.draw(sprite);
+		}
+	};
+
+	struct CenterOfGravity : sf::Drawable {
+	private:
 		sf::Vector2f pos;
 		sf::RectangleShape cross[2];
 		float size;
@@ -73,11 +114,10 @@ private:
 
 	bool timeStop = false;
 	CenterOfGravity centerOfGravity;
+	FpsTracker fpsTracker;
+	BackGround* backGround;
 
-	int musicVolume;
 	bool showOrbits;
-	bool showFPS;
-	bool drawBackground;
 
 	void loadSettings();
 	void saveSettings();

@@ -72,55 +72,44 @@ Simulation::Simulation() {
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 16;
-    App.create(sf::VideoMode(), "Gravity Simulator", sf::Style::Fullscreen, settings);
-    ImGui::SFML::Init(App);
+    app.create(sf::VideoMode(), "Gravity Simulator", sf::Style::Fullscreen, settings);
+    ImGui::SFML::Init(app);
     ImGui::setStyle();
     
     clock.restart();
 
     offset = sf::Vector2f(0, 0);
 
-    camera.reset(sf::FloatRect(0, 0, App.getSize().x, App.getSize().y));
+    camera.reset(sf::FloatRect(0, 0, app.getSize().x, app.getSize().y));
     camera.setViewport(sf::FloatRect(0.f, 0.f, 1.f, 1.f));
 
-    t.loadFromFile("background.png");
-    background.setScale(camera.getSize().x / t.getSize().x, camera.getSize().y / t.getSize().y);
-    background.setTexture(t);
-
-    font.loadFromFile("C:/Windows/Fonts/arial.ttf");
-    fpsTracker.setFont(font);
-    fpsTracker.setCharacterSize(13);
-    fpsTracker.setStyle(sf::Text::Bold);
-    fpsTracker.setFillColor(sf::Color::White);
-    fpsTracker.setPosition(10, 7);
+    backGround = new BackGround("background.png", camera);
 
     loadSettings();
 
 }
 
 void Simulation::start() {
-    while (App.isOpen()) {
+    while (app.isOpen()) {
         update();
     }
 }
 
 void Simulation::update() {
-    EllapsedTime = clock.restart();
+    ellapsedTime = clock.restart();
     if (!timeStop && Physics::timeSpeed>0)
-    ParticlesSystem::update(EllapsedTime,Physics::timeSpeed);
+    ParticlesSystem::update(ellapsedTime,Physics::timeSpeed);
     updateEvents();
     updateGui();
     updatePhysics();
-    camera.move(-offset);
     updateGraphics();
 }
 
 void Simulation::saveSettings() {
     std::ofstream ofs("settings.ini");
     ofs << "[Settings]\n";
-    ofs << "MusicVolume="+std::to_string(musicVolume)<<'\n';
-    ofs << "DrawBackground=" + std::to_string(drawBackground) << '\n';
-    ofs << "ShowFPS=" + std::to_string(showFPS) << '\n';
+    ofs << "DrawBackground=" + std::to_string(backGround->show) << '\n';
+    ofs << "fpsTracker.show=" + std::to_string(fpsTracker.show) << '\n';
     ofs << "ShowOrbits=" + std::to_string(showOrbits) << '\n';
 }
 
@@ -130,24 +119,22 @@ void Simulation::loadSettings() {
         std::string s;
         ifs >> s;
         ifs >> s;
-        musicVolume = stoi(s.substr(s.find('=') + 1));
         ifs >> s;
-        drawBackground = bool(stoi(s.substr(s.find('=') + 1)));
+        backGround->show = bool(stoi(s.substr(s.find('=') + 1)));
         ifs >> s;
-        showFPS = bool(stoi(s.substr(s.find('=') + 1)));
+        fpsTracker.show = bool(stoi(s.substr(s.find('=') + 1)));
         ifs >> s;
         showOrbits = bool(stoi(s.substr(s.find('=') + 1)));
     }
     else {
-        showFPS = false;
-        musicVolume = 100;
+        fpsTracker.show = false;
         showOrbits = true;
-        drawBackground = true;
+        backGround->show = true;
     }
 }
 
 void Simulation::updatePhysics() {
-    Physics::update(EllapsedTime, timeStop);
+    Physics::update(ellapsedTime, timeStop);
     if (centerOfGravity.show)
         centerOfGravity=Physics::calculateCenterOfGravity();
 }
@@ -155,36 +142,33 @@ void Simulation::updatePhysics() {
 
 void Simulation::updateGraphics() {
 
-    App.clear();
-    if (drawBackground) {
-        App.setView(App.getDefaultView());
-        App.draw(background);
+    app.clear();
+    if (backGround->show) {
+        app.setView(app.getDefaultView());
+        app.draw(*backGround);
     }
 
-    App.setView(camera);
+    app.setView(camera);
     for (auto& obj : Physics::objects) {
-        obj.draw(App);
+        obj.draw(app);
         if (!timeStop && Physics::timeSpeed!=0 && showOrbits)
             ParticlesSystem::add(new Pixel(obj.pos, sf::Vector3f(obj.color[0], obj.color[1], obj.color[2]),ParticlesSystem::getOrbitLifeTime()));
     }
     if (centerOfGravity.show)
-        centerOfGravity.draw(App);
+        centerOfGravity.draw(app);
 
-    ParticlesSystem::draw(App);
+    ParticlesSystem::draw(app);
 
-    if (centerOfGravity.show) {
-        centerOfGravity.draw(App);
+
+    if (fpsTracker.show) {
+        app.setView(app.getDefaultView());
+        fpsTracker.calculate(ellapsedTime);
+        app.draw(fpsTracker);
+        app.setView(camera);
     }
 
-    if (showFPS) {
-        App.setView(App.getDefaultView());
-        fpsTracker.setString(std::to_string(int(1 / EllapsedTime.asSeconds())));
-        App.draw(fpsTracker);
-        App.setView(camera);
-    }
-
-    ImGui::SFML::Render(App);
-    App.display();
+    ImGui::SFML::Render(app);
+    app.display();
 }
 
 void zoomViewAt(sf::Vector2i pixel, sf::View& view, sf::RenderWindow& window, float zoom)
@@ -200,10 +184,10 @@ void zoomViewAt(sf::Vector2i pixel, sf::View& view, sf::RenderWindow& window, fl
 
 void Simulation::updateEvents() {
     sf::Event event;
-    while (App.pollEvent(event)) {
+    while (app.pollEvent(event)) {
         ImGui::SFML::ProcessEvent(event);
         if (event.type == sf::Event::Closed)
-            App.close();
+            app.close();
 
         if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::LControl || event.key.code == sf::Keyboard::RControl))
             timeStop = !timeStop;
@@ -211,7 +195,7 @@ void Simulation::updateEvents() {
         if (!ImGui::GetIO().WantCaptureMouse) {
             if (event.type == sf::Event::MouseWheelMoved) {
                 if (event.mouseWheel.delta > 0) 
-                    zoomViewAt(sf::Mouse::getPosition(), camera, App, 0.9);
+                    zoomViewAt(sf::Mouse::getPosition(), camera, app, 0.9);
                 
                 else 
                     camera.zoom(1.1);   
@@ -219,7 +203,7 @@ void Simulation::updateEvents() {
             }
 
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-                sf::Vector2f mb = App.mapPixelToCoords(sf::Mouse::getPosition());
+                sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
                 if (!ImGui::addObjMenu) {
                     for (auto& body : Physics::objects) {
                         if (body.sprite.getGlobalBounds().contains(mb)) {
@@ -239,32 +223,32 @@ void Simulation::updateEvents() {
             }
         }
     }
+    static sf::Vector2f pos;
+
     if (selectedObj == nullptr) {
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
-            offset = (App.mapPixelToCoords(sf::Mouse::getPosition()) - Pos) * 0.7f;
-        else
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
+            sf::Vector2f CurrentmousePos = app.mapPixelToCoords(sf::Mouse::getPosition());
+            offset = (CurrentmousePos - pos) * 0.7f;
+            pos = app.mapPixelToCoords(sf::Mouse::getPosition());
+        }
+        else {
+            pos = app.mapPixelToCoords(sf::Mouse::getPosition());
             offset = { 0,0 };
+        }
     }
 
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
-        sf::Vector2f CurrentmousePos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
-        offset = (CurrentmousePos - Pos) * 0.7f;
-        Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
-    }
-    else {
-        Pos = sf::Vector2f(sf::Mouse::getPosition() + App.getPosition());
-    }
-
-    sf::Time EllapsedTime = clock.restart();
+    sf::Time ellapsedTime = clock.restart();
     if (selectedObj != nullptr) {
         camera.setCenter(selectedObj->pos);
         ImGui::editingMenu = true;
     }
+
+    camera.move(-offset);
 }
 
 void Simulation::updateGui(){
     
-    ImGui::SFML::Update(App, EllapsedTime);
+    ImGui::SFML::Update(app, ellapsedTime);
     ImGui::Begin("Gravity simulation", nullptr, ImGuiWindowFlags_NoMove+ ImGuiWindowFlags_NoResize);
     {
         ImGui::Separator();
@@ -356,14 +340,16 @@ void Simulation::updateGui(){
             ImGui::ListBoxFooter();
             ImGui::Separator();
             ImGui::Text("Enter new save name:");
-            ImGui::InputText("##EnterSaveName", &s);
+            static std::string saveName;
+            ImGui::InputText("##EnterSaveName", &saveName);
             ImGui::SameLine();
             if (ImGui::Button("+")) {
-                std::ofstream f("saves/" + s + ".wrld");
+                std::ofstream f("saves/" + saveName + ".wrld");
                 f.close();
-                Save newSaveFile(std::filesystem::path("saves/" + s + ".wrld"));
-                newSaveFile.name = s;
-                s = "";
+                Save newSaveFile(std::filesystem::path("saves/" + saveName + ".wrld"));
+                newSaveFile.name = saveName;
+                saveName = "";
+
 
                 newSaveFile.save(Physics::objects, camera.getCenter());
             }
@@ -372,12 +358,9 @@ void Simulation::updateGui(){
                 ImGui::savingMenu = false;
         }
         else if (ImGui::settingsMenu) {//Settings menu
-            ImGui::Text("Music volume");
-            ImGui::SliderInt("##Nusic volume", &musicVolume, 0, 100);
+            ImGui::Checkbox("Draw background", &backGround->show);
             ImGui::Separator();
-            ImGui::Checkbox("Draw background", &drawBackground);
-            ImGui::Separator();
-            ImGui::Checkbox("Show FPS", &showFPS);
+            ImGui::Checkbox("Show FPS", &fpsTracker.show);
             ImGui::Separator();
             ImGui::Checkbox("Show orbits", &showOrbits);
             
@@ -444,7 +427,7 @@ void Simulation::updateGui(){
             ImGui::Checkbox("Stop time\t\tPress Ctrl", &timeStop);
 
             ImGui::Separator();
-            if (ImGui::Button("Exit")) App.close();
+            if (ImGui::Button("Exit")) app.close();
         }
     }
     ImGui::End();
@@ -453,5 +436,6 @@ void Simulation::updateGui(){
 Simulation::~Simulation() {
     ImGui::SFML::Shutdown();
     delete(selectedObj);
+    delete(backGround);
     saveSettings();
 }
