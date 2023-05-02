@@ -65,7 +65,7 @@ namespace ImGui {
 Simulation::Simulation() {
 
     Physics::objects.push_back(Object(2000000, sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Sun",sf::Color(1,1,1),true,20));
-    Physics::objects.push_back(Object(300, sf::Vector2f(960, 50), sf::Vector2f(320, 0), "Planet"));
+    Physics::objects.push_back(Object(300, sf::Vector2f(960, 50), sf::Vector2f(500, 0), "Planet"));
 
     selectedObj = nullptr;
     savedTimeSpeed = 0;
@@ -210,11 +210,11 @@ void Simulation::updateEvents() {
 
         if (!ImGui::GetIO().WantCaptureMouse) {
             if (event.type == sf::Event::MouseWheelMoved) {
-                if (event.mouseWheel.delta > 0)
-                    zoomViewAt(sf::Mouse::getPosition(),camera,App,0.9);
-
-                else
-                    camera.zoom(1.1);
+                if (event.mouseWheel.delta > 0) 
+                    zoomViewAt(sf::Mouse::getPosition(), camera, App, 0.9);
+                
+                else 
+                    camera.zoom(1.1);   
 
             }
 

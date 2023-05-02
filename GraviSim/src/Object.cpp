@@ -18,13 +18,13 @@ Object::Object(float mass, sf::Vector2f pos, sf::Vector2f speed, std::string nam
 
 void Object::updatePosition(float EllapsedTime) {
 	if (!this->fixed) {
-		this->pos += (this->speed * EllapsedTime+0.5f*this->boost*EllapsedTime*EllapsedTime);
+		this->pos += this->speed * EllapsedTime;
 	}
 }
 
 void Object::updateSpeed(float EllapsedTime) {
 	if (!this->fixed) {
-		this->speed+=EllapsedTime*0.5f*(this->boost +this->d_boost);
+		this->speed+=EllapsedTime*this->acceleration;
 	}
 }
 

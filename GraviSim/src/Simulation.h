@@ -45,23 +45,25 @@ private:
 	class CenterOfGravity : sf::Drawable {
 		sf::Vector2f pos;
 		sf::RectangleShape cross[2];
+		float size;
 	public:
 		bool show;
 
 		CenterOfGravity() {
 			show = false;
-
+			size = 16;
 			cross[0].setFillColor(sf::Color::Red);
 			cross[1].setFillColor(sf::Color::Red);
-			cross[0].setSize({ 8, 1 });
-			cross[1].setSize({ 1, 8 });
-			cross[0].setOrigin(4, 0.5);
-			cross[1].setOrigin(0.5, 4);
+			cross[0].setSize({ size, 1 });
+			cross[1].setSize({ 1, size });
+			cross[0].setOrigin(size/2, 0.5);
+			cross[1].setOrigin(0.5, size/2);
 		}
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const {
 			target.draw(cross[0]);
 			target.draw(cross[1]);
 		}
+
 		void operator=(const sf::Vector2f pos) {
 			this->pos = pos;
 			cross[0].setPosition(pos);

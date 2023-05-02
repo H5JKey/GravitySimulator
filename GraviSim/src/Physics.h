@@ -13,6 +13,6 @@ public:
 
 	static void update(sf::Time EllapsedTime, bool timeStop);
 
-	static void calculateForce(Object &obj1, Object &obj2);
+	static void calculateAcceleration(Object &obj1, Object &obj2);
 	static sf::Vector2f calculateCenterOfGravity();
 };
