@@ -118,6 +118,7 @@ private:
 	BackGround* backGround;
 
 	bool showOrbits;
+	bool moreAccuracy;
 
 	void loadSettings();
 	void saveSettings();

@@ -109,8 +109,9 @@ void Simulation::saveSettings() {
     std::ofstream ofs("settings.ini");
     ofs << "[Settings]\n";
     ofs << "DrawBackground=" + std::to_string(backGround->show) << '\n';
-    ofs << "fpsTracker.show=" + std::to_string(fpsTracker.show) << '\n';
+    ofs << "ShowFPS=" + std::to_string(fpsTracker.show) << '\n';
     ofs << "ShowOrbits=" + std::to_string(showOrbits) << '\n';
+    ofs << "MoreAccuracy=" + std::to_string(moreAccuracy) << '\n';
 }
 
 void Simulation::loadSettings() {
@@ -119,22 +120,27 @@ void Simulation::loadSettings() {
         std::string s;
         ifs >> s;
         ifs >> s;
-        ifs >> s;
         backGround->show = bool(stoi(s.substr(s.find('=') + 1)));
         ifs >> s;
         fpsTracker.show = bool(stoi(s.substr(s.find('=') + 1)));
         ifs >> s;
         showOrbits = bool(stoi(s.substr(s.find('=') + 1)));
+        ifs >> s;
+        moreAccuracy = bool(stoi(s.substr(s.find('=') + 1)));
     }
     else {
         fpsTracker.show = false;
         showOrbits = true;
         backGround->show = true;
+        moreAccuracy = false;
     }
 }
 
 void Simulation::updatePhysics() {
-    Physics::update(ellapsedTime, timeStop);
+    if (moreAccuracy)
+        Physics::update(sf::Time(sf::seconds(0.0001)), timeStop);
+    else
+        Physics::update(ellapsedTime, timeStop);
     if (centerOfGravity.show)
         centerOfGravity=Physics::calculateCenterOfGravity();
 }
@@ -362,6 +368,7 @@ void Simulation::updateGui(){
             ImGui::Separator();
             ImGui::Checkbox("Show FPS", &fpsTracker.show);
             ImGui::Separator();
+            ImGui::Checkbox("More accurancy", &moreAccuracy);
             ImGui::Checkbox("Show orbits", &showOrbits);
             
             ImGui::Separator();
