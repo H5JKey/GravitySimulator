@@ -353,10 +353,10 @@ void Simulation::updateGui() {
                 for (auto p : std::filesystem::directory_iterator("saves")) {
                     Save saveFile(p);
                     if (ImGui::Selectable(saveFile.name.c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 20, 15))) {
-                        sf::Vector2f cameraInfo;
                         camera.setCenter(saveFile.load(objects));
                         ParticlesSystem::clear();
                     }
+                    saveFile.close();
                     ImGui::SameLine();
                     if (ImGui::Button(("-##" + std::to_string(i)).c_str()))
                         std::filesystem::remove(p);
