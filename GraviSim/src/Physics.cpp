@@ -1,19 +1,14 @@
 #include "Physics.h"
 #include "ParticlesSystem.h"
 
-void Physics::update(std::vector<Object>& objects, sf::Time EllapsedTime, bool timeStop) {
-	concurrency::parallel_for_each(objects.begin(), objects.end(), [&](Object& object) {
-		if (timeSpeed != 0 && !timeStop) {
-			object.acceleration = { 0,0 };
-			for (Object& anotherObject : objects) {
-				if (&object == &anotherObject) continue;
-				calculateAcceleration(object, anotherObject);
-			}
-			object.updateSpeed(EllapsedTime.asSeconds() * timeSpeed);
-			object.updatePosition(EllapsedTime.asSeconds() * timeSpeed);
-		}
-		object.updateGraphic();
-		});
+void Physics::update(Object& object,std::vector<Object>& objects, sf::Time EllapsedTime) {
+	object.acceleration = { 0,0 };
+	for (Object& anotherObject : objects) {
+		if (&object == &anotherObject) continue;
+		calculateAcceleration(object, anotherObject);
+	}
+	object.updateSpeed(EllapsedTime.asSeconds() * timeSpeed);
+	object.updatePosition(EllapsedTime.asSeconds() * timeSpeed);
 }
 
 void Physics::calculateAcceleration(Object& obj1, Object& obj2) {

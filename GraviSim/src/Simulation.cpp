@@ -100,7 +100,7 @@ void Simulation::update() {
         ParticlesSystem::update(ellapsedTime);
     updateEvents();
     updateGui();
-    updatePhysics();
+    updateObjects();
     updateGraphics();
 
 }
@@ -136,12 +136,17 @@ void Simulation::loadSettings() {
     }
 }
 
-void Simulation::updatePhysics() {
-    if (moreAccuracy)
-        Physics::update(objects, sf::Time(sf::seconds(0.0001)), timeStop);
-    else
-        Physics::update(objects, ellapsedTime, timeStop);
-
+void Simulation::updateObjects() {
+    for (Object& object : objects) {
+        if (!timeStop && Physics::timeSpeed!=0) {
+            if (moreAccuracy)
+                Physics::update(object,objects, sf::Time(sf::seconds(0.0001)));
+            else
+                Physics::update(object,objects, ellapsedTime);
+            object.updateGraphic();
+        }
+    }
+    
     if (centerOfGravity.show)
         centerOfGravity = Physics::calculateCenterOfGravity(forGravityCenter);
 
@@ -214,7 +219,7 @@ void Simulation::updateEvents() {
         if (event.type == sf::Event::Closed)
             app.close();
 
-        if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::LControl || event.key.code == sf::Keyboard::RControl))
+        if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::F2))
             timeStop = !timeStop;
 
         if (!ImGui::GetIO().WantCaptureMouse) {
@@ -292,7 +297,7 @@ void Simulation::updateGui() {
             ImGui::InputFloat2("##Speed", *speed);
             ImGui::Separator();
             ImGui::Text("Color:");
-            float color[3] = { selectedObj->color.r / 255.f,selectedObj->color.g / 255.f ,selectedObj->color.b / 255.f };
+            float color[3] = { static_cast<float>(selectedObj->color.r / 255.f),static_cast<float>(selectedObj->color.g / 255.f) ,static_cast<float>(selectedObj->color.b / 255.f) };
             ImGui::ColorEdit3("##Color", color);
             selectedObj->color = { static_cast<sf::Uint8>(color[0] * 255), static_cast<sf::Uint8>(color[1] * 255), static_cast<sf::Uint8>(color[2] * 255) };
             ImGui::Separator();
@@ -345,8 +350,7 @@ void Simulation::updateGui() {
             ImGui::ListBoxHeader("##SavesList");
             int i = 0;
             {
-                for (auto& p : std::filesystem::directory_iterator("saves")) {
-                    std::filesystem::path path = p;
+                for (auto p : std::filesystem::directory_iterator("saves")) {
                     Save saveFile(p);
                     if (ImGui::Selectable(saveFile.name.c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 20, 15))) {
                         sf::Vector2f cameraInfo;
@@ -357,6 +361,7 @@ void Simulation::updateGui() {
                     if (ImGui::Button(("-##" + std::to_string(i)).c_str()))
                         std::filesystem::remove(p);
                 }
+                i++;
             }
             ImGui::ListBoxFooter();
             ImGui::Separator();
@@ -447,7 +452,7 @@ void Simulation::updateGui() {
             ImGui::Separator();
             ImGui::Text("Time Speed");
             ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 1500);
-            ImGui::Checkbox("Stop time\t\tPress Ctrl", &timeStop);
+            ImGui::Checkbox("Stop time\t\tPress F2", &timeStop);
 
             ImGui::Separator();
             if (ImGui::Button("Exit")) app.close();

@@ -131,7 +131,7 @@ private:
 	void updateGui();
 	void updateEvents();
 	void updateGraphics();
-	void updatePhysics();
+	void updateObjects();
 	void update();
 
 };
