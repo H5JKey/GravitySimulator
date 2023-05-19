@@ -1,36 +1,46 @@
 #include "Save.h"
 
-Save::Save(std::filesystem::path p) : m_file(p) {
+
+Save::Save(std::filesystem::path p):m_file(p) {
 	std::getline(m_file, name);
 }
 
 
 sf::Vector2f Save::load(std::vector<Object>& objects) {
+	sf::Vector2f cameraPosition;
+	m_file >> cameraPosition.x >> cameraPosition.y;
 	objects.clear();
-	sf::Vector2f info;
-	m_file >> info.x >> info.y;
-
+	Object obj;
+	int color[3] = { 0,0,0 };
 	while (!m_file.eof()) {
-		Object obj;
-		m_file >> obj.name >> obj.pos.x >> obj.pos.y >> obj.mass >> obj.speed.x >> obj.speed.y >> obj.acceleration.x >> obj.acceleration.y >> obj.radius >> obj.color[0] >> obj.color[1] >> obj.color[2] >> obj.fixed;
+		m_file >> obj.name >> obj.pos.x >> obj.pos.y >> obj.mass >> obj.speed.x >> obj.speed.y >> obj.acceleration.x >> obj.acceleration.y >> obj.radius >> color[0] >> color[1] >> color[2] >> obj.fixed;
 		if (obj.name == "##noName##") obj.name = "";
+		obj.color.r = static_cast<sf::Uint8>(color[0]);
+		obj.color.g = static_cast<sf::Uint8>(color[1]);
+		obj.color.b = static_cast<sf::Uint8>(color[2]);
 		objects.push_back(obj);
 	}
-	return info;
+	return cameraPosition;
 }
 
-void Save::save(std::vector<Object>& objects, sf::Vector2f camPos) {
+void Save::save(const std::vector<Object>& objects, const sf::Vector2f cameraPosition) {
 	m_file.clear();
 	m_file << name << '\n';
-	m_file << camPos.x << ' ' << camPos.y;
+	m_file << cameraPosition.x << ' ' << cameraPosition.y;
 	if (objects.size() != 0)
 		m_file << '\n';
-	for (Object& obj : objects) {
+	int color[3];
+	for (Object obj : objects) {
 		std::string name = obj.name;
 		if (obj.name == "") name = "##noName##";
-		m_file << name << ' ' << obj.pos.x << ' ' << obj.pos.y << ' ' << obj.mass << ' ' << obj.speed.x << ' ' << obj.speed.y << ' ' << obj.acceleration.x << ' ' << obj.acceleration.y << ' ' << obj.radius << ' ' << obj.color[0] << ' ' << obj.color[1] << ' ' << obj.color[2] << ' ' << obj.fixed;
+		color[0] = static_cast<int>(obj.color.r);
+		color[1] = static_cast<int>(obj.color.g);
+		color[2] = static_cast<int>(obj.color.b);
+		m_file << name << ' ' << obj.pos.x << ' ' << obj.pos.y << ' ' << obj.mass << ' ' << obj.speed.x << ' ' << obj.speed.y << ' ' << obj.acceleration.x << ' ' << obj.acceleration.y << ' ' << obj.radius << ' ' << color[0] << ' ' << color[1] << ' ' << color[2] << ' ' << obj.fixed;
+
 		if (&obj != &*(objects.end() - 1))
 			m_file << '\n';
+
 	}
 }
 

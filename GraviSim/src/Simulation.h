@@ -25,19 +25,23 @@ class Simulation
 public:
 	Simulation();
 	void start();
+	~Simulation();
 private:
 
 	sf::RenderWindow app;
 	sf::View camera;
 	sf::Time ellapsedTime;
-	sf::Clock clock, delta;
-	sf::Vector2f offset; //camera offset
+	sf::Clock clock;
+
+	std::vector<Object*> forGravityCenter;
+	std::vector<Object> objects;
+
 	Object* selectedObj;
 	Object newObj;
 
 	int savedTimeSpeed;
 
-	struct FpsTracker : sf::Drawable{
+	struct FpsTracker : sf::Drawable {
 	private:
 		sf::Font font;
 		sf::Text str;
@@ -97,8 +101,8 @@ private:
 			cross[1].setFillColor(sf::Color::Red);
 			cross[0].setSize({ size, 1 });
 			cross[1].setSize({ 1, size });
-			cross[0].setOrigin(size/2, 0.5);
-			cross[1].setOrigin(0.5, size/2);
+			cross[0].setOrigin(size / 2, 0.5);
+			cross[1].setOrigin(0.5, size / 2);
 		}
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const {
 			target.draw(cross[0]);
@@ -120,6 +124,8 @@ private:
 	bool showOrbits;
 	bool moreAccuracy;
 
+private:
+
 	void loadSettings();
 	void saveSettings();
 	void updateGui();
@@ -128,7 +134,5 @@ private:
 	void updatePhysics();
 	void update();
 
-public:
-	~Simulation();
 };
 

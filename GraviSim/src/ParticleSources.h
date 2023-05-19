@@ -1,6 +1,5 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <iostream>
 
 class ParticleSource : public sf::Drawable, public sf::Transformable {
 public:
@@ -9,15 +8,13 @@ public:
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const = 0;
 
 
-    ParticleSource(unsigned int count, sf::Vector2f position, sf::Vector3f color) :
+    ParticleSource(unsigned int count, sf::Vector2f position, sf::Color color) :
         m_particles(count),
         m_vertices(sf::Points, count),
         m_emitter(position)
     {
         for (std::size_t i = 0; i < m_particles.size(); ++i) {
-            m_vertices[i].color.r = static_cast<sf::Uint8>(color.x * 255);
-            m_vertices[i].color.g = static_cast<sf::Uint8>(color.y * 255);
-            m_vertices[i].color.b = static_cast<sf::Uint8>(color.z * 255);
+            m_vertices[i].color = color;
         }
         inProcess = true;
     }
@@ -42,7 +39,7 @@ public:
 class Explosion : public ParticleSource
 {
 public:
-    Explosion(unsigned int count, sf::Vector2f position, sf::Vector3f color) : ParticleSource(count, position, color)
+    Explosion(unsigned int count, sf::Vector2f position, sf::Color color) : ParticleSource(count, position, color)
     {
         for (int i = 0; i < m_particles.size(); i++) {
             set(i);
@@ -96,7 +93,7 @@ public:
 
 class Pixel : public ParticleSource {
 public:
-    Pixel(sf::Vector2f position, sf::Vector3f color, sf::Time lifeTime) : ParticleSource(1, position, color)
+    Pixel(sf::Vector2f position, sf::Color color, sf::Time lifeTime) : ParticleSource(1, position, color)
     {
         m_particles[0].lifetime = lifeTime;
         m_particles[0].lefttime = m_particles[0].lifetime;
