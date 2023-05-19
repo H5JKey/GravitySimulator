@@ -330,14 +330,11 @@ void Simulation::updateGui(){
                 for (auto& p : std::filesystem::directory_iterator("saves")) {
                     std::filesystem::path path = p;
                     Save saveFile(p);
-                    saveFile.readInfo();
-                    if (ImGui::Selectable(saveFile.name.c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 20, 15))) {
-                        sf::Vector2f cameraInfo = saveFile.readCameraInfo();
+                    if (ImGui::Selectable(saveFile.name.c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 20, 15))) {                   
+                        sf::Vector2f cameraInfo = saveFile.load(Physics::objects);
                         camera.setCenter(cameraInfo.x, cameraInfo.y);
-                        saveFile.loadWorld(Physics::objects);
                         ParticlesSystem::clear();
                     }
-                    saveFile.close();
                     ImGui::SameLine();
                     if (ImGui::Button(("-##" + std::to_string(i)).c_str())) {
                         std::filesystem::remove(p);
