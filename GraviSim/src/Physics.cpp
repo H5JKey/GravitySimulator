@@ -37,7 +37,7 @@ void Physics::update(sf::Time EllapsedTime, bool timeStop) {
 void Physics::calculateAcceleration(Object& obj1, Object& obj2) {
 	float r = sqrtf((obj1.pos.x - obj2.pos.x) * (obj1.pos.x - obj2.pos.x) + (obj1.pos.y - obj2.pos.y) * (obj1.pos.y - obj2.pos.y));
 	r = std::max(r, 0.1f);
-	float rWorld = r * pow(10, 6);
+	float rWorld = r*powf(10,6);
 	float len = 6.67*pow(10, -11) * (obj2.mass * pow(10, 24) / (rWorld * rWorld));
 	obj1.acceleration += len * ((obj2.pos - obj1.pos) / r);
 }

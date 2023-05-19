@@ -98,7 +98,7 @@ void Simulation::start() {
 void Simulation::update() {
     ellapsedTime = clock.restart();
     if (!timeStop && Physics::timeSpeed>0)
-    ParticlesSystem::update(ellapsedTime,Physics::timeSpeed);
+    ParticlesSystem::update(ellapsedTime);
     updateEvents();
     updateGui();
     updatePhysics();
@@ -195,7 +195,7 @@ void Simulation::updateEvents() {
         if (event.type == sf::Event::Closed)
             app.close();
 
-        if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::LControl || event.key.code == sf::Keyboard::RControl))
+        if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::F2))
             timeStop = !timeStop;
 
         if (!ImGui::GetIO().WantCaptureMouse) {
@@ -339,8 +339,10 @@ void Simulation::updateGui(){
                     }
                     saveFile.close();
                     ImGui::SameLine();
-                    if (ImGui::Button(("-##"+ std::to_string(i)).c_str()))
+                    if (ImGui::Button(("-##" + std::to_string(i)).c_str())) {
                         std::filesystem::remove(p);
+                    }
+                    i++;
                 }
             }
             ImGui::ListBoxFooter();
@@ -430,8 +432,8 @@ void Simulation::updateGui(){
 
             ImGui::Separator();
             ImGui::Text("Time Speed");
-            ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 15);
-            ImGui::Checkbox("Stop time\t\tPress Ctrl", &timeStop);
+            ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 1500);
+            ImGui::Checkbox("Stop time\t\tPress F2", &timeStop);
 
             ImGui::Separator();
             if (ImGui::Button("Exit")) app.close();

@@ -9,7 +9,7 @@ public:
 
     static void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default);
     static void add(ParticleSource* source);
-    static void update(sf::Time elapsed, float timeSpeed);
+    static void update(sf::Time elapsed, float timeSpeed=1);
     static void clear();
     static void setOrbitLifeTime(sf::Time newLifeTime);
     static sf::Time getOrbitLifeTime();

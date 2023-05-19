@@ -18,13 +18,13 @@ Object::Object(float mass, sf::Vector2f pos, sf::Vector2f speed, std::string nam
 
 void Object::updatePosition(float EllapsedTime) {
 	if (!this->fixed) {
-		this->pos += this->speed * EllapsedTime;
+		this->pos += (this->speed * EllapsedTime)/powf(10,3);
 	}
 }
 
 void Object::updateSpeed(float EllapsedTime) {
 	if (!this->fixed) {
-		this->speed+=EllapsedTime*this->acceleration;
+		this->speed+=(EllapsedTime*this->acceleration)/powf(10,3);
 	}
 }
 
@@ -47,3 +47,5 @@ Object::Object() {
 	this->color[0] = this->color[1] = this->color[2] = 1;
 	this->radius = abs(this->mass) / 1000 + 1;;
 }
+
+
