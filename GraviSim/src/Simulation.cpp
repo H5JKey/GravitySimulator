@@ -252,7 +252,7 @@ void Simulation::updateEvents() {
                     }
                 }
                 else {
-                    newObj.pos = mb;
+                    newObj.pos = mb*powf(10,3);
                     objects.push_back(newObj);
                 }
             }

@@ -36,7 +36,7 @@ void Object::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 }
 
 bool Object::collide(Object& anotherObject) {
-	return (anotherObject.pos.x - this->pos.x) * (anotherObject.pos.x - this->pos.x) + (anotherObject.pos.y - this->pos.y) * (anotherObject.pos.y - this->pos.y) <= (this->radius + anotherObject.radius) * (this->radius + anotherObject.radius);
+	return (anotherObject.pos.x - this->pos.x) * (anotherObject.pos.x - this->pos.x) + (anotherObject.pos.y - this->pos.y) * (anotherObject.pos.y - this->pos.y) <= powf(10,3)*(this->radius + anotherObject.radius) * powf(10,3)*(this->radius + anotherObject.radius);
 }
 
 bool Object::collide(sf::Vector2f point) {
