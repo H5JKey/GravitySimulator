@@ -94,8 +94,11 @@ void Simulation::start() {
     }
 }
 
+
 void Simulation::update() {
     ellapsedTime = clock.restart();
+    if (!timeStop)
+        timer += (ellapsedTime*Physics::timeSpeed);
     if (!timeStop && Physics::timeSpeed > 0)
         ParticlesSystem::update(ellapsedTime);
     updateEvents();
@@ -111,7 +114,7 @@ void Simulation::saveSettings() {
     ofs << "DrawBackground=" + std::to_string(backGround->show) << '\n';
     ofs << "ShowFPS=" + std::to_string(fpsTracker.show) << '\n';
     ofs << "ShowOrbits=" + std::to_string(showOrbits) << '\n';
-    ofs << "MoreAccuracy=" + std::to_string(moreAccuracy) << '\n';
+    ofs << "ShowTimer=" + std::to_string(timer.show) << '\n';
 }
 
 void Simulation::loadSettings() {
@@ -126,23 +129,20 @@ void Simulation::loadSettings() {
         ifs >> s;
         showOrbits = bool(stoi(s.substr(s.find('=') + 1)));
         ifs >> s;
-        moreAccuracy = bool(stoi(s.substr(s.find('=') + 1)));
+        timer.show = bool(stoi(s.substr(s.find('=') + 1)));
     }
     else {
         fpsTracker.show = false;
         showOrbits = true;
         backGround->show = true;
-        moreAccuracy = false;
+        timer.show = false;
     }
 }
 
 void Simulation::updateObjects() {
     for (Object& object : objects) {
         if (!timeStop && Physics::timeSpeed!=0) {
-            if (moreAccuracy)
-                Physics::update(object,objects, sf::Time(sf::seconds(0.0001)));
-            else
-                Physics::update(object,objects, ellapsedTime);
+                Physics::update(object,objects, sf::Time(sf::seconds(0.0015)));
             object.updateGraphic();
         }
     }
@@ -194,6 +194,11 @@ void Simulation::updateGraphics() {
         app.setView(app.getDefaultView());
         fpsTracker.calculate(ellapsedTime);
         app.draw(fpsTracker);
+        app.setView(camera);
+    }
+    if (timer.show) {
+        app.setView(app.getDefaultView());
+        timer.draw(app);
         app.setView(camera);
     }
 
@@ -388,8 +393,9 @@ void Simulation::updateGui() {
             ImGui::Separator();
             ImGui::Checkbox("Show FPS", &fpsTracker.show);
             ImGui::Separator();
-            ImGui::Checkbox("More accurancy", &moreAccuracy);
             ImGui::Checkbox("Show orbits", &showOrbits);
+            ImGui::Separator();
+            ImGui::Checkbox("Show timer", &timer.show);
 
             ImGui::Separator();
             if (ImGui::Button("Exit"))

@@ -79,8 +79,6 @@ private:
 			sprite.setTexture(texture);
 		}
 
-
-
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const {
 			target.draw(sprite);
 		}
@@ -116,13 +114,40 @@ private:
 		}
 	};
 
+	struct Timer : sf::Drawable {
+	private:
+		sf::Font font;
+		sf::Text str;
+		sf::Time time;
+	public:
+		bool show;
+		Timer() {
+			show = false;
+			font.loadFromFile("C:/Windows/Fonts/arial.ttf");
+			str.setFont(font);
+			str.setCharacterSize(13);
+			str.setStyle(sf::Text::Bold);
+			str.setFillColor(sf::Color::White);
+			str.setPosition(10, 25);
+		}
+
+		virtual void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const {
+			target.draw(str);
+		}
+
+		void operator+=(sf::Time ellapsedTime) {
+			time += ellapsedTime;
+			str.setString(std::to_string(int(time.asSeconds())));
+		}
+		
+	};
+
 	bool timeStop = false;
 	CenterOfGravity centerOfGravity;
 	FpsTracker fpsTracker;
 	BackGround* backGround;
-
+	Timer timer;
 	bool showOrbits;
-	bool moreAccuracy;
 
 private:
 

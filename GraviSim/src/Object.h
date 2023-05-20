@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <math.h>
+#include <ostream>
+#include <istream>
 
 class Object :sf::Drawable
 {
@@ -29,5 +31,10 @@ public:
 	bool collide(sf::Vector2f point);
 
 	~Object() {}
+
+
+	friend std::ostream& operator<<(std::ostream& out, Object& object);
+	friend std::istream& operator>>(std::istream& in, Object& object);
 };
+
 
