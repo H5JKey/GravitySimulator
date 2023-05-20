@@ -54,7 +54,7 @@ private:
 			str.setCharacterSize(13);
 			str.setStyle(sf::Text::Bold);
 			str.setFillColor(sf::Color::White);
-			str.setPosition(10, 7);
+			str.setPosition(10, 40);
 		}
 
 		void calculate(sf::Time ellapsedTime) {
@@ -125,10 +125,10 @@ private:
 			show = false;
 			font.loadFromFile("C:/Windows/Fonts/arial.ttf");
 			str.setFont(font);
-			str.setCharacterSize(13);
+			str.setCharacterSize(17);
 			str.setStyle(sf::Text::Bold);
 			str.setFillColor(sf::Color::White);
-			str.setPosition(10, 25);
+			str.setPosition(10, 7);
 		}
 
 		virtual void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const {
@@ -137,7 +137,16 @@ private:
 
 		void operator+=(sf::Time ellapsedTime) {
 			time += ellapsedTime;
-			str.setString(std::to_string(int(time.asSeconds())));
+			int s = time.asSeconds();
+
+			int m = s / 60;
+			s %= 60;
+			int h = m / 60;
+			m %= 60;
+			int d = h / 24;
+			h %= 24;
+
+			str.setString(std::to_string(d) + ':' + std::to_string(h) + ':' + std::to_string(m) + ':' + std::to_string(s));
 		}
 		
 	};
