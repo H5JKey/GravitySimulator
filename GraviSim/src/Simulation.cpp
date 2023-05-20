@@ -98,7 +98,7 @@ void Simulation::start() {
 void Simulation::update() {
     ellapsedTime = clock.restart();
     if (!timeStop)
-        timer += (ellapsedTime*Physics::timeSpeed);
+        timer += (sf::seconds(0.0015) * Physics::timeSpeed);
     if (!timeStop && Physics::timeSpeed > 0)
         ParticlesSystem::update(ellapsedTime);
     updateEvents();
@@ -157,7 +157,7 @@ void Simulation::updateObjects() {
                 if (object.collide(anotherObject)) {
                     if (anotherObject.mass >= object.mass) {
 
-                        ParticlesSystem::add(new Explosion(1000, object.pos, object.color));
+                        ParticlesSystem::add(new Explosion(1000, object.pos/powf(10,3), object.color));
                         forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](const auto& obj) {return obj == &object; }), forGravityCenter.end());
                         return true;
                     }
@@ -182,7 +182,7 @@ void Simulation::updateGraphics() {
     for (auto& object : objects) {
         object.draw(app);
         if (!timeStop && Physics::timeSpeed != 0 && showOrbits)
-            ParticlesSystem::add(new Pixel(object.pos, object.color, ParticlesSystem::getOrbitLifeTime()));
+            ParticlesSystem::add(new Pixel(object.pos/powf(10,3), object.color, ParticlesSystem::getOrbitLifeTime()));
     }
     if (centerOfGravity.show)
         centerOfGravity.draw(app);
@@ -361,15 +361,18 @@ void Simulation::updateGui() {
 
                     if (ImGui::Selectable(name.c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 20, 15))) {
                         Save saveFile(p);
-                        camera.setCenter(saveFile.load(objects));
+                        sf::Vector2f center;
+                        sf::Time time;
+                        saveFile.load(objects,center,time);
+                        timer.set(time);
                         ParticlesSystem::clear();
                         saveFile.close();
                     }
                     ImGui::SameLine();
                     if (ImGui::Button(("-##" + std::to_string(i)).c_str()))
                         std::filesystem::remove(p);
+                    i++;
                 }
-                i++;
             }
             ImGui::ListBoxFooter();
             ImGui::Separator();
@@ -381,7 +384,7 @@ void Simulation::updateGui() {
                 std::ofstream f("saves/" + saveName + ".sim");
                 f.close();
                 Save newSaveFile(std::filesystem::path("saves/" + saveName + ".sim"));
-                newSaveFile.save(objects, camera.getCenter());
+                newSaveFile.save(objects, camera.getCenter(),timer.get());
                 saveName = "";
             }
             ImGui::Separator();
@@ -459,6 +462,8 @@ void Simulation::updateGui() {
             ImGui::Text("Time Speed");
             ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 1500);
             ImGui::Checkbox("Stop time\t\tPress F2", &timeStop);
+            if (ImGui::Button("Reset timer"))
+                timer.reset();
 
             ImGui::Separator();
             if (ImGui::Button("Exit")) app.close();

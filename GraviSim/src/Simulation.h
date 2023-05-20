@@ -135,8 +135,7 @@ private:
 			target.draw(str);
 		}
 
-		void operator+=(sf::Time ellapsedTime) {
-			time += ellapsedTime;
+		void display() {
 			int s = time.asSeconds();
 
 			int m = s / 60;
@@ -147,6 +146,25 @@ private:
 			h %= 24;
 
 			str.setString(std::to_string(d) + ':' + std::to_string(h) + ':' + std::to_string(m) + ':' + std::to_string(s));
+		}
+
+		inline void reset() {
+			time = sf::Time::Zero;
+			str.setString("0:0:0:0");
+		}
+
+		inline void set(sf::Time time) {
+			this->time = time;
+			display();
+		}
+
+		inline sf::Time get() {
+			return time;
+		}
+
+		void operator+=(sf::Time ellapsedTime) {
+			time += ellapsedTime;
+			display();
 		}
 		
 	};

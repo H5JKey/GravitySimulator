@@ -3,7 +3,7 @@
 
 
 Object::Object(float mass, int radius, sf::Vector2f pos, sf::Vector2f speed, std::string name, sf::Color color, bool fixed) : m_picture(radius, 90) {
-	this->pos = pos;
+	this->pos = pos*powf(10,3);
 	this->mass = mass;
 	this->speed = speed;
 	this->name = name;
@@ -14,7 +14,7 @@ Object::Object(float mass, int radius, sf::Vector2f pos, sf::Vector2f speed, std
 
 void Object::updatePosition(float EllapsedTime) {
 	if (!this->fixed) {
-		this->pos += (this->speed * EllapsedTime)/powf(10,3);
+		this->pos += (this->speed * EllapsedTime);
 	}
 }
 
@@ -26,7 +26,7 @@ void Object::updateSpeed(float EllapsedTime) {
 
 void Object::updateGraphic() {
 	m_picture.setRadius(radius);
-	m_picture.setPosition(pos - sf::Vector2f(m_picture.getRadius(), m_picture.getRadius()));
+	m_picture.setPosition(pos/powf(10,3) - sf::Vector2f(m_picture.getRadius(), m_picture.getRadius()));
 	m_picture.setFillColor(color);
 }
 

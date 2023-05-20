@@ -14,8 +14,8 @@ private:
 public:
 
 	Save(std::filesystem::path p);
-	sf::Vector2f load(std::vector<Object>& objects);
-	void save(std::vector<Object>& objects, sf::Vector2f cameraPosition);
+	void load(std::vector<Object>& objects, sf::Vector2f& center, sf::Time& time);
+	void save(std::vector<Object>& objects, sf::Vector2f cameraPosition, sf::Time time);
 	void close();
 	~Save();
 

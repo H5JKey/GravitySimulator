@@ -12,10 +12,10 @@ class Object :sf::Drawable
 private:
 	sf::CircleShape m_picture;
 public:
-	float mass;
-	sf::Vector2f pos;
-	sf::Vector2f speed;
-	sf::Vector2f acceleration;
+	float mass;                  //10^24 Kg						
+	sf::Vector2f pos;			 //1 px - 10^3 km
+	sf::Vector2f speed;			 //km/s
+	sf::Vector2f acceleration;	 //km/s^2
 	std::string name;
 	sf::Color color;
 

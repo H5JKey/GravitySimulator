@@ -12,14 +12,13 @@ struct ObjectSavingParams {
 Save::Save(std::filesystem::path p):m_file(p) {}
 
 
-sf::Vector2f Save::load(std::vector<Object>& objects) {
-	sf::Vector2f cameraPosition;
-	m_file.read((char*)&cameraPosition, sizeof(sf::Vector2f));
+void Save::load(std::vector<Object>& objects, sf::Vector2f& center, sf::Time& time) {
+	m_file.read((char*)&center, sizeof(sf::Vector2f));
+	m_file.read((char*)&time, sizeof(sf::Time));
 	objects.clear();
 	ObjectSavingParams params;
 	Object obj;
 
-	int color[3] = { 0,0,0 };
 	
 	while (m_file.read((char*)&params, sizeof(ObjectSavingParams))) {
 		obj.mass = params.mass;
@@ -30,13 +29,13 @@ sf::Vector2f Save::load(std::vector<Object>& objects) {
 		obj.pos = params.pos;
 		objects.push_back(obj);
 	}
-	return cameraPosition;
 }
 
-void Save::save(std::vector<Object>& objects, sf::Vector2f cameraPosition) {
+void Save::save(std::vector<Object>& objects, sf::Vector2f center, sf::Time time) {
 	m_file.clear();
-	m_file.write((char*)&cameraPosition, sizeof(sf::Vector2f));
-	int color[3];
+	m_file.write((char*)&center, sizeof(sf::Vector2f));
+	m_file.write((char*)&time, sizeof(sf::Time));
+
 	for (Object& obj : objects) {
 		ObjectSavingParams params;
 		params.mass = obj.mass;
