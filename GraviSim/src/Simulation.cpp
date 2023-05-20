@@ -273,7 +273,7 @@ void Simulation::updateEvents() {
 
     sf::Time ellapsedTime = clock.restart();
     if (selectedObj != nullptr) {
-        camera.setCenter(selectedObj->pos);
+        camera.setCenter(selectedObj->pos/powf(10,3));
         ImGui::editingMenu = true;
     }
 
@@ -324,7 +324,7 @@ void Simulation::updateGui() {
             ImGui::InputText("##Name", &newObj.name);
             ImGui::Separator();
             ImGui::Text("Mass:");
-            ImGui::InputFloat("##Mass", &newObj.mass, 50.f);
+            ImGui::InputFloat("##Mass", &newObj.mass, 50.f,0);
             ImGui::Separator();
             ImGui::Text("Radius");
             ImGui::InputInt("##Radius", &newObj.radius);
