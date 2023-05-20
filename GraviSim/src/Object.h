@@ -4,6 +4,9 @@
 #include <ostream>
 #include <istream>
 
+
+
+
 class Object :sf::Drawable
 {
 private:
@@ -32,9 +35,6 @@ public:
 
 	~Object() {}
 
-
-	friend std::ostream& operator<<(std::ostream& out, Object& object);
-	friend std::istream& operator>>(std::istream& in, Object& object);
 };
 
 

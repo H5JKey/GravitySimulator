@@ -142,9 +142,9 @@ void Simulation::loadSettings() {
 void Simulation::updateObjects() {
     for (Object& object : objects) {
         if (!timeStop && Physics::timeSpeed!=0) {
-                Physics::update(object,objects, sf::Time(sf::seconds(0.0015)));
-            object.updateGraphic();
+                Physics::update(object,objects, sf::Time(sf::seconds(0.0015)));  
         }
+        object.updateGraphic();
     }
     
     if (centerOfGravity.show)
@@ -356,12 +356,15 @@ void Simulation::updateGui() {
             int i = 0;
             {
                 for (auto p : std::filesystem::directory_iterator("saves")) {
-                    Save saveFile(p);
-                    if (ImGui::Selectable(saveFile.name.c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 20, 15))) {
+                    std::string name = std::filesystem::path(p).filename().string();
+                    name = name.substr(0, name.rfind('.'));
+
+                    if (ImGui::Selectable(name.c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 20, 15))) {
+                        Save saveFile(p);
                         camera.setCenter(saveFile.load(objects));
                         ParticlesSystem::clear();
+                        saveFile.close();
                     }
-                    saveFile.close();
                     ImGui::SameLine();
                     if (ImGui::Button(("-##" + std::to_string(i)).c_str()))
                         std::filesystem::remove(p);
@@ -378,11 +381,8 @@ void Simulation::updateGui() {
                 std::ofstream f("saves/" + saveName + ".sim");
                 f.close();
                 Save newSaveFile(std::filesystem::path("saves/" + saveName + ".sim"));
-                newSaveFile.name = saveName;
-                saveName = "";
-
-
                 newSaveFile.save(objects, camera.getCenter());
+                saveName = "";
             }
             ImGui::Separator();
             if (ImGui::Button("Exit"))

@@ -11,6 +11,6 @@ public:
 
 	static void update(Object& object, std::vector<Object>& objects, sf::Time EllapsedTime);
 
-	static void calculateAcceleration(Object& obj1, Object& obj2);
+	static sf::Vector2f calculateAcceleration(const Object& obj1, const Object& obj2);
 	static sf::Vector2f calculateCenterOfGravity(std::vector<Object*>& forGravityCenter);
 };

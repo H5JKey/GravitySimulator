@@ -12,7 +12,6 @@ class Save
 private:
 	std::fstream m_file;
 public:
-	std::string name;
 
 	Save(std::filesystem::path p);
 	sf::Vector2f load(std::vector<Object>& objects);

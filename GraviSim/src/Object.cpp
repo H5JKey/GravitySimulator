@@ -50,25 +50,3 @@ Object::Object() :m_picture(radius, 90) {
 	this->color = { 255,255,255 };
 	this->radius = abs(this->mass) / 6000 + 1;
 }
-
-
-
-std::ostream& operator<<(std::ostream& out, Object& object) {
-	if (object.name == "") object.name = "##noName##";
-	int color[3];
-	color[0] = static_cast<int>(object.color.r);
-	color[1] = static_cast<int>(object.color.g);
-	color[2] = static_cast<int>(object.color.b);
-	out << object.name << ' ' << object.pos.x << ' ' << object.pos.y << ' ' << object.mass << ' ' << object.speed.x << ' ' << object.speed.y << ' ' << ' ' << object.radius << ' ' << color[0] << ' ' << color[1] << ' ' << color[2] << ' ' << object.fixed;
-	return out;
-}
-
-std::istream& operator>>(std::istream& in, Object& object) {
-	int color[3];
-	in >> object.name >> object.pos.x >> object.pos.y >> object.mass >> object.speed.x >> object.speed.y >> object.radius >> color[0] >> color[1] >> color[2] >> object.fixed;
-	if (object.name == "##noName##") object.name = "";
-	object.color.r = static_cast<sf::Uint8>(color[0]);
-	object.color.g = static_cast<sf::Uint8>(color[1]);
-	object.color.b = static_cast<sf::Uint8>(color[2]);
-	return in;
-}

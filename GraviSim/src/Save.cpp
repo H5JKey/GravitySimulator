@@ -1,19 +1,33 @@
 #include "Save.h"
 
+struct ObjectSavingParams {
+	float mass;
+	sf::Vector2f pos;
+	sf::Vector2f speed;
+	std::string name;
+	sf::Color color;
+	float radius;
+};
 
-Save::Save(std::filesystem::path p):m_file(p) {
-	std::getline(m_file, name);
-}
+Save::Save(std::filesystem::path p):m_file(p) {}
 
 
 sf::Vector2f Save::load(std::vector<Object>& objects) {
 	sf::Vector2f cameraPosition;
-	m_file >> cameraPosition.x >> cameraPosition.y;
+	m_file.read((char*)&cameraPosition, sizeof(sf::Vector2f));
 	objects.clear();
+	ObjectSavingParams params;
 	Object obj;
+
 	int color[3] = { 0,0,0 };
-	while (!m_file.eof()) {
-		m_file >> obj;
+	
+	while (m_file.read((char*)&params, sizeof(ObjectSavingParams))) {
+		obj.mass = params.mass;
+		obj.name = params.name;
+		obj.speed = params.speed;
+		obj.color = params.color;
+		obj.radius = params.radius;
+		obj.pos = params.pos;
 		objects.push_back(obj);
 	}
 	return cameraPosition;
@@ -21,16 +35,18 @@ sf::Vector2f Save::load(std::vector<Object>& objects) {
 
 void Save::save(std::vector<Object>& objects, sf::Vector2f cameraPosition) {
 	m_file.clear();
-	m_file << name << '\n';
-	m_file << cameraPosition.x << ' ' << cameraPosition.y;
-	if (objects.size() != 0)
-		m_file << '\n';
+	m_file.write((char*)&cameraPosition, sizeof(sf::Vector2f));
 	int color[3];
 	for (Object& obj : objects) {
-		m_file << obj;
-		if (&obj != &*(objects.end() - 1))
-			m_file << '\n';
+		ObjectSavingParams params;
+		params.mass = obj.mass;
+		params.pos = obj.pos;
+		params.speed = obj.speed;
+		params.color = obj.color;
+		params.name = obj.name;
+		params.radius = obj.radius;
 
+		m_file.write((char*)&params, sizeof(ObjectSavingParams));
 	}
 }
 
