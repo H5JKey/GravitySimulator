@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="dll">
+      <UniqueIdentifier>{3d7297ad-23bc-4662-b0cf-3dc53f89f24a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\imgui\imgui.cpp">
@@ -104,5 +107,31 @@
     <ClInclude Include="src\ParticleSources.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\x64\Release\sfml-window-d-2.dll">
+      <Filter>dll</Filter>
+    </None>
+    <None Include="..\x64\Release\sfml-window-2.dll">
+      <Filter>dll</Filter>
+    </None>
+    <None Include="..\x64\Release\sfml-system-2.dll">
+      <Filter>dll</Filter>
+    </None>
+    <None Include="..\x64\Release\sfml-system-d-2.dll">
+      <Filter>dll</Filter>
+    </None>
+    <None Include="..\x64\Release\sfml-graphics-d-2.dll">
+      <Filter>dll</Filter>
+    </None>
+    <None Include="..\x64\Release\sfml-graphics-2.dll">
+      <Filter>dll</Filter>
+    </None>
+    <None Include="..\x64\Release\sfml-audio-d-2.dll">
+      <Filter>dll</Filter>
+    </None>
+    <None Include="..\x64\Release\sfml-audio-2.dll">
+      <Filter>dll</Filter>
+    </None>
   </ItemGroup>
 </Project>
