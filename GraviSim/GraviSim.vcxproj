@@ -190,8 +190,7 @@
     <ClInclude Include="src\Simulation.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\x64\Release\sfml-audio-2.dll" />
-    <None Include="..\x64\Release\sfml-audio-d-2.dll" />
+    <None Include="..\x64\Release\openal32.dll" />
     <None Include="..\x64\Release\sfml-graphics-2.dll" />
     <None Include="..\x64\Release\sfml-graphics-d-2.dll" />
     <None Include="..\x64\Release\sfml-system-2.dll" />
