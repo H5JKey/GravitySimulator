@@ -474,7 +474,6 @@ void Simulation::updateGui() {
 
 Simulation::~Simulation() {
     ImGui::SFML::Shutdown();
-    delete(selectedObj);
     delete(backGround);
     saveSettings();
 }
