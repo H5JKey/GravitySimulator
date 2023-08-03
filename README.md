@@ -1,6 +1,6 @@
 # GravitySimulator
 
-Its a simple gravity simulation program based on Newton's law of gravity written in c++ with ImGui lib.
+Its a simple gravity simulation program based on Newton's law of gravity written in c++ with ImGui and SFML.
 In this program you can:
   1. Add and delete objects
   2. Edit object's params
