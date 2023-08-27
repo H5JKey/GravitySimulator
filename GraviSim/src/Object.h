@@ -5,12 +5,7 @@
 #include <istream>
 
 
-
-
-class Object :sf::Drawable
-{
-private:
-	sf::CircleShape m_picture;
+class Properties {
 public:
 	float mass;					 //in 10^24 Kg
 	int radius;					 //in px --- 1 px = 10^3 km
@@ -20,7 +15,13 @@ public:
 	std::string name;
 	sf::Color color;
 	bool fixed;
+};
 
+class Object : sf::Drawable, public Properties
+{
+private:
+	sf::CircleShape m_picture;
+public:
 
 	Object(float mass, int radius, sf::Vector2f pos, sf::Vector2f speed = sf::Vector2f(0, 0), std::string name = "", sf::Color color = sf::Color(255, 255, 255), bool fixed = false);
 	Object();
