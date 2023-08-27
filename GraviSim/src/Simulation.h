@@ -94,7 +94,7 @@ private:
 
 		CenterOfGravity() {
 			show = false;
-			size = 16;
+			size = 160;
 			cross[0].setFillColor(sf::Color::Red);
 			cross[1].setFillColor(sf::Color::Red);
 			cross[0].setSize({ size, 1 });

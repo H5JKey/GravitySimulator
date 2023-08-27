@@ -98,7 +98,7 @@ void Simulation::start() {
 void Simulation::update() {
     ellapsedTime = clock.restart();
     if (!timeStop)
-        timer += (sf::seconds(0.0015) * Physics::timeSpeed);
+        timer += (ellapsedTime * Physics::timeSpeed);
     if (!timeStop && Physics::timeSpeed > 0)
         ParticlesSystem::update(ellapsedTime);
     updateEvents();
@@ -142,7 +142,7 @@ void Simulation::loadSettings() {
 void Simulation::updateObjects() {
     for (Object& object : objects) {
         if (!timeStop && Physics::timeSpeed!=0) {
-                Physics::update(object,objects, sf::Time(sf::seconds(0.0015)));  
+                Physics::update(object,objects, ellapsedTime);
         }
         object.updateGraphic();
     }
@@ -378,27 +378,21 @@ void Simulation::updateGui() {
                 ImGui::addObjMenu = true;
             ImGui::ListBoxHeader("##ObjectsList"); {
 
+
                 for (int i = 0; i < objects.size(); i++) {
                     if (objects[i].name == "") continue;
-                    if (ImGui::Selectable((objects[i].name + "##" + std::to_string(i)).c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 20, 15))) {
+                    if (ImGui::Selectable((objects[i].name + "##" + std::to_string(i)).c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 25, 15))) {
                         selectedObj = &objects[i];
                     }
                     ImGui::SameLine();
                     if (centerOfGravity.show) {
-                        bool flag;
+                        forGravityCenter.clear();
 
-                        if (std::find(forGravityCenter.begin(), forGravityCenter.end(), &objects[i]) != forGravityCenter.end())
-                            flag = true;
-                        else
-                            flag = false;
-                        bool wantAdd = flag;
-                        ImGui::Checkbox(std::to_string(i).c_str(), &wantAdd);
-                        if (flag != wantAdd) {
-                            if (wantAdd)
-                                forGravityCenter.push_back(&objects[i]);
-                            else
-                                forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](const auto& object) {return object == &objects[i]; }), forGravityCenter.end());
-                        }
+                        ImGui::Checkbox(std::to_string(i).c_str(), &objects[i].useForGravityCenter);
+                        
+                        if (objects[i].useForGravityCenter)
+                            forGravityCenter.push_back(&objects[i]);
+
                     }
                     else {
                         if (ImGui::Button(("-##" + std::to_string(i)).c_str())) {
@@ -406,7 +400,6 @@ void Simulation::updateGui() {
                             forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](const auto& object) {return object == &objects[i]; }), forGravityCenter.end());
                         }
                     }
-
                 }
             }
             ImGui::ListBoxFooter();
@@ -417,16 +410,14 @@ void Simulation::updateGui() {
         }
         else {//Main menu
             if (ImGui::Button("Settings"))
-                if (ImGui::Selectable("Settings"))
-                    ImGui::settingsMenu = true;
-                ImGui::SameLine();
+                ImGui::settingsMenu = true;
+            ImGui::SameLine();
             if (ImGui::Button("Objects"))
                     ImGui::objectsMenu = true;
-                ImGui::SameLine();
+            ImGui::SameLine();
             if (ImGui::Button("Save/Load"))
                     ImGui::savingMenu = true;
             
-
             ImGui::Separator();
             ImGui::Text("Time Speed");
             ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 1500);
@@ -457,7 +448,7 @@ void Simulation::updateGui() {
             ImGui::InputFloat2("##Speed", *speed);
             ImGui::Separator();
             ImGui::Text("Color:");
-            float color[3] = { static_cast<float>(selectedObj->color.r / 255.f),static_cast<float>(selectedObj->color.g / 255.f) ,static_cast<float>(selectedObj->color.b / 255.f) };
+            float color[3] = { static_cast<float>(selectedObj->color.r / 255.f), static_cast<float>(selectedObj->color.g / 255.f) ,static_cast<float>(selectedObj->color.b / 255.f) };
             ImGui::ColorEdit3("##Color", color);
             selectedObj->color = { static_cast<sf::Uint8>(color[0] * 255), static_cast<sf::Uint8>(color[1] * 255), static_cast<sf::Uint8>(color[2] * 255) };
             ImGui::Separator();

@@ -22,6 +22,7 @@ class Object : sf::Drawable, public Properties
 private:
 	sf::CircleShape m_picture;
 public:
+	bool useForGravityCenter;
 
 	Object(float mass, int radius, sf::Vector2f pos, sf::Vector2f speed = sf::Vector2f(0, 0), std::string name = "", sf::Color color = sf::Color(255, 255, 255), bool fixed = false);
 	Object();
