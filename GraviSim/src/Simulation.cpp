@@ -283,43 +283,10 @@ void Simulation::updateEvents() {
 void Simulation::updateGui() {
 
     ImGui::SFML::Update(app, ellapsedTime);
-    ImGui::Begin("Gravity simulation", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+    ImGui::Begin("Gravity simulation", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
     {
         ImGui::Separator();
-        if (ImGui::editingMenu) {//Editing selected object
-            ImGui::Text("Name:");
-            ImGui::InputText("##Name", &selectedObj->name);
-            ImGui::Separator();
-            ImGui::Text("Mass:");
-            ImGui::InputFloat("##Mass", &selectedObj->mass, 50.f);
-            ImGui::Separator();
-            ImGui::Text("Radius");
-            ImGui::InputInt("##Radius", &selectedObj->radius);
-            selectedObj->radius = std::clamp(selectedObj->radius, 1, 750);
-            ImGui::Separator();
-            ImGui::Text("Speed:");
-            float* speed[2] = { &selectedObj->speed.x, &selectedObj->speed.y };
-            ImGui::InputFloat2("##Speed", *speed);
-            ImGui::Separator();
-            ImGui::Text("Color:");
-            float color[3] = { static_cast<float>(selectedObj->color.r / 255.f),static_cast<float>(selectedObj->color.g / 255.f) ,static_cast<float>(selectedObj->color.b / 255.f) };
-            ImGui::ColorEdit3("##Color", color);
-            selectedObj->color = { static_cast<sf::Uint8>(color[0] * 255), static_cast<sf::Uint8>(color[1] * 255), static_cast<sf::Uint8>(color[2] * 255) };
-            ImGui::Separator();
-            ImGui::Separator();
-            ImGui::Checkbox("Fixed", &selectedObj->fixed);
-            if (ImGui::Button("Delete this object")) {
-                objects.erase(std::remove_if(objects.begin(), objects.end(), [&](const auto& object) {return &object == selectedObj; }), objects.end());
-                forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](const auto& object) {return object == selectedObj; }), forGravityCenter.end());
-                selectedObj = nullptr;
-                ImGui::editingMenu = false;
-            }
-            ImGui::Separator();
-            if (ImGui::Button("Exit"))
-                selectedObj = nullptr;
-            ImGui::editingMenu = false;
-        }
-        else if (ImGui::addObjMenu) {//Adding new object
+        if (ImGui::addObjMenu) {//Adding new object
             ImGui::Text("Name:");
             ImGui::InputText("##Name", &newObj.name);
             ImGui::Separator();
@@ -450,13 +417,15 @@ void Simulation::updateGui() {
         }
         else {//Main menu
             if (ImGui::Button("Settings"))
-                ImGui::settingsMenu = true;
-            ImGui::SameLine();
+                if (ImGui::Selectable("Settings"))
+                    ImGui::settingsMenu = true;
+                ImGui::SameLine();
             if (ImGui::Button("Objects"))
-                ImGui::objectsMenu = true;
-            ImGui::SameLine();
+                    ImGui::objectsMenu = true;
+                ImGui::SameLine();
             if (ImGui::Button("Save/Load"))
-                ImGui::savingMenu = true;
+                    ImGui::savingMenu = true;
+            
 
             ImGui::Separator();
             ImGui::Text("Time Speed");
@@ -466,15 +435,51 @@ void Simulation::updateGui() {
                 timer.reset();
 
             ImGui::Separator();
-            if (ImGui::Button("Exit")) app.close();
+            if (ImGui::Button("Exit")) 
+                app.close();
         }
     }
     ImGui::End();
+    if (ImGui::editingMenu) {//Editing selected object
+        ImGui::Begin("##ObjectMenu", nullptr, ImGuiWindowFlags_NoResize); {
+            ImGui::Text("Name:");
+            ImGui::InputText("##Name", &selectedObj->name);
+            ImGui::Separator();
+            ImGui::Text("Mass:");
+            ImGui::InputFloat("##Mass", &selectedObj->mass, 50.f);
+            ImGui::Separator();
+            ImGui::Text("Radius");
+            ImGui::InputInt("##Radius", &selectedObj->radius);
+            selectedObj->radius = std::clamp(selectedObj->radius, 1, 750);
+            ImGui::Separator();
+            ImGui::Text("Speed:");
+            float* speed[2] = { &selectedObj->speed.x, &selectedObj->speed.y };
+            ImGui::InputFloat2("##Speed", *speed);
+            ImGui::Separator();
+            ImGui::Text("Color:");
+            float color[3] = { static_cast<float>(selectedObj->color.r / 255.f),static_cast<float>(selectedObj->color.g / 255.f) ,static_cast<float>(selectedObj->color.b / 255.f) };
+            ImGui::ColorEdit3("##Color", color);
+            selectedObj->color = { static_cast<sf::Uint8>(color[0] * 255), static_cast<sf::Uint8>(color[1] * 255), static_cast<sf::Uint8>(color[2] * 255) };
+            ImGui::Separator();
+            ImGui::Separator();
+            ImGui::Checkbox("Fixed", &selectedObj->fixed);
+            if (ImGui::Button("Delete this object")) {
+                objects.erase(std::remove_if(objects.begin(), objects.end(), [&](const auto& object) {return &object == selectedObj; }), objects.end());
+                forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](const auto& object) {return object == selectedObj; }), forGravityCenter.end());
+                selectedObj = nullptr;
+                ImGui::editingMenu = false;
+            }
+            ImGui::Separator();
+            if (ImGui::Button("Exit"))
+                selectedObj = nullptr;
+            ImGui::editingMenu = false;
+        }
+        ImGui::End();
+    }
 }
 
 Simulation::~Simulation() {
     ImGui::SFML::Shutdown();
-    delete(selectedObj);
     delete(backGround);
     saveSettings();
 }
