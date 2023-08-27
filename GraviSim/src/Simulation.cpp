@@ -158,7 +158,6 @@ void Simulation::updateObjects() {
                     if (anotherObject.mass >= object.mass) {
 
                         ParticlesSystem::add(new Explosion(1000, object.pos/powf(10,3), object.color));
-                        forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](const auto& obj) {return obj == &object; }), forGravityCenter.end());
                         return true;
                     }
                 }
@@ -229,11 +228,12 @@ void Simulation::updateEvents() {
 
         if (!ImGui::GetIO().WantCaptureMouse) {
             if (event.type == sf::Event::MouseWheelMoved) {
-                if (event.mouseWheel.delta > 0)
-                    zoomViewAt(sf::Mouse::getPosition(), camera, app, 0.9);
-
-                else
+                if (event.mouseWheel.delta > 0) {
+                    zoomViewAt(sf::Mouse::getPosition(), camera, app, 0.9);    
+                }
+                else {
                     camera.zoom(1.1);
+                }
 
             }
             static sf::Clock delta;//for double clicks
@@ -333,6 +333,7 @@ void Simulation::updateGui() {
                         saveFile.load(objects,center,time);
                         timer.set(time);
                         ParticlesSystem::clear();
+                        centerOfGravity.show = false;
                         saveFile.close();
                     }
                     ImGui::SameLine();
@@ -378,7 +379,7 @@ void Simulation::updateGui() {
                 ImGui::addObjMenu = true;
             ImGui::ListBoxHeader("##ObjectsList"); {
 
-
+                forGravityCenter.clear();
                 for (int i = 0; i < objects.size(); i++) {
                     if (objects[i].name == "") continue;
                     if (ImGui::Selectable((objects[i].name + "##" + std::to_string(i)).c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 25, 15))) {
@@ -386,19 +387,15 @@ void Simulation::updateGui() {
                     }
                     ImGui::SameLine();
                     if (centerOfGravity.show) {
-                        forGravityCenter.clear();
 
                         ImGui::Checkbox(std::to_string(i).c_str(), &objects[i].useForGravityCenter);
                         
                         if (objects[i].useForGravityCenter)
                             forGravityCenter.push_back(&objects[i]);
-
                     }
                     else {
-                        if (ImGui::Button(("-##" + std::to_string(i)).c_str())) {
+                        if (ImGui::Button(("-##" + std::to_string(i)).c_str())) 
                             objects.erase(objects.begin() + i);
-                            forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](const auto& object) {return object == &objects[i]; }), forGravityCenter.end());
-                        }
                     }
                 }
             }

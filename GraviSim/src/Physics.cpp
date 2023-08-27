@@ -24,7 +24,7 @@ sf::Vector2f Physics::calculateCenterOfGravity(std::vector<Object*>& forGravityC
 	int m = 0;
 	sf::Vector2f rm;
 	for (Object* obj : forGravityCenter) {
-		rm += obj->mass * obj->pos;
+		rm += obj->mass * (obj->pos / 1000.f);
 		m += obj->mass;
 	}
 	return rm / float(m);
