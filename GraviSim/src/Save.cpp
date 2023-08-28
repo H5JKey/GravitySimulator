@@ -43,8 +43,7 @@ void Save::save(std::vector<Object>& objects, sf::Vector2f center, sf::Time time
 }
 
 void Save::close() {
-	if (m_file.is_open())
-		m_file.close();
+	m_file.close();
 }
 
 

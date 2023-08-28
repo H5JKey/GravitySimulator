@@ -544,10 +544,55 @@ void Simulation::updateGui() {
                 ImGui::settingsMenu = true;
             ImGui::SameLine();
             if (ImGui::Button("Objects"))
-                ImGui::objectsMenu = true;
+                    ImGui::objectsMenu = true;
+            if (ImGui::Button("Save"))
+                ImGuiFileDialog::Instance()->OpenDialog("ChooseFileToSave", "Choose file", ".sim", ".");
+
+            if (ImGuiFileDialog::Instance()->Display("ChooseFileToSave"))
+            {
+                if (ImGuiFileDialog::Instance()->IsOk())
+                {
+                    std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                    std::ofstream f(filePathName);
+                    f.close();
+                    Save newSaveFile(filePathName);
+                    newSaveFile.save(objects, camera.getCenter(), timer.get());
+                    newSaveFile.close();
+                }
+
+                ImGuiFileDialog::Instance()->Close();
+            }
+
             ImGui::SameLine();
-            if (ImGui::Button("Save/Load"))
-                ImGui::savingMenu = true;
+            if (ImGui::Button("Load"))
+                ImGuiFileDialog::Instance()->OpenDialog("ChooseFileToLoad", "Choose file", ".sim", ".");
+
+            if (ImGuiFileDialog::Instance()->Display("ChooseFileToLoad"))
+            {
+                if (ImGuiFileDialog::Instance()->IsOk())
+                {
+                    std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                    Save saveFile(filePathName);
+                    sf::Vector2f center;
+                    sf::Time time;
+                    saveFile.load(objects, center, time);
+                    timer.set(time);
+                    ParticlesSystem::clear();
+                    centerOfGravity.show = false;
+                    saveFile.close();
+                }
+
+                ImGuiFileDialog::Instance()->Close();
+            }
+            ImGui::Separator();
+
+            ImGui::RadioButton("Destruction upon collision", &selectedCollisionOption, 0);
+
+            ImGui::RadioButton("Collision", &selectedCollisionOption, 1);
+            if (selectedCollisionOption == 1) {
+                ImGui::Text("restitutionCoefficient");
+                ImGui::SliderFloat("##restitution coefficientSlider", &restitutionCoefficient, 0, 1);
+            }
 
             ImGui::Separator();
             ImGui::Text("Time Speed");
