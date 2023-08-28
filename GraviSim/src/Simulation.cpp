@@ -414,6 +414,7 @@ void Simulation::updateGui() {
                     f.close();
                     Save newSaveFile(filePathName);
                     newSaveFile.save(objects, camera.getCenter(), timer.get());
+                    newSaveFile.close();
                 }
 
                 ImGuiFileDialog::Instance()->Close();
@@ -435,6 +436,7 @@ void Simulation::updateGui() {
                     timer.set(time);
                     ParticlesSystem::clear();
                     centerOfGravity.show = false;
+                    saveFile.close();
                 }
 
                 ImGuiFileDialog::Instance()->Close();
