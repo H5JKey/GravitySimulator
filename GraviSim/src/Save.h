@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <filesystem>
 #include <fstream>
 #include <vector>
 
@@ -13,7 +12,7 @@ private:
 	std::fstream m_file;
 public:
 
-	Save(std::filesystem::path p);
+	Save(std::string path);
 	void load(std::vector<Object>& objects, sf::Vector2f& center, sf::Time& time);
 	void save(std::vector<Object>& objects, sf::Vector2f cameraPosition, sf::Time time);
 	void close();

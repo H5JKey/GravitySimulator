@@ -1,7 +1,7 @@
 #include "Save.h"
 
 
-Save::Save(std::filesystem::path p):m_file(p) {}
+Save::Save(std::string path):m_file(path) {}
 
 
 void Save::load(std::vector<Object>& objects, sf::Vector2f& center, sf::Time& time) {

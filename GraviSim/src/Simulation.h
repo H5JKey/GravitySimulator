@@ -5,6 +5,7 @@
 #include "Object.h"
 #include "Save.h"
 #include "ParticlesSystem.h"
+#include "VectorMath.h"
 
 
 #include <ppl.h>
@@ -16,6 +17,7 @@
 #include "../lib/imgui/imgui.h"
 #include "../lib/imgui/imgui-SFML.h"
 #include "../lib/imgui/imgui_stdlib.h"
+#include "../lib/imgui_file_dialog/ImGuiFileDialog.h"
 
 
 
@@ -170,6 +172,9 @@ private:
 	};
 
 	bool timeStop = false;
+
+	int selectedCollisionOption = 0;
+	float restitutionCoefficient = 1.f;
 	CenterOfGravity centerOfGravity;
 	FpsTracker fpsTracker;
 	BackGround* backGround;

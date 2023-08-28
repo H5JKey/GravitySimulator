@@ -3,9 +3,9 @@
 
 void Physics::update(Object& object,std::vector<Object>& objects, sf::Time EllapsedTime) {
 	object.acceleration = { 0,0 };
-	for (Object& anotherObject : objects) {
-		if (&object == &anotherObject) continue;
-		object.acceleration+=calculateAcceleration(object, anotherObject);
+	for (Object& otherObject : objects) {
+		if (&object == &otherObject) continue;
+		object.acceleration+=calculateAcceleration(object, otherObject);
 	}
 	object.updateSpeed(EllapsedTime.asSeconds() * timeSpeed);
 	object.updatePosition(EllapsedTime.asSeconds() * timeSpeed);
