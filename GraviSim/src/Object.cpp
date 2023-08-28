@@ -10,6 +10,8 @@ Object::Object(float mass, int radius, sf::Vector2f pos, sf::Vector2f speed, std
 	this->fixed = fixed;
 	this->radius = radius;
 	this->color = color;
+	useForGravityCenter=false;
+
 }
 
 void Object::updatePosition(float EllapsedTime) {
@@ -49,4 +51,6 @@ Object::Object() :m_picture(radius, 90) {
 	this->name = "";
 	this->color = { 255,255,255 };
 	this->radius = abs(this->mass) / 6000 + 1;
+	useForGravityCenter=false;
+
 }
