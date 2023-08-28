@@ -6,6 +6,7 @@
 #include "Save.h"
 #include "ParticlesSystem.h"
 #include "VectorMath.h"
+#include "HUD.h"
 
 
 #include <ppl.h>
@@ -43,30 +44,6 @@ private:
 
 	int savedTimeSpeed;
 
-	struct FpsTracker : sf::Drawable {
-	private:
-		sf::Font font;
-		sf::Text str;
-	public:
-		bool show;
-		FpsTracker() {
-			show = false;
-			font.loadFromFile("C:/Windows/Fonts/arial.ttf");
-			str.setFont(font);
-			str.setCharacterSize(13);
-			str.setStyle(sf::Text::Bold);
-			str.setFillColor(sf::Color::White);
-			str.setPosition(10, 40);
-		}
-
-		void calculate(sf::Time ellapsedTime) {
-			str.setString(std::to_string(int(1 / ellapsedTime.asSeconds())));
-		}
-
-		virtual void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const {
-			target.draw(str);
-		}
-	};
 
 	struct BackGround : sf::Drawable {
 	private:
@@ -116,61 +93,7 @@ private:
 		}
 	};
 
-	struct Timer : sf::Drawable {
-	private:
-		sf::Font font;
-		sf::Text str;
-		sf::Time time;
-	public:
-		bool show;
-		Timer() {
-			show = false;
-			font.loadFromFile("C:/Windows/Fonts/arial.ttf");
-			str.setFont(font);
-			str.setCharacterSize(17);
-			str.setStyle(sf::Text::Bold);
-			str.setFillColor(sf::Color::White);
-			str.setPosition(10, 7);
-		}
-
-		virtual void draw(sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates::Default) const {
-			target.draw(str);
-		}
-
-		void display() {
-			int s = time.asSeconds();
-
-			int m = s / 60;
-			s %= 60;
-			int h = m / 60;
-			m %= 60;
-			int d = h / 24;
-			h %= 24;
-
-			str.setString(std::to_string(d) + ':' + std::to_string(h) + ':' + std::to_string(m) + ':' + std::to_string(s));
-		}
-
-		inline void reset() {
-			time = sf::Time::Zero;
-			str.setString("0:0:0:0");
-		}
-
-		inline void set(sf::Time time) {
-			this->time = time;
-			display();
-		}
-
-		inline sf::Time get() {
-			return time;
-		}
-
-		void operator+=(sf::Time ellapsedTime) {
-			time += ellapsedTime;
-			display();
-		}
-		
-	};
-
+	
 	bool timeStop = false;
 
 	int selectedCollisionOption = 0;
