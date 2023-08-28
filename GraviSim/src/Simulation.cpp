@@ -63,9 +63,6 @@ namespace ImGui {
 
 Simulation::Simulation() {
 
-    objects.push_back(Object(2000000, 20, sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Sun", sf::Color(255, 255, 255), true));
-    objects.push_back(Object(300, 2, sf::Vector2f(960, 50), sf::Vector2f(500, 0), "Planet"));
-
     selectedObj = nullptr;
     savedTimeSpeed = 0;
 
@@ -88,6 +85,9 @@ Simulation::Simulation() {
 }
 
 void Simulation::start() {
+    objects.push_back(Object(2000000, 20, sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Sun", sf::Color(255, 255, 255), true));
+    objects.push_back(Object(300, 2, sf::Vector2f(960, 50), sf::Vector2f(500, 0), "Planet"));
+
     while (app.isOpen()) {
         update();
     }
@@ -414,7 +414,6 @@ void Simulation::updateGui() {
                     f.close();
                     Save newSaveFile(filePathName);
                     newSaveFile.save(objects, camera.getCenter(), timer.get());
-                    newSaveFile.close();
                 }
 
                 ImGuiFileDialog::Instance()->Close();
@@ -436,7 +435,6 @@ void Simulation::updateGui() {
                     timer.set(time);
                     ParticlesSystem::clear();
                     centerOfGravity.show = false;
-                    saveFile.close();
                 }
 
                 ImGuiFileDialog::Instance()->Close();
