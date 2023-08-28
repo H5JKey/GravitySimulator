@@ -8,11 +8,11 @@ void Save::load(std::vector<Object>& objects, sf::Vector2f& center, sf::Time& ti
 	m_file.read((char*)&center, sizeof(sf::Vector2f));
 	m_file.read((char*)&time, sizeof(sf::Time));
 	objects.clear();
-	Properties savingObj;
-	Object obj;
 
-	
+
+	Properties savingObj;
 	while (m_file.read((char*)&savingObj, sizeof(savingObj))) {
+		Object obj;
 		obj.mass = savingObj.mass;
 		obj.name = savingObj.name;
 		obj.speed = savingObj.speed;
@@ -21,6 +21,7 @@ void Save::load(std::vector<Object>& objects, sf::Vector2f& center, sf::Time& ti
 		obj.pos = savingObj.pos;
 		objects.push_back(obj);
 	}
+	m_file.close();
 }
 
 void Save::save(std::vector<Object>& objects, sf::Vector2f center, sf::Time time) {
@@ -28,9 +29,9 @@ void Save::save(std::vector<Object>& objects, sf::Vector2f center, sf::Time time
 	m_file.write((char*)&center, sizeof(sf::Vector2f));
 	m_file.write((char*)&time, sizeof(sf::Time));
 
-	Properties savingObj;
 	for (Object& obj : objects) {
 
+		Properties savingObj;
 		savingObj.mass = obj.mass;
 		savingObj.pos = obj.pos;
 		savingObj.speed = obj.speed;
@@ -40,6 +41,7 @@ void Save::save(std::vector<Object>& objects, sf::Vector2f center, sf::Time time
 
 		m_file.write((char*)&savingObj, sizeof(savingObj));
 	}
+	m_file.close();
 }
 
 void Save::close() {
