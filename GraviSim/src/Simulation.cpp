@@ -153,7 +153,7 @@ void Simulation::updateObjects() {
         switch (selectedCollisionOption)
         {
         case 1:
-            for (int i = 0; i < objects.size(); i++) {
+            concurrency::parallel_for(0, int(objects.size()), [&](int i) {
                 for (int j = i + 1; j < objects.size(); j++) {
 
                     Object* object1 = &objects[i];
@@ -177,7 +177,7 @@ void Simulation::updateObjects() {
                         object2->speed -= (J / m2) * n;
                     }
                 }
-            }
+            });
             break;
 
         case 0:
