@@ -316,8 +316,65 @@ void Simulation::updateEvents() {
 void Simulation::updateGui() {
 
     ImGui::SFML::Update(app, ellapsedTime);
-    ImGui::Begin("Gravity simulation", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+    ImGui::Begin("Gravity simulation", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar);
     {
+        if (ImGui::BeginMenuBar())
+        {
+            if (ImGui::BeginMenu("Settings")) {
+                ImGui::settingsMenu = true;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("Objects")) {
+                ImGui::objectsMenu = true;
+                ImGui::EndMenu();
+            }
+            if (ImGui::BeginMenu("File"))
+            {
+                if (ImGui::MenuItem("Open..")) {
+                    ImGuiFileDialog::Instance()->OpenDialog("ChooseFileToLoad", "Choose file", ".sim", ".");
+                }
+                if (ImGui::MenuItem("Save")) {
+                    ImGuiFileDialog::Instance()->OpenDialog("ChooseFileToSave", "Choose file", ".sim", ".");
+                }
+
+                ImGui::EndMenu();
+            }
+            ImGui::EndMenuBar();
+        }
+
+
+
+        if (ImGuiFileDialog::Instance()->Display("ChooseFileToSave"))
+        {
+            if (ImGuiFileDialog::Instance()->IsOk())
+            {
+                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                std::ofstream f(filePathName);
+                f.close();
+                Save newSaveFile(filePathName);
+                newSaveFile.save(objects, camera.getCenter(), timer.get());
+            }
+
+            ImGuiFileDialog::Instance()->Close();
+        }
+
+        if (ImGuiFileDialog::Instance()->Display("ChooseFileToLoad"))
+        {
+            if (ImGuiFileDialog::Instance()->IsOk())
+            {
+                std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+                Save saveFile(filePathName);
+                sf::Vector2f center;
+                sf::Time time;
+                saveFile.load(objects, center, time);
+                timer.set(time);
+                ParticlesSystem::clear();
+                centerOfGravity.show = false;
+            }
+
+            ImGuiFileDialog::Instance()->Close();
+        }
+
         ImGui::Separator();
         if (ImGui::addObjMenu) {//Adding new object
             ImGui::Text("Name:");
@@ -397,50 +454,6 @@ void Simulation::updateGui() {
                 ImGui::objectsMenu = false;
         }
         else {//Main menu
-            if (ImGui::Button("Settings"))
-                ImGui::settingsMenu = true;
-            ImGui::SameLine();
-            if (ImGui::Button("Objects"))
-                    ImGui::objectsMenu = true;
-            if (ImGui::Button("Save"))
-                ImGuiFileDialog::Instance()->OpenDialog("ChooseFileToSave", "Choose file", ".sim", ".");
-
-            if (ImGuiFileDialog::Instance()->Display("ChooseFileToSave"))
-            {
-                if (ImGuiFileDialog::Instance()->IsOk())
-                {
-                    std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-                    std::ofstream f(filePathName);
-                    f.close();
-                    Save newSaveFile(filePathName);
-                    newSaveFile.save(objects, camera.getCenter(), timer.get());
-                }
-
-                ImGuiFileDialog::Instance()->Close();
-            }
-
-            ImGui::SameLine();
-            if (ImGui::Button("Load"))
-                ImGuiFileDialog::Instance()->OpenDialog("ChooseFileToLoad", "Choose file", ".sim", ".");
-
-            if (ImGuiFileDialog::Instance()->Display("ChooseFileToLoad"))
-            {
-                if (ImGuiFileDialog::Instance()->IsOk())
-                {
-                    std::string filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
-                    Save saveFile(filePathName);
-                    sf::Vector2f center;
-                    sf::Time time;
-                    saveFile.load(objects, center, time);
-                    timer.set(time);
-                    ParticlesSystem::clear();
-                    centerOfGravity.show = false;
-                }
-
-                ImGuiFileDialog::Instance()->Close();
-            }
-            ImGui::Separator();
-
             ImGui::RadioButton("Destruction upon collision", &selectedCollisionOption, 0);
 
             ImGui::RadioButton("Collision", &selectedCollisionOption, 1);
