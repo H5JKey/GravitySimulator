@@ -168,9 +168,9 @@ void Simulation::updateObjects() {
                         float m2 = object2->mass;
 
                         if (m1 == 0)
-                            m1 = 0.001;
+                            m1 = 0.00001;
                         if (m2 == 0)
-                            m2 = 0.001;
+                            m2 = 0.00001;
 
                         float J = VectorMath::dot(((m1 * m2) / (m1 + m2)) * (1.f + restitutionCoefficient) * (object2->speed - object1->speed), n);
                         object1->speed += (J / m1) * n;
@@ -322,10 +322,12 @@ void Simulation::updateGui() {
         {
             if (ImGui::BeginMenu("Settings")) {
                 ImGui::settingsMenu = true;
+                ImGui::objectsMenu = false;
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Objects")) {
                 ImGui::objectsMenu = true;
+                ImGui::settingsMenu = false;
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("File"))
