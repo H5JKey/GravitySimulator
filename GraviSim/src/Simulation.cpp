@@ -341,10 +341,12 @@ void Simulation::updateGui() {
         {
             if (ImGui::BeginMenu("Settings")) {
                 ImGui::settingsMenu = true;
+                ImGui::objectsMenu = false;
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Objects")) {
                 ImGui::objectsMenu = true;
+                ImGui::settingsMenu = false;
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("File"))
