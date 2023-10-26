@@ -3,8 +3,9 @@
 namespace ImGui {
     bool addObjMenu = false;
     bool editingMenu = false;
-    bool settingsMenu = false;
+    bool otherSettingsMenu = false;
     bool objectsMenu = false;
+    bool simulationSettingsMenu = false;
 
     void setStyle() {
         ImGuiStyle& style = ImGui::GetStyle();
@@ -321,13 +322,23 @@ void Simulation::updateGui() {
         if (ImGui::BeginMenuBar())
         {
             if (ImGui::BeginMenu("Settings")) {
-                ImGui::settingsMenu = true;
+                if (ImGui::MenuItem("Simulation settings")) {
+                    ImGui::simulationSettingsMenu = true;
+                    ImGui::otherSettingsMenu = false;
+                }
+                if (ImGui::MenuItem("Other settings")) {
+                    ImGui::simulationSettingsMenu = false;
+                    ImGui::otherSettingsMenu = true;
+                }
                 ImGui::objectsMenu = false;
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("Objects")) {
-                ImGui::objectsMenu = true;
-                ImGui::settingsMenu = false;
+                if (ImGui::MenuItem("Add object")) 
+                    ImGui::addObjMenu = true;
+                if (ImGui::MenuItem("View all objects"))
+                    ImGui::objectsMenu = true;
+                ImGui::otherSettingsMenu = false;
                 ImGui::EndMenu();
             }
             if (ImGui::BeginMenu("File"))
@@ -409,7 +420,7 @@ void Simulation::updateGui() {
             if (ImGui::Button("Exit"))
                 ImGui::addObjMenu = false;
         }
-        else if (ImGui::settingsMenu) {//Settings menu
+        else if (ImGui::otherSettingsMenu) {//Other settings menu
             ImGui::Checkbox("Draw background", &backGround->show);
             ImGui::Separator();
             ImGui::Checkbox("Show FPS", &fpsTracker.show);
@@ -420,13 +431,24 @@ void Simulation::updateGui() {
 
             ImGui::Separator();
             if (ImGui::Button("Exit"))
-                ImGui::settingsMenu = false;
+                ImGui::otherSettingsMenu = false;
+
+        }
+        else if (ImGui::simulationSettingsMenu) {//Simulation settings menu
+            ImGui::RadioButton("Destruction upon collision", &selectedCollisionOption, 0);
+
+            ImGui::RadioButton("Collision", &selectedCollisionOption, 1);
+            if (selectedCollisionOption == 1) {
+                ImGui::Text("Restitution coefficient");
+                ImGui::SliderFloat("##restitution coefficientSlider", &restitutionCoefficient, 0, 1);
+            }
+            ImGui::Separator();
+            if (ImGui::Button("Exit"))
+                ImGui::simulationSettingsMenu = false;
 
         }
         else if (ImGui::objectsMenu) {//Objects Menu
             ImGui::Checkbox("Show center of gravity", &centerOfGravity.show);
-            if (ImGui::Button("+"))
-                ImGui::addObjMenu = true;
             ImGui::ListBoxHeader("##ObjectsList"); {
 
                 forGravityCenter.clear();
@@ -456,15 +478,6 @@ void Simulation::updateGui() {
                 ImGui::objectsMenu = false;
         }
         else {//Main menu
-            ImGui::RadioButton("Destruction upon collision", &selectedCollisionOption, 0);
-
-            ImGui::RadioButton("Collision", &selectedCollisionOption, 1);
-            if (selectedCollisionOption == 1) {
-                ImGui::Text("restitutionCoefficient");
-                ImGui::SliderFloat("##restitution coefficientSlider", &restitutionCoefficient, 0, 1);
-            }
-
-            ImGui::Separator();
             ImGui::Text("Time Speed");
             ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 1500);
             ImGui::Checkbox("Stop time\t\tPress F2", &timeStop);
