@@ -9,7 +9,9 @@ Object::Object(float mass, int radius, sf::Vector2f pos, sf::Vector2f speed, std
 	this->name = name;
 	this->fixed = fixed;
 	this->radius = radius;
+	this->acceleration = { 0,0 };
 	this->color = color;
+
 	useForGravityCenter=false;
 
 }
@@ -51,6 +53,7 @@ Object::Object() :m_picture(radius, 90) {
 	this->name = "";
 	this->color = { 255,255,255 };
 	this->radius = abs(this->mass) / 6000 + 1;
+
 	useForGravityCenter=false;
 
 }
