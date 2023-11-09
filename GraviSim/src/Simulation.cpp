@@ -6,6 +6,17 @@ namespace ImGui {
     bool otherSettingsMenu = false;
     bool objectsMenu = false;
     bool simulationSettingsMenu = false;
+    struct ContextMenu {
+        ContextMenu() {
+            show = false;
+            pos = { 0,0 };
+        }
+        bool show;
+        ImVec2 pos;
+    };
+    ContextMenu contextMenu;
+  
+    
 
     void setStyle() {
         ImGuiStyle& style = ImGui::GetStyle();
@@ -325,26 +336,6 @@ void Simulation::updateGui() {
     {
         if (ImGui::BeginMenuBar())
         {
-            if (ImGui::BeginMenu("Settings")) {
-                if (ImGui::MenuItem("Simulation settings")) {
-                    ImGui::simulationSettingsMenu = true;
-                    ImGui::otherSettingsMenu = false;
-                }
-                if (ImGui::MenuItem("Other settings")) {
-                    ImGui::simulationSettingsMenu = false;
-                    ImGui::otherSettingsMenu = true;
-                }
-                ImGui::objectsMenu = false;
-                ImGui::EndMenu();
-            }
-            if (ImGui::BeginMenu("Objects")) {
-                if (ImGui::MenuItem("Add object")) 
-                    ImGui::addObjMenu = true;
-                if (ImGui::MenuItem("View all objects"))
-                    ImGui::objectsMenu = true;
-                ImGui::otherSettingsMenu = false;
-                ImGui::EndMenu();
-            }
             if (ImGui::BeginMenu("File"))
             {
                 if (ImGui::MenuItem("Open..")) {
@@ -356,9 +347,31 @@ void Simulation::updateGui() {
 
                 ImGui::EndMenu();
             }
+
+            if (ImGui::BeginMenu("Objects")) {
+                if (ImGui::MenuItem("Add object"))
+                    ImGui::addObjMenu = true;
+                if (ImGui::MenuItem("View all objects"))
+                    ImGui::objectsMenu = true;
+                ImGui::otherSettingsMenu = false;
+                ImGui::EndMenu();
+            }
+
+
+            if (ImGui::BeginMenu("Settings")) {
+                if (ImGui::MenuItem("Simulation settings")) {
+                    ImGui::simulationSettingsMenu = true;
+                    ImGui::otherSettingsMenu = false;
+                }
+                if (ImGui::MenuItem("Other settings")) {
+                    ImGui::simulationSettingsMenu = false;
+                    ImGui::otherSettingsMenu = true;
+                }
+                ImGui::objectsMenu = false;
+                ImGui::EndMenu();  
+            }
             ImGui::EndMenuBar();
         }
-
 
 
         if (ImGuiFileDialog::Instance()->Display("ChooseFileToSave"))
@@ -486,6 +499,8 @@ void Simulation::updateGui() {
 
         }
         else if (ImGui::simulationSettingsMenu) {//Simulation settings menu
+            ImGui::Checkbox("Gravity on", &Physics::gravityOn);
+            ImGui::Separator();
             ImGui::RadioButton("Destruction upon collision", &selectedCollisionOption, 0);
 
         }
@@ -577,6 +592,19 @@ void Simulation::updateGui() {
                 selectedObj = nullptr;
             ImGui::editingMenu = false;
         }
+    }
+
+    //Context menu
+
+    if (ImGui::contextMenu.show) {
+        ImGui::SetNextWindowPos(ImGui::contextMenu.pos);
+        ImGui::Begin("Context menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+
+        ImGui::Button("Paste    Ctrl+V",{150,20});
+        ImGui::Button("Copy     Ctrl+C", { 150,20 });
+        ImGui::Button("Delete         ", { 150,20 });
+
+        ImGui::End();
     }
 
     //Context menu

@@ -8,6 +8,7 @@ class Physics
 {
 public:
 	static float timeSpeed;
+	static bool gravityOn;
 
 	static void update(Object& object, std::vector<Object>& objects, sf::Time EllapsedTime);
 
