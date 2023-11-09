@@ -3,9 +3,11 @@
 
 void Physics::update(Object& object,std::vector<Object>& objects, sf::Time EllapsedTime) {
 	object.acceleration = { 0,0 };
-	for (Object& otherObject : objects) {
-		if (&object == &otherObject) continue;
-		object.acceleration+=calculateAcceleration(object, otherObject);
+	if (gravityOn) {
+		for (Object& otherObject : objects) {
+			if (&object == &otherObject) continue;
+			object.acceleration += calculateAcceleration(object, otherObject);
+		}
 	}
 	object.updateSpeed(EllapsedTime.asSeconds() * timeSpeed);
 	object.updatePosition(EllapsedTime.asSeconds() * timeSpeed);
@@ -31,4 +33,5 @@ sf::Vector2f Physics::calculateCenterOfGravity(std::vector<Object*>& forGravityC
 }
 
 float Physics::timeSpeed = 500;
+bool Physics::gravityOn = true;
 

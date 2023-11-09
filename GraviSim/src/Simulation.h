@@ -104,6 +104,7 @@ private:
 	Timer timer;
 	bool showOrbits;
 
+
 private:
 
 	void loadSettings();
