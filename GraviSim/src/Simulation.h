@@ -41,6 +41,8 @@ private:
 
 	Object* selectedObj;
 	Object newObj;
+	Object copiedObject;
+	bool copied = false;
 
 	int savedTimeSpeed;
 
