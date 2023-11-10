@@ -13,6 +13,7 @@ namespace ImGui {
         }
         bool show;
         ImVec2 pos;
+        Object* selectedObject;
     };
     ContextMenu contextMenu;
   
@@ -126,7 +127,7 @@ void Simulation::saveSettings() {
     ofs << "ShowFPS=" + std::to_string(fpsTracker.show) << '\n';
     ofs << "ShowOrbits=" + std::to_string(showOrbits) << '\n';
     ofs << "ShowTimer=" + std::to_string(timer.show) << '\n';
-    ofs << "OrbitLife=" + std::to_string(ParticlesSystem::getOrbitLifeTime().asMilliseconds()) << '\n';
+    ofs << "OrbitLifeTime=" + std::to_string(ParticlesSystem::getOrbitLifeTime().asMilliseconds()) << '\n';
 }
 
 void Simulation::loadSettings() {
@@ -143,7 +144,7 @@ void Simulation::loadSettings() {
         ifs >> s;
         timer.show = bool(stoi(s.substr(s.find('=') + 1)));
         ifs >> s;
-        ParticlesSystem::setOrbitLifeTime(sf::Time(sf::milliseconds(stoi(s.substr(s.find('=') + 1)))));
+        ParticlesSystem::setOrbitLifeTime(sf::milliseconds(stoi(s.substr(s.find('=') + 1))));
     }
     else {
         fpsTracker.show = false;
@@ -271,6 +272,26 @@ void Simulation::updateEvents() {
         if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::F2))
             timeStop = !timeStop;
 
+        if ((event.type == sf::Event::KeyPressed) && (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) && sf::Keyboard::isKeyPressed(sf::Keyboard::C)) {
+            sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
+            for (auto& object : objects) {
+                if (object.collide(mb)) {
+                    copied = true;
+                    copiedObject = object;
+                    break;
+                }
+            }
+        }
+
+        if ((event.type == sf::Event::KeyPressed) && (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) && sf::Keyboard::isKeyPressed(sf::Keyboard::V)) {
+            objects.push_back(copiedObject);
+
+            sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
+            mb = { mb.x * 1000,mb.y * 1000 };
+            (objects.end() - 1)->pos = mb;
+        }
+           
+
         if (!ImGui::GetIO().WantCaptureMouse) {
             if (event.type == sf::Event::MouseWheelMoved) {
                 if (event.mouseWheel.delta > 0)
@@ -303,15 +324,23 @@ void Simulation::updateEvents() {
             }
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right) {
                 ImGui::contextMenu.show = true;
-                ImGui::contextMenu.pos= sf::Mouse::getPosition();
+                ImGui::contextMenu.pos = sf::Mouse::getPosition();
+                ImGui::contextMenu.selectedObject = nullptr;
+                sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
+                for (auto& object : objects) {
+                    if (object.collide(mb)) {
+                        ImGui::contextMenu.selectedObject = &object;
+                        break;
+                    }
+                }
             }
         }
     }
     static sf::Vector2f previousMousePos;
     static sf::Vector2f cameraOffset;
 
-    if (selectedObject == nullptr) {
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && !ImGui::GetIO().WantCaptureMouse && !ImGui::addObjectMenu) {
+    if (selectedObj == nullptr) {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
             sf::Vector2f currentmousePos = app.mapPixelToCoords(sf::Mouse::getPosition());
             cameraOffset = (currentmousePos - previousMousePos) * 0.7f;
         }
@@ -484,12 +513,6 @@ void Simulation::updateGui() {
             ImGui::Checkbox("Show FPS", &fpsTracker.show);
             ImGui::Separator();
             ImGui::Checkbox("Show orbits", &showOrbits);
-            if (showOrbits) {
-                int t = ParticlesSystem::getOrbitLifeTime().asMilliseconds();
-                ImGui::SliderInt("Orbit life time", &t, 0, 50000);
-                ParticlesSystem::setOrbitLifeTime(sf::Time(sf::milliseconds(t)));
-
-            }
             ImGui::Separator();
             ImGui::Checkbox("Show timer", &timer.show);
 
@@ -613,9 +636,46 @@ void Simulation::updateGui() {
         ImGui::SetNextWindowPos(ImGui::contextMenu.pos);
         ImGui::Begin("Context menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
 
-        ImGui::Button("Paste    Ctrl+V",{150,20});
-        ImGui::Button("Copy     Ctrl+C", { 150,20 });
-        ImGui::Button("Delete         ", { 150,20 });
+        if (ImGui::Button("Paste    Ctrl+V", { 150,20 })) {
+            if (copied) {
+                objects.push_back(copiedObject);
+                sf::Vector2f pos = app.mapPixelToCoords(ImGui::contextMenu.pos);
+
+                pos = { pos.x * 1000,pos.y * 1000 };
+                (objects.end() - 1)->pos = pos;
+                ImGui::contextMenu.show = false;
+            }
+        }
+
+        if (ImGui::contextMenu.selectedObject) {
+            if (ImGui::Button("Copy     Ctrl+C", { 150,20 })) {
+                copied = true;
+                copiedObject = *ImGui::contextMenu.selectedObject;
+                copiedObject.useForGravityCenter = false;
+                ImGui::contextMenu.show = false;
+            }
+            if (ImGui::Button("Delete         ", { 150,20 })) {
+                objects.erase(std::remove_if(objects.begin(), objects.end(), [&](const auto& object) {return &object == ImGui::contextMenu.selectedObject; }), objects.end());
+                forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](const auto& object) {return object == ImGui::contextMenu.selectedObject; }), forGravityCenter.end());
+                ImGui::contextMenu.show = false;
+            }
+        }
+        else {
+            auto color = ImGui::GetStyle().Colors[ImGuiCol_Button];
+            ImGui::PushStyleColor(ImGuiCol_Button, { color.x,color.y,color.z,color.w / 2 });
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { color.x,color.y,color.z,color.w / 2 });
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, { color.x,color.y,color.z,color.w / 2 });
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
+
+            ImGui::Button("Copy     Ctrl+C", { 150,20 });
+            ImGui::Button("Delete         ", { 150,20 });
+
+            ImGui::PopStyleColor();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleColor();
+            ImGui::PopStyleColor();
+        }
+        
 
         ImGui::End();
     }
