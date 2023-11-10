@@ -39,8 +39,10 @@ private:
 	std::vector<Object*> forGravityCenter;
 	std::vector<Object> objects;
 
-	Object* selectedObj;
-	Object newObj;
+	Object* selectedObject;
+	Object newObject;
+	Object copiedObject;
+	bool copied = false;
 
 	int savedTimeSpeed;
 
