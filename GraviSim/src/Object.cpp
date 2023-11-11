@@ -57,3 +57,16 @@ Object::Object() :m_picture(radius, 90) {
 	useForGravityCenter=false;
 
 }
+
+void Object::operator=(Object other) {
+	mass = other.mass;
+	radius = other.radius;
+	pos = other.pos;
+	speed = other.speed;
+	acceleration = other.acceleration;
+	name = other.name;
+	color = other.color;
+	fixed = other.fixed;
+	m_picture = other.m_picture;
+	useForGravityCenter = other.useForGravityCenter;
+}

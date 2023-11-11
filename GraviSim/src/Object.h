@@ -17,6 +17,18 @@ public:
 	bool fixed;
 };
 
+	void operator=(Properties& other) {
+		mass = other.mass;
+		radius = other.radius;
+		pos = other.pos;
+		speed = other.speed;
+		acceleration = other.acceleration;
+		name = other.name;
+		color = other.color;
+		fixed = other.fixed;
+	}
+};
+
 class Object : sf::Drawable, public Properties
 {
 private:
@@ -36,6 +48,7 @@ public:
 
 	~Object() {}
 
+	void operator=(Object other);
 };
 
 
