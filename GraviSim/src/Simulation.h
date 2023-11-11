@@ -39,8 +39,8 @@ private:
 	std::vector<Object*> forGravityCenter;
 	std::vector<Object> objects;
 
-	Object* selectedObject;
-	Object newObject;
+	Object* selectedObj;
+	Object newObj;
 	Object copiedObject;
 	bool copied = false;
 
@@ -105,6 +105,7 @@ private:
 	BackGround* backGround;
 	Timer timer;
 	bool showOrbits;
+
 
 private:
 
