@@ -1,7 +1,7 @@
 ﻿#include "Simulation.h"
 
 namespace ImGui {
-    bool addObjectMenu = false;
+    bool addObjMenu = false;
     bool editingMenu = false;
     bool otherSettingsMenu = false;
     bool objectsMenu = false;
@@ -16,8 +16,8 @@ namespace ImGui {
         Object* selectedObject;
     };
     ContextMenu contextMenu;
-  
-    
+
+
 
     void setStyle() {
         ImGuiStyle& style = ImGui::GetStyle();
@@ -110,7 +110,7 @@ void Simulation::start() {
 void Simulation::update() {
     ellapsedTime = clock.restart();
     if (!timeStop)
-        timer += (sf::seconds(0.0015) * Physics::timeSpeed);
+        timer += (sf::seconds(0.00007) * Physics::timeSpeed);
     if (!timeStop && Physics::timeSpeed > 0)
         ParticlesSystem::update(ellapsedTime);
     updateEvents();
@@ -155,13 +155,13 @@ void Simulation::loadSettings() {
 }
 
 void Simulation::updateObjects() {
-    for (Object& Objectect : objects) {
-        if (!timeStop && Physics::timeSpeed!=0) {
-                Physics::update(object,objects, sf::seconds(0.00007));
+    for (Object& object : objects) {
+        if (!timeStop && Physics::timeSpeed != 0) {
+            Physics::update(object, objects, sf::seconds(0.00007));
         }
-        Objectect.updateGraphic();
+        object.updateGraphic();
     }
-    
+
     if (centerOfGravity.show)
         centerOfGravity = Physics::calculateCenterOfGravity(forGravityCenter);
 
@@ -193,7 +193,7 @@ void Simulation::updateObjects() {
                         object2->speed -= (J / m2) * n;
                     }
                 }
-            });
+                });
             break;
 
         case 0:
@@ -208,9 +208,12 @@ void Simulation::updateObjects() {
                         }
                     }
 
-            }
-            return false;
-            }), objects.end());
+                }
+                return false;
+                }), objects.end());
+            break;
+        }
+
     }
 }
 
@@ -224,10 +227,10 @@ void Simulation::updateGraphics() {
     }
 
     app.setView(camera);
-    for (auto& Objectect : objects) {
-        Objectect.draw(app);
+    for (auto& object : objects) {
+        object.draw(app);
         if (!timeStop && Physics::timeSpeed != 0 && showOrbits)
-            ParticlesSystem::add(new Pixel(Objectect.pos/powf(10,3), Objectect.color, ParticlesSystem::getOrbitLifeTime()));
+            ParticlesSystem::add(new Pixel(object.pos / powf(10, 3), object.color, ParticlesSystem::getOrbitLifeTime()));
     }
     if (centerOfGravity.show)
         centerOfGravity.draw(app);
@@ -287,56 +290,38 @@ void Simulation::updateEvents() {
             objects.push_back(copiedObject);
 
             sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
+            mb = { mb.x * 1000,mb.y * 1000 };
             for (auto& object : objects) {
                 (objects.end() - 1)->pos = mb;
             }
         }
         if ((event.type == sf::Event::KeyPressed) && (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete))) {
-           sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
-           objects.erase(std::remove_if(objects.begin(), objects.end(), [&](Object& object) {return object.collide(mb); }), objects.end());
-           forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](Object* object) {return object->collide(mb); }), forGravityCenter.end());
-        }
-        
-
-        if ((event.type == sf::Event::KeyPressed) && (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) && sf::Keyboard::isKeyPressed(sf::Keyboard::C)) {
             sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
-            for (auto& object : objects) {
-                if (object.collide(mb)) {
-                    copied = true;
-                    copiedObject = object;
-                    break;
-                }
-            }
+            objects.erase(std::remove_if(objects.begin(), objects.end(), [&](Object& object) {return object.collide(mb); }), objects.end());
+            forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](Object* object) {return object->collide(mb); }), forGravityCenter.end());
         }
 
-        if ((event.type == sf::Event::KeyPressed) && (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) && sf::Keyboard::isKeyPressed(sf::Keyboard::V)) {
-            objects.push_back(copiedObject);
-
-            sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
-            mb = { mb.x * 1000,mb.y * 1000 };
-            (objects.end() - 1)->pos = mb;
-        }
-           
 
         if (!ImGui::GetIO().WantCaptureMouse) {
             if (event.type == sf::Event::MouseWheelMoved) {
-                if (event.mouseWheel.delta > 0)
+                if (event.mouseWheel.delta > 0) {
                     zoomViewAt(sf::Mouse::getPosition(), camera, app, 0.9);
-
-                else
+                }
+                else {
                     camera.zoom(1.1);
+                }
 
             }
             static sf::Clock delta;//for double clicks
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                 ImGui::contextMenu.show = false;
                 sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
-                if (!ImGui::addObjectMenu) {
+                if (!ImGui::addObjMenu) {
                     for (auto& object : objects) {
                         if (object.collide(mb)) {
                             if (delta.getElapsedTime().asMilliseconds() > 500) delta.restart();
                             else {
-                                selectedObject = &object;
+                                selectedObj = &object;
                                 delta.restart();
                             }
                             break;
@@ -344,8 +329,8 @@ void Simulation::updateEvents() {
                     }
                 }
                 else {
-                    newObject.pos = mb*powf(10,3);
-                    objects.push_back(newObject);
+                    newObj.pos = mb * powf(10, 3);
+                    objects.push_back(newObj);
                 }
             }
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right) {
@@ -378,8 +363,8 @@ void Simulation::updateEvents() {
     }
 
     sf::Time ellapsedTime = clock.restart();
-    if (selectedObject != nullptr) {
-        camera.setCenter(selectedObject->pos/powf(10,3));
+    if (selectedObj != nullptr) {
+        camera.setCenter(selectedObj->pos / powf(10, 3));
         ImGui::editingMenu = true;
     }
 
@@ -425,7 +410,7 @@ void Simulation::updateGui() {
                     ImGui::otherSettingsMenu = true;
                 }
                 ImGui::objectsMenu = false;
-                ImGui::EndMenu();  
+                ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
         }
@@ -465,75 +450,34 @@ void Simulation::updateGui() {
         ImGui::Separator();
         if (ImGui::addObjMenu) {//Adding new object
             ImGui::Text("Name:");
-            ImGui::InputText("##Name", &newObject.name);
+            ImGui::InputText("##Name", &newObj.name);
             ImGui::Separator();
             ImGui::Text("Mass:");
-            ImGui::InputFloat("##Mass", &newObject.mass, 50.f,0);
+            ImGui::InputFloat("##Mass", &newObj.mass, 50.f, 0);
             ImGui::Separator();
             ImGui::Text("Radius");
-            ImGui::InputInt("##Radius", &newObject.radius);
-            newObject.radius = std::clamp(newObject.radius, 1, 750);
+            ImGui::InputInt("##Radius", &newObj.radius);
+            newObj.radius = std::clamp(newObj.radius, 1, 750);
             ImGui::Separator();
             ImGui::Text("Position:");
-            float* position[2] = { &newObject.pos.x, &newObject.pos.y };
+            float* position[2] = { &newObj.pos.x, &newObj.pos.y };
             ImGui::InputFloat2("##Position", *position);
             ImGui::Text("Speed:");
-            float* speed[2] = { &newObject.speed.x, &newObject.speed.y };
+            float* speed[2] = { &newObj.speed.x, &newObj.speed.y };
             ImGui::InputFloat2("##Speed", *speed);
             ImGui::Separator();
             ImGui::Text("Color:");
-            float color[3] = { newObject.color.r / 255.f,newObject.color.g / 255.f ,newObject.color.b / 255.f };
+            float color[3] = { newObj.color.r / 255.f,newObj.color.g / 255.f ,newObj.color.b / 255.f };
             ImGui::ColorEdit3("##SelectColor", color);
-            newObject.color = { static_cast<sf::Uint8>(color[0] * 255), static_cast<sf::Uint8>(color[1] * 255), static_cast<sf::Uint8>(color[2] * 255) };
+            newObj.color = { static_cast<sf::Uint8>(color[0] * 255), static_cast<sf::Uint8>(color[1] * 255), static_cast<sf::Uint8>(color[2] * 255) };
             ImGui::Separator();
-            ImGui::Checkbox("Fixed", &newObject.fixed);
+            ImGui::Checkbox("Fixed", &newObj.fixed);
             ImGui::Separator();
             if (ImGui::Button("Create"))
-                objects.push_back(newObject);
+                objects.push_back(newObj);
             ImGui::Separator();
             if (ImGui::Button("Exit"))
-                ImGui::addObjectMenu = false;
-        }
-        else if (ImGui::savingMenu) {//Saving current configuration or loading another from file
-            ImGui::Text("Saves:");
-            ImGui::ListBoxHeader("##SavesList");
-            int i = 0;
-            {
-                for (auto p : std::filesystem::directory_iterator("saves")) {
-                    std::string name = std::filesystem::path(p).filename().string();
-                    name = name.substr(0, name.rfind('.'));
-
-                    if (ImGui::Selectable(name.c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 20, 15))) {
-                        Save saveFile(p);
-                        sf::Vector2f center;
-                        sf::Time time;
-                        saveFile.load(objects,center,time);
-                        timer.set(time);
-                        ParticlesSystem::clear();
-                        saveFile.close();
-                    }
-                    ImGui::SameLine();
-                    if (ImGui::Button(("-##" + std::to_string(i)).c_str()))
-                        std::filesystem::remove(p);
-                    i++;
-                }
-            }
-            ImGui::ListBoxFooter();
-            ImGui::Separator();
-            ImGui::Text("Enter new save name:");
-            static std::string saveName;
-            ImGui::InputText("##EnterSaveName", &saveName);
-            ImGui::SameLine();
-            if (ImGui::Button("+")) {
-                std::ofstream f("saves/" + saveName + ".sim");
-                f.close();
-                Save newSaveFile(std::filesystem::path("saves/" + saveName + ".sim"));
-                newSaveFile.save(objects, camera.getCenter(),timer.get());
-                saveName = "";
-            }
-            ImGui::Separator();
-            if (ImGui::Button("Exit"))
-                ImGui::savingMenu = false;
+                ImGui::addObjMenu = false;
         }
         else if (ImGui::otherSettingsMenu) {//Other settings menu
             ImGui::Checkbox("Draw background", &backGround->show);
@@ -567,13 +511,6 @@ void Simulation::updateGui() {
             ImGui::Separator();
             if (ImGui::Button("Exit"))
                 ImGui::simulationSettingsMenu = false;
-                ImGui::otherSettingsMenu = false;
-
-        }
-        else if (ImGui::simulationSettingsMenu) {//Simulation settings menu
-            ImGui::Checkbox("Gravity on", &Physics::gravityOn);
-            ImGui::Separator();
-            ImGui::RadioButton("Destruction upon collision", &selectedCollisionOption, 0);
 
         }
         else if (ImGui::objectsMenu) {//Objects Menu
@@ -590,12 +527,12 @@ void Simulation::updateGui() {
                     if (centerOfGravity.show) {
 
                         ImGui::Checkbox(std::to_string(i).c_str(), &objects[i].useForGravityCenter);
-                        
+
                         if (objects[i].useForGravityCenter)
                             forGravityCenter.push_back(&objects[i]);
                     }
                     else {
-                        if (ImGui::Button(("-##" + std::to_string(i)).c_str())) 
+                        if (ImGui::Button(("-##" + std::to_string(i)).c_str()))
                             objects.erase(objects.begin() + i);
                     }
                 }
@@ -614,7 +551,7 @@ void Simulation::updateGui() {
                 timer.reset();
 
             ImGui::Separator();
-            if (ImGui::Button("Exit")) 
+            if (ImGui::Button("Exit"))
                 app.close();
         }
     }
@@ -701,69 +638,7 @@ void Simulation::updateGui() {
             ImGui::PopStyleColor();
             ImGui::PopStyleColor();
         }
-        
 
-    }
-
-    //Context menu
-
-    if (ImGui::contextMenu.show) {
-        ImGui::SetNextWindowPos(ImGui::contextMenu.pos);
-        ImGui::Begin("Context menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
-
-        ImGui::Button("Paste    Ctrl+V",{150,20});
-        ImGui::Button("Copy     Ctrl+C", { 150,20 });
-        ImGui::Button("Delete         ", { 150,20 });
-
-        ImGui::End();
-    }
-
-    //Context menu
-
-    if (ImGui::contextMenu.show) {
-        ImGui::SetNextWindowPos(ImGui::contextMenu.pos);
-        ImGui::Begin("Context menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
-
-        if (ImGui::Button("Paste    Ctrl+V", { 150,20 })) {
-            if (copied) {
-                objects.push_back(copiedObject);
-                sf::Vector2f pos = app.mapPixelToCoords(ImGui::contextMenu.pos);
-
-                pos = { pos.x * 1000,pos.y * 1000 };
-                (objects.end() - 1)->pos = pos;
-                ImGui::contextMenu.show = false;
-            }
-        }
-
-        if (ImGui::contextMenu.selectedObject) {
-            if (ImGui::Button("Copy     Ctrl+C", { 150,20 })) {
-                copied = true;
-                copiedObject = *ImGui::contextMenu.selectedObject;
-                copiedObject.useForGravityCenter = false;
-                ImGui::contextMenu.show = false;
-            }
-            if (ImGui::Button("Delete         ", { 150,20 })) {
-                objects.erase(std::remove_if(objects.begin(), objects.end(), [&](const auto& object) {return &object == ImGui::contextMenu.selectedObject; }), objects.end());
-                forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](const auto& object) {return object == ImGui::contextMenu.selectedObject; }), forGravityCenter.end());
-                ImGui::contextMenu.show = false;
-            }
-        }
-        else {
-            auto color = ImGui::GetStyle().Colors[ImGuiCol_Button];
-            ImGui::PushStyleColor(ImGuiCol_Button, { color.x,color.y,color.z,color.w / 2 });
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { color.x,color.y,color.z,color.w / 2 });
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, { color.x,color.y,color.z,color.w / 2 });
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
-
-            ImGui::Button("Copy     Ctrl+C", { 150,20 });
-            ImGui::Button("Delete         ", { 150,20 });
-
-            ImGui::PopStyleColor();
-            ImGui::PopStyleColor();
-            ImGui::PopStyleColor();
-            ImGui::PopStyleColor();
-        }
-        
 
         ImGui::End();
     }

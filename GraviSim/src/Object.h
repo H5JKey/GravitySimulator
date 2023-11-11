@@ -15,7 +15,6 @@ public:
 	std::string name;
 	sf::Color color;
 	bool fixed;
-};
 
 	void operator=(Properties& other) {
 		mass = other.mass;
