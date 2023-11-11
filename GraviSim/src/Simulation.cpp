@@ -290,10 +290,16 @@ void Simulation::updateEvents() {
             objects.push_back(copiedObject);
 
             sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
-            mb = { mb.x * 1000,mb.y * 1000 };
-            (objects.end() - 1)->pos = mb;
+            for (auto& object : objects) {
+                (objects.end() - 1)->pos = mb;
+            }
         }
-           
+        if ((event.type == sf::Event::KeyPressed) && (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete))) {
+           sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
+           objects.erase(std::remove_if(objects.begin(), objects.end(), [&](Object& object) {return object.collide(mb); }), objects.end());
+           forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](Object* object) {return object->collide(mb); }), forGravityCenter.end());
+        }
+        
 
         if (!ImGui::GetIO().WantCaptureMouse) {
             if (event.type == sf::Event::MouseWheelMoved) {
@@ -338,6 +344,8 @@ void Simulation::updateEvents() {
                     }
                 }
             }
+
+
         }
     }
     static sf::Vector2f previousMousePos;
