@@ -98,12 +98,8 @@ Simulation::Simulation() {
 }
 
 void Simulation::start() {
-    Physics::timeSpeed = 0;
-    for (int x = -50; x < 50; x += 4) {
-        for (int y = -50; y < 50; y += 4) {
-            objects.push_back(Object(300, 2, sf::Vector2f(x, y)));
-        }
-    }
+    objects.push_back(Object(2000000, 20, sf::Vector2f(960, 540), sf::Vector2f(0, 0), "Sun", sf::Color(255, 255, 255), true));
+    objects.push_back(Object(300, 2, sf::Vector2f(960, 50), sf::Vector2f(500, 0), "Planet"));
 
     while (app.isOpen()) {
         update();
