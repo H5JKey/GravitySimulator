@@ -12,10 +12,11 @@ void Save::load(std::vector<Object>& objects, sf::Vector2f& center, sf::Time& ti
 	m_file.read((char*)&n, sizeof(n));
 	objects.clear();
 
-	Object* objects_arr = new Object[n];
-	m_file.read((char*) objects_arr, n * sizeof(Object));
+	Properties* objectsProperties_arr = new Properties[n];
+	m_file.read((char*)objectsProperties_arr, n * sizeof(Properties));
+	objects.resize(n);
 	for (int i = 0; i < n; i++) {
-		objects.push_back(objects_arr[i]);
+		objects[i] = objectsProperties_arr[i];
 	}
 	
 }
@@ -26,9 +27,10 @@ void Save::save(std::vector<Object>& objects, sf::Vector2f center, sf::Time time
 	m_file.write((char*)&center, sizeof(sf::Vector2f));
 	m_file.write((char*)&time, sizeof(sf::Time));
 	m_file.write((char*)&n, sizeof(n));
-	Object* objects_arr=new Object[n];
-	std::copy(objects.begin(), objects.end(), objects_arr);
-	m_file.write((const char*)objects_arr, n * sizeof(Object));
+	Properties* objectsProperties_arr =new Object[n];
+	for (int i = 0; i < n; i++)
+		objectsProperties_arr[i] = objects[i];
+	m_file.write((const char*)objectsProperties_arr, n * sizeof(Properties));
 	
 	m_file.close();
 }

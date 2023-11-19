@@ -70,3 +70,14 @@ void Object::operator=(Object other) {
 	m_picture = other.m_picture;
 	useForGravityCenter = other.useForGravityCenter;
 }
+
+void Object::operator=(Properties other) {
+	mass = other.mass;
+	radius = other.radius;
+	pos = other.pos;
+	speed = other.speed;
+	acceleration = other.acceleration;
+	name = other.name;
+	color = other.color;
+	fixed = other.fixed;
+}

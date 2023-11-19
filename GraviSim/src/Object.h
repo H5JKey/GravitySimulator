@@ -48,6 +48,8 @@ public:
 	~Object() {}
 
 	void operator=(Object other);
+	void operator=(Properties other);
 };
+
 
 
