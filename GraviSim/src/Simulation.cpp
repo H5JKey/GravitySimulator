@@ -272,7 +272,7 @@ void Simulation::updateEvents() {
         if (event.type == sf::Event::Closed)
             app.close();
 
-        if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::F2))
+        if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space))
             timeStop = !timeStop;
 
         if ((event.type == sf::Event::KeyPressed) && (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) && sf::Keyboard::isKeyPressed(sf::Keyboard::C)) {
@@ -547,7 +547,7 @@ void Simulation::updateGui() {
         else {//Main menu
             ImGui::Text("Time Speed");
             ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 1500);
-            ImGui::Checkbox("Stop time\t\tPress F2", &timeStop);
+            ImGui::Checkbox("Stop time\t Press Space", &timeStop);
             if (ImGui::Button("Reset timer"))
                 timer.reset();
 
