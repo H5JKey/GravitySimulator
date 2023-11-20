@@ -10,16 +10,11 @@ void Save::load(std::vector<Object>& objects, sf::Vector2f& center, sf::Time& ti
 	m_file.read((char*)&time, sizeof(sf::Time));
 	std::size_t n;
 	m_file.read((char*)&n, sizeof(n));
-	objects.clear();
-
-	Properties* objectsProperties_arr = new Properties[n];
-	for (int i=0; i<n; i++)
-		m_file.read((char*)&objectsProperties_arr[i], sizeof(Properties));
 	objects.resize(n);
-	for (int i = 0; i < n; i++) {
-		objects[i] = objectsProperties_arr[i];
-	}
-	delete[] objectsProperties_arr;
+
+	for (int i=0; i<n; i++)
+		m_file.read((char*)&objects[i].properties, sizeof(objects[i].properties));
+	objects.resize(n);
 }
 
 void Save::save(std::vector<Object>& objects, sf::Vector2f center, sf::Time time) {
@@ -28,17 +23,9 @@ void Save::save(std::vector<Object>& objects, sf::Vector2f center, sf::Time time
 	m_file.write((char*)&center, sizeof(sf::Vector2f));
 	m_file.write((char*)&time, sizeof(sf::Time));
 	m_file.write((char*)&n, sizeof(n));
-	Properties properties;
 	for (int i = 0; i < n; i++) {
-		properties.mass = objects[i].mass;
-		properties.radius = objects[i].radius;
-		properties.pos = objects[i].pos;
-		properties.speed = objects[i].speed;
-		properties.acceleration = objects[i].acceleration;
-		properties.name = objects[i].name;
-		properties.color = objects[i].color;
-		properties.fixed = objects[i].fixed;
-		m_file.write((char*)&properties, sizeof(Properties));
+		
+		m_file.write((char*)&objects[i].properties, sizeof(objects[i].properties));
 	}
 
 

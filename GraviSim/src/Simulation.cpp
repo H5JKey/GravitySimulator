@@ -171,27 +171,8 @@ void Simulation::updateObjects() {
         case 1:
             concurrency::parallel_for(0, int(objects.size()), [&](int i) {
                 for (int j = i + 1; j < objects.size(); j++) {
-
-                    Object* object1 = &objects[i];
-                    Object* object2 = &objects[j];
-                    if (object1->collide(*object2)) {
-
-                        sf::Vector2f n = object2->pos - object1->pos;
-
-                        VectorMath::normalize(n);
-
-                        float m1 = object1->mass;
-                        float m2 = object2->mass;
-
-                        if (m1 == 0)
-                            m1 = 0.00001;
-                        if (m2 == 0)
-                            m2 = 0.00001;
-
-                        float J = VectorMath::dot(((m1 * m2) / (m1 + m2)) * (1.f + restitutionCoefficient) * (object2->speed - object1->speed), n);
-                        object1->speed += (J / m1) * n;
-                        object2->speed -= (J / m2) * n;
-                    }
+                    if (objects[i].collide(objects[j])) 
+                        Physics::handleCollision(objects[i], objects[j]);
                 }
                 });
             break;
@@ -201,9 +182,9 @@ void Simulation::updateObjects() {
                 for (Object& otherObject : objects) {
                     if (&otherObject == &object) continue;
                     if (object.collide(otherObject)) {
-                        if (otherObject.mass >= object.mass) {
+                        if (otherObject.properties.mass >= object.properties.mass) {
 
-                            ParticlesSystem::add(new Explosion(1000, object.pos / powf(10, 3), object.color));
+                            ParticlesSystem::add(new Explosion(1000, object.properties.pos / powf(10, 3), object.properties.color));
                             return true;
                         }
                     }
@@ -230,7 +211,7 @@ void Simulation::updateGraphics() {
     for (auto& object : objects) {
         object.draw(app);
         if (!timeStop && Physics::timeSpeed != 0 && showOrbits)
-            ParticlesSystem::add(new Pixel(object.pos / powf(10, 3), object.color, ParticlesSystem::getOrbitLifeTime()));
+            ParticlesSystem::add(new Pixel(object.properties.pos / powf(10, 3), object.properties.color, ParticlesSystem::getOrbitLifeTime()));
     }
     if (centerOfGravity.show)
         centerOfGravity.draw(app);
@@ -292,7 +273,7 @@ void Simulation::updateEvents() {
             sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
             mb = { mb.x * 1000,mb.y * 1000 };
             for (auto& object : objects) {
-                (objects.end() - 1)->pos = mb;
+                (objects.end() - 1)->properties.pos = mb;
             }
         }
         if ((event.type == sf::Event::KeyPressed) && (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete))) {
@@ -329,7 +310,7 @@ void Simulation::updateEvents() {
                     }
                 }
                 else {
-                    newObj.pos = mb * powf(10, 3);
+                    newObj.properties.pos = mb * powf(10, 3);
                     objects.push_back(newObj);
                 }
             }
@@ -364,7 +345,7 @@ void Simulation::updateEvents() {
 
     sf::Time ellapsedTime = clock.restart();
     if (selectedObj != nullptr) {
-        camera.setCenter(selectedObj->pos / powf(10, 3));
+        camera.setCenter(selectedObj->properties.pos / powf(10, 3));
         ImGui::editingMenu = true;
     }
 
@@ -451,28 +432,28 @@ void Simulation::updateGui() {
         ImGui::Separator();
         if (ImGui::addObjMenu) {//Adding new object
             ImGui::Text("Name:");
-            ImGui::InputText("##Name", &newObj.name);
+            ImGui::InputText("##Name", &newObj.properties.name);
             ImGui::Separator();
             ImGui::Text("Mass:");
-            ImGui::InputFloat("##Mass", &newObj.mass, 50.f, 0);
+            ImGui::InputFloat("##Mass", &newObj.properties.mass, 50.f, 0);
             ImGui::Separator();
             ImGui::Text("Radius");
-            ImGui::InputInt("##Radius", &newObj.radius);
-            newObj.radius = std::clamp(newObj.radius, 1, 750);
+            ImGui::InputInt("##Radius", &newObj.properties.radius);
+            newObj.properties.radius = std::clamp(newObj.properties.radius, 1, 750);
             ImGui::Separator();
             ImGui::Text("Position:");
-            float* position[2] = { &newObj.pos.x, &newObj.pos.y };
+            float* position[2] = { &newObj.properties.pos.x, &newObj.properties.pos.y };
             ImGui::InputFloat2("##Position", *position);
             ImGui::Text("Speed:");
-            float* speed[2] = { &newObj.speed.x, &newObj.speed.y };
+            float* speed[2] = { &newObj.properties.speed.x, &newObj.properties.speed.y };
             ImGui::InputFloat2("##Speed", *speed);
             ImGui::Separator();
             ImGui::Text("Color:");
-            float color[3] = { newObj.color.r / 255.f,newObj.color.g / 255.f ,newObj.color.b / 255.f };
+            float color[3] = { newObj.properties.color.r / 255.f,newObj.properties.color.g / 255.f ,newObj.properties.color.b / 255.f };
             ImGui::ColorEdit3("##SelectColor", color);
-            newObj.color = { static_cast<sf::Uint8>(color[0] * 255), static_cast<sf::Uint8>(color[1] * 255), static_cast<sf::Uint8>(color[2] * 255) };
+            newObj.properties.color = { static_cast<sf::Uint8>(color[0] * 255), static_cast<sf::Uint8>(color[1] * 255), static_cast<sf::Uint8>(color[2] * 255) };
             ImGui::Separator();
-            ImGui::Checkbox("Fixed", &newObj.fixed);
+            ImGui::Checkbox("Fixed", &newObj.properties.fixed);
             ImGui::Separator();
             if (ImGui::Button("Create"))
                 objects.push_back(newObj);
@@ -520,8 +501,8 @@ void Simulation::updateGui() {
 
                 forGravityCenter.clear();
                 for (int i = 0; i < objects.size(); i++) {
-                    if (objects[i].name == "") continue;
-                    if (ImGui::Selectable((objects[i].name + "##" + std::to_string(i)).c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 25, 15))) {
+                    if (objects[i].properties.name == "") continue;
+                    if (ImGui::Selectable((objects[i].properties.name + "##" + std::to_string(i)).c_str(), false, 0, ImVec2(ImGui::GetWindowContentRegionWidth() - 25, 15))) {
                         selectedObj = &objects[i];
                     }
                     ImGui::SameLine();
@@ -560,26 +541,26 @@ void Simulation::updateGui() {
     if (ImGui::editingMenu) {//Editing selected object
         ImGui::Begin("##ObjectMenu", nullptr, ImGuiWindowFlags_NoResize); {
             ImGui::Text("Name:");
-            ImGui::InputText("##Name", &selectedObj->name);
+            ImGui::InputText("##Name", &selectedObj->properties.name);
             ImGui::Separator();
             ImGui::Text("Mass:");
-            ImGui::InputFloat("##Mass", &selectedObj->mass, 50.f);
+            ImGui::InputFloat("##Mass", &selectedObj->properties.mass, 50.f);
             ImGui::Separator();
             ImGui::Text("Radius");
-            ImGui::InputInt("##Radius", &selectedObj->radius);
-            selectedObj->radius = std::clamp(selectedObj->radius, 1, 750);
+            ImGui::InputInt("##Radius", &selectedObj->properties.radius);
+            selectedObj->properties.radius = std::clamp(selectedObj->properties.radius, 1, 750);
             ImGui::Separator();
             ImGui::Text("Speed:");
-            float* speed[2] = { &selectedObj->speed.x, &selectedObj->speed.y };
+            float* speed[2] = { &selectedObj->properties.speed.x, &selectedObj->properties.speed.y };
             ImGui::InputFloat2("##Speed", *speed);
             ImGui::Separator();
             ImGui::Text("Color:");
-            float color[3] = { static_cast<float>(selectedObj->color.r / 255.f), static_cast<float>(selectedObj->color.g / 255.f) ,static_cast<float>(selectedObj->color.b / 255.f) };
+            float color[3] = { static_cast<float>(selectedObj->properties.color.r / 255.f), static_cast<float>(selectedObj->properties.color.g / 255.f) ,static_cast<float>(selectedObj->properties.color.b / 255.f) };
             ImGui::ColorEdit3("##Color", color);
-            selectedObj->color = { static_cast<sf::Uint8>(color[0] * 255), static_cast<sf::Uint8>(color[1] * 255), static_cast<sf::Uint8>(color[2] * 255) };
+            selectedObj->properties.color = { static_cast<sf::Uint8>(color[0] * 255), static_cast<sf::Uint8>(color[1] * 255), static_cast<sf::Uint8>(color[2] * 255) };
             ImGui::Separator();
             ImGui::Separator();
-            ImGui::Checkbox("Fixed", &selectedObj->fixed);
+            ImGui::Checkbox("Fixed", &selectedObj->properties.fixed);
             if (ImGui::Button("Delete this object")) {
                 objects.erase(std::remove_if(objects.begin(), objects.end(), [&](const auto& object) {return &object == selectedObj; }), objects.end());
                 forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](const auto& object) {return object == selectedObj; }), forGravityCenter.end());
@@ -606,7 +587,7 @@ void Simulation::updateGui() {
                 sf::Vector2f pos = app.mapPixelToCoords(ImGui::contextMenu.pos);
 
                 pos = { pos.x * 1000,pos.y * 1000 };
-                (objects.end() - 1)->pos = pos;
+                (objects.end() - 1)->properties.pos = pos;
                 ImGui::contextMenu.show = false;
             }
         }
