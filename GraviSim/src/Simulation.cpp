@@ -120,8 +120,6 @@ void Simulation::update() {
 
 }
 
-
-
 void Simulation::saveSettings() {
     std::ofstream ofs("settings.ini");
     ofs << "[Settings]\n";
@@ -257,12 +255,6 @@ void Simulation::updateEvents() {
 
         if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space))
             timeStop = !timeStop;
-        if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::B)) {
-            sf::Vector2f pos=app.mapPixelToCoords(sf::Mouse::getPosition());
-            for (float a = 0; a < 2 * 3.141592; a += 0.01) {
-                Simulation::objects.push_back(Object(20, 1, sf::Vector2f(pos.x+cos(a)*2, pos.y + sin(a)*2), sf::Vector2f(cos(a)*50000, sin(a) * 50000)));
-            }
-        }
 
         if ((event.type == sf::Event::KeyPressed) && (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) && sf::Keyboard::isKeyPressed(sf::Keyboard::C)) {
             sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
