@@ -455,6 +455,9 @@ void Simulation::updateGui() {
             ImGui::Separator();
             ImGui::Checkbox("Fixed", &newObj.properties.fixed);
             ImGui::Separator();
+            ImGui::Checkbox("Consider in gravity center", &newObj.useForGravityCenter);
+            ImGui::Checkbox("Affected by gravity", &newObj.properties.affectedByGravity);
+            ImGui::Checkbox("Affectes others", &newObj.properties.affectsOthers);
             if (ImGui::Button("Create"))
                 objects.push_back(newObj);
             ImGui::Separator();
