@@ -498,7 +498,6 @@ void Simulation::updateGui() {
         else if (ImGui::objectsMenu) {//Objects Menu
             ImGui::Checkbox("Show center of gravity", &centerOfGravity.show);
             ImGui::ListBoxHeader("##ObjectsList"); {
-
                 forGravityCenter.clear();
                 for (int i = 0; i < objects.size(); i++) {
                     if (objects[i].properties.name == "") continue;
@@ -507,7 +506,6 @@ void Simulation::updateGui() {
                     }
                     ImGui::SameLine();
                     if (centerOfGravity.show) {
-
                         ImGui::Checkbox(std::to_string(i).c_str(), &objects[i].useForGravityCenter);
 
                         if (objects[i].useForGravityCenter)
@@ -561,7 +559,16 @@ void Simulation::updateGui() {
             ImGui::Separator();
             ImGui::Separator();
             ImGui::Checkbox("Fixed", &selectedObj->properties.fixed);
-            if (ImGui::Button("Delete this object")) {
+            ImGui::Checkbox("Consider in gravity center",&selectedObj->useForGravityCenter);
+            ImGui::Checkbox("Affected by gravity", &selectedObj->properties.affectedByGravity);
+            ImGui::Checkbox("Affectes others", &selectedObj->properties.affectsOthers);
+            if (ImGui::Button("Copy")) {
+                copiedObject = *selectedObj;
+                copiedObject.useForGravityCenter = false;
+                copied = true;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Delete")) {
                 objects.erase(std::remove_if(objects.begin(), objects.end(), [&](const auto& object) {return &object == selectedObj; }), objects.end());
                 forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](const auto& object) {return object == selectedObj; }), forGravityCenter.end());
                 selectedObj = nullptr;
@@ -580,7 +587,6 @@ void Simulation::updateGui() {
     if (ImGui::contextMenu.show) {
         ImGui::SetNextWindowPos(ImGui::contextMenu.pos);
         ImGui::Begin("Context menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
-
         if (ImGui::Button("Paste    Ctrl+V", { 150,20 })) {
             if (copied) {
                 objects.push_back(copiedObject);
@@ -599,9 +605,19 @@ void Simulation::updateGui() {
                 copiedObject.useForGravityCenter = false;
                 ImGui::contextMenu.show = false;
             }
+            if (!ImGui::contextMenu.selectedObject->useForGravityCenter) {
+                if (ImGui::Button("Consider      ", { 150,20 })) {
+                    ImGui::contextMenu.selectedObject->useForGravityCenter = true;
+                }
+            }
+            if (ImGui::contextMenu.selectedObject->useForGravityCenter) {
+                if (ImGui::Button("Not consider  ", { 150,20 })) {
+                    ImGui::contextMenu.selectedObject->useForGravityCenter = false;
+                }
+            }
             if (ImGui::Button("Delete         ", { 150,20 })) {
                 objects.erase(std::remove_if(objects.begin(), objects.end(), [&](const auto& object) {return &object == ImGui::contextMenu.selectedObject; }), objects.end());
-                forGravityCenter.erase(std::remove_if(forGravityCenter.begin(), forGravityCenter.end(), [&](const auto& object) {return object == ImGui::contextMenu.selectedObject; }), forGravityCenter.end());
+  
                 ImGui::contextMenu.show = false;
             }
         }
@@ -613,6 +629,7 @@ void Simulation::updateGui() {
             ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
 
             ImGui::Button("Copy     Ctrl+C", { 150,20 });
+            ImGui::Button("Consider       ", { 150,20 });
             ImGui::Button("Delete         ", { 150,20 });
 
             ImGui::PopStyleColor();

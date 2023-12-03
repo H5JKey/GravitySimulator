@@ -21,6 +21,8 @@ private:
 		std::string name;
 		sf::Color color;
 		bool fixed;
+		bool affectedByGravity;
+		bool affectsOthers;
 
 		void operator=(Properties& other) {
 			mass = other.mass;
@@ -31,6 +33,8 @@ private:
 			name = other.name;
 			color = other.color;
 			fixed = other.fixed;
+			affectedByGravity=other.affectedByGravity;
+			affectsOthers = other.affectsOthers;
 		}
 	};
 public:

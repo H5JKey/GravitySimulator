@@ -6,8 +6,9 @@ void Physics::update(Object& object,std::vector<Object>& objects, sf::Time Ellap
 	object.properties.acceleration = { 0,0 };
 	if (gravityOn) {
 		for (Object& otherObject : objects) {
-			if (&object == &otherObject) continue;
-			object.properties.acceleration += calculateAcceleration(object, otherObject);
+			if (&object == &otherObject || !otherObject.properties.affectsOthers) continue;
+			if (object.properties.affectedByGravity)
+				object.properties.acceleration += calculateAcceleration(object, otherObject);
 		}
 	}
 	object.updateSpeed(EllapsedTime.asSeconds() * timeSpeed);

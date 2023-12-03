@@ -11,6 +11,8 @@ Object::Object(float mass, int radius, sf::Vector2f pos, sf::Vector2f speed, std
 	this->properties.radius = radius;
 	this->properties.acceleration = { 0,0 };
 	this->properties.color = color;
+	this->properties.affectedByGravity = true;
+	this->properties.affectsOthers = true;
 
 	useForGravityCenter=false;
 }
