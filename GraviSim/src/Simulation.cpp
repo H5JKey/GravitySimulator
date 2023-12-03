@@ -454,6 +454,9 @@ void Simulation::updateGui() {
             newObj.properties.color = { static_cast<sf::Uint8>(color[0] * 255), static_cast<sf::Uint8>(color[1] * 255), static_cast<sf::Uint8>(color[2] * 255) };
             ImGui::Separator();
             ImGui::Checkbox("Fixed", &newObj.properties.fixed);
+            ImGui::Checkbox("Consider in gravity center", &newObj.useForGravityCenter);
+            ImGui::Checkbox("Affected by gravity", &newObj.properties.affectedByGravity);
+            ImGui::Checkbox("Affectes others", &newObj.properties.affectsOthers);
             ImGui::Separator();
             ImGui::Checkbox("Consider in gravity center", &newObj.useForGravityCenter);
             ImGui::Checkbox("Affected by gravity", &newObj.properties.affectedByGravity);
