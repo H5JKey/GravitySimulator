@@ -60,7 +60,8 @@ Object::Object() :m_picture(properties.radius, 90) {
 	this->properties.name = "";
 	this->properties.color = { 255,255,255 };
 	this->properties.radius = abs(this->properties.mass) / 6000 + 1;
-
+	this->properties.affectedByGravity = true;
+	this->properties.affectsOthers = true;
 	useForGravityCenter=false;
 
 }
