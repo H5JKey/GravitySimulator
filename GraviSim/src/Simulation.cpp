@@ -74,10 +74,12 @@ namespace ImGui {
     }
 }
 
-Simulation::Simulation() {
+Simulation::Simulation():console(this) {
 
     selectedObj = nullptr;
     savedTimeSpeed = 0;
+    restitutionCoefficient = 1.f;
+    selectedCollisionOption = 0;
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 16;
@@ -250,16 +252,22 @@ void Simulation::updateEvents() {
     sf::Event event;
     while (app.pollEvent(event)) {
         ImGui::SFML::ProcessEvent(event);
+
+        if (event.type == sf::Event::MouseMoved)
+            cursorPosition = app.mapPixelToCoords(sf::Mouse::getPosition());
+
         if (event.type == sf::Event::Closed)
             app.close();
 
-        if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space))
+        if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space) && (!ImGui::GetIO().WantCaptureKeyboard))
             timeStop = !timeStop;
 
+        if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::F1))
+            console.show = !console.show;
+       
         if ((event.type == sf::Event::KeyPressed) && (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) && sf::Keyboard::isKeyPressed(sf::Keyboard::C)) {
-            sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
             for (auto& object : objects) {
-                if (object.collide(mb)) {
+                if (object.collide(cursorPosition)) {
                     copied = true;
                     copiedObject = object;
                     break;
@@ -269,11 +277,9 @@ void Simulation::updateEvents() {
 
         if ((event.type == sf::Event::KeyPressed) && (sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl)) && sf::Keyboard::isKeyPressed(sf::Keyboard::V)) {
             objects.push_back(copiedObject);
-
-            sf::Vector2f mb = app.mapPixelToCoords(sf::Mouse::getPosition());
-            mb = { mb.x * 1000,mb.y * 1000 };
+            
             for (auto& object : objects) {
-                (objects.end() - 1)->properties.pos = mb;
+                (objects.end() - 1)->properties.pos = cursorPosition * powf(10, 3);
             }
         }
         if ((event.type == sf::Event::KeyPressed) && (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete))) {
@@ -357,6 +363,7 @@ void Simulation::updateGui() {
     ImGui::SFML::Update(app, ellapsedTime);
     ImGui::Begin("Gravity simulation", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar);
     {
+
         if (ImGui::BeginMenuBar())
         {
             if (ImGui::BeginMenu("File"))
@@ -424,6 +431,7 @@ void Simulation::updateGui() {
                 camera.setCenter(center);
                 ParticlesSystem::clear();
                 centerOfGravity.show = false;
+                selectedObj = nullptr;
             }
 
             ImGuiFileDialog::Instance()->Close();
@@ -442,8 +450,11 @@ void Simulation::updateGui() {
             newObj.properties.radius = std::clamp(newObj.properties.radius, 1, 750);
             ImGui::Separator();
             ImGui::Text("Position:");
-            float* position[2] = { &newObj.properties.pos.x, &newObj.properties.pos.y };
-            ImGui::InputFloat2("##Position", *position);
+            float position[2] = {newObj.properties.pos.x/1000, newObj.properties.pos.y/1000 };
+            ImGui::InputFloat2("##Position", position);
+            newObj.properties.pos.x = position[0] * powf(10, 3);
+            newObj.properties.pos.y = position[1] * powf(10, 3);
+
             ImGui::Text("Speed:");
             float* speed[2] = { &newObj.properties.speed.x, &newObj.properties.speed.y };
             ImGui::InputFloat2("##Speed", *speed);
@@ -585,6 +596,8 @@ void Simulation::updateGui() {
         ImGui::End();
     }
 
+
+
     //Context menu
 
     if (ImGui::contextMenu.show) {
@@ -595,8 +608,7 @@ void Simulation::updateGui() {
                 objects.push_back(copiedObject);
                 sf::Vector2f pos = app.mapPixelToCoords(ImGui::contextMenu.pos);
 
-                pos = { pos.x * 1000,pos.y * 1000 };
-                (objects.end() - 1)->properties.pos = pos;
+                (objects.end() - 1)->properties.pos = pos * powf(10, 3);;
                 ImGui::contextMenu.show = false;
             }
         }
@@ -642,6 +654,22 @@ void Simulation::updateGui() {
         }
 
 
+        ImGui::End();
+    }
+
+
+    //Console
+    if (console.show) {     
+        ImGui::SetNextWindowSize(ImVec2(app.getSize().x, 40));
+        ImGui::SetNextWindowPos(ImVec2(0, app.getSize().y - 40));
+        ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+        {
+            std::string consoleCommand;
+            ImGui::SetNextItemWidth(app.getSize().x - 15);
+            if (ImGui::InputText("##Console", &consoleCommand, ImGuiInputTextFlags_EnterReturnsTrue)) {
+                console.handleCommand(consoleCommand);
+            }
+        }
         ImGui::End();
     }
 }

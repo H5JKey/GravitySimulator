@@ -7,6 +7,7 @@
 #include "ParticlesSystem.h"
 #include "VectorMath.h"
 #include "HUD.h"
+#include "Console.h"
 
 
 #include <ppl.h>
@@ -21,8 +22,6 @@
 #include "../lib/imgui_file_dialog/ImGuiFileDialog.h"
 
 
-
-
 class Simulation
 {
 public:
@@ -30,23 +29,6 @@ public:
 	void start();
 	~Simulation();
 private:
-
-	sf::RenderWindow app;
-	sf::View camera;
-	sf::Time ellapsedTime;
-	sf::Clock clock;
-
-	std::vector<Object*> forGravityCenter;
-	std::vector<Object> objects;
-
-	Object* selectedObj;
-	Object newObj;
-	Object copiedObject;
-	bool copied = false;
-
-	int savedTimeSpeed;
-
-
 	struct BackGround : sf::Drawable {
 	private:
 		sf::Texture texture;
@@ -95,16 +77,34 @@ private:
 		}
 	};
 
-	
-	bool timeStop = false;
 
-	int selectedCollisionOption = 0;
-	float restitutionCoefficient = 1.f;
+	bool showOrbits;
+	bool copied = false;
+	int savedTimeSpeed;
+	bool timeStop = false;
+	int selectedCollisionOption;
+	float restitutionCoefficient;
+	sf::Vector2f cursorPosition;
 	CenterOfGravity centerOfGravity;
 	FpsTracker fpsTracker;
 	BackGround* backGround;
 	Timer timer;
-	bool showOrbits;
+
+
+	friend int Console::handleCommand(std::string command);
+	Console console;
+
+	sf::RenderWindow app;
+	sf::View camera;
+	sf::Time ellapsedTime;
+	sf::Clock clock;
+
+	std::vector<Object*> forGravityCenter;
+	std::vector<Object> objects;
+
+	Object* selectedObj;
+	Object newObj;
+	Object copiedObject;
 
 
 private:

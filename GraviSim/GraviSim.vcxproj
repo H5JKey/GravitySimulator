@@ -157,6 +157,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Console.cpp" />
     <ClCompile Include="src\HUD.cpp" />
     <ClCompile Include="lib\imgui\imgui-SFML.cpp" />
     <ClCompile Include="lib\imgui\imgui.cpp" />
@@ -174,6 +175,7 @@
     <ClCompile Include="src\Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Console.h" />
     <ClInclude Include="src\HUD.h" />
     <ClInclude Include="lib\imgui\imconfig-SFML.h" />
     <ClInclude Include="lib\imgui\imconfig.h" />
