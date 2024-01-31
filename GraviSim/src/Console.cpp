@@ -21,6 +21,14 @@ int Console::handleCommand(std::string command)
 					return error;
 			}
 		}
+		else if (args[0] == "/fill") {
+			for (float x = stoi(args[1]); x <= stoi(args[3]); x += stoi(args[5])) {
+				for (float y = stoi(args[2]); y <= stoi(args[4]); y += stoi(args[6])) {
+					simulation->objects.push_back(simulation->copiedObject);
+					(simulation->objects.end() - 1)->properties.pos = sf::Vector2f(x*1000,y*1000);
+				}
+			}
+		}
 	}
 	return error;
 }

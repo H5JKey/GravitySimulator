@@ -33,5 +33,6 @@ public:
 	}
 
 	int handleCommand(std::string command);
-		
+	
+	int add(std::vector<std::string>& args);
 };
