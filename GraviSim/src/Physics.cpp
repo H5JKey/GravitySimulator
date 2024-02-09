@@ -2,17 +2,22 @@
 #include "ParticlesSystem.h"
 #include "VectorMath.h"
 
-void Physics::update(Object& object,std::vector<Object>& objects, sf::Time EllapsedTime) {
-	object.properties.acceleration = { 0,0 };
-	if (gravityOn) {
-		for (Object& otherObject : objects) {
-			if (&object == &otherObject || !otherObject.properties.affectsOthers) continue;
-			if (object.properties.affectedByGravity)
-				object.properties.acceleration += calculateAcceleration(object, otherObject);
+void Physics::update(std::vector<Object>& objects, sf::Time EllapsedTime) {
+	Concurrency::parallel_for(0, int(objects.size()), [&](int i) {
+		objects[i].properties.acceleration = { 0,0 };
+		if (gravityOn) {
+			if (!timeStop && timeSpeed != 0) {
+				for (std::size_t j = 0; j < objects.size(); j++) {
+					if (!objects[j].properties.affectsOthers) continue;
+					if (objects[i].properties.affectedByGravity)
+						objects[i].properties.acceleration += calculateAcceleration(objects[i], objects[j]);
+				}
+			}
 		}
-	}
-	object.updateSpeed(EllapsedTime.asSeconds() * timeSpeed);
-	object.updatePosition(EllapsedTime.asSeconds() * timeSpeed);
+		objects[i].updateSpeed(EllapsedTime.asSeconds() * timeSpeed);
+		objects[i].updatePosition(EllapsedTime.asSeconds() * timeSpeed);
+		objects[i].updateGraphic();
+	});
 }
 
 sf::Vector2f Physics::calculateAcceleration(const Object& obj1, const Object& obj2) {
@@ -54,7 +59,4 @@ void Physics::handleCollision(Object& object1, Object& object2) {
 
 }
 
-float Physics::timeSpeed = 500;
-bool Physics::gravityOn = true;
-float Physics::restitutionCoefficient = 1;
 

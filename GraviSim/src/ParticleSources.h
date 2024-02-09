@@ -36,6 +36,7 @@ public:
     bool inProcess;
 };
 
+
 class Explosion : public ParticleSource
 {
 public:
@@ -122,7 +123,5 @@ public:
 
         target.draw(m_vertices, states);
     }
-
-
 
 };

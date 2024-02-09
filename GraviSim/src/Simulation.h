@@ -81,7 +81,6 @@ private:
 	bool showOrbits;
 	bool copied = false;
 	int savedTimeSpeed;
-	bool timeStop = false;
 	int selectedCollisionOption;
 	float restitutionCoefficient;
 	sf::Vector2f cursorPosition;
@@ -89,7 +88,7 @@ private:
 	FpsTracker fpsTracker;
 	BackGround* backGround;
 	Timer timer;
-
+	Physics physics;
 
 	friend int Console::handleCommand(std::string command);
 	Console console;

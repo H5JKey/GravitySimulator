@@ -111,9 +111,9 @@ void Simulation::start() {
 
 void Simulation::update() {
     ellapsedTime = clock.restart();
-    if (!timeStop)
-        timer += (sf::seconds(0.00007) * Physics::timeSpeed);
-    if (!timeStop && Physics::timeSpeed > 0)
+    if (!physics.timeStop)
+        timer += (sf::seconds(0.00007) * physics.timeSpeed);
+    if (!physics.timeStop && physics.timeSpeed > 0)
         ParticlesSystem::update(ellapsedTime);
     updateEvents();
     updateGui();
@@ -157,24 +157,20 @@ void Simulation::loadSettings() {
 }
 
 void Simulation::updateObjects() {
-    for (Object& object : objects) {
-        if (!timeStop && Physics::timeSpeed != 0) {
-            Physics::update(object, objects, sf::seconds(0.00007));
-        }
-        object.updateGraphic();
-    }
+   
+    physics.update(objects, sf::seconds(0.00007));
 
     if (centerOfGravity.show)
-        centerOfGravity = Physics::calculateCenterOfGravity(forGravityCenter);
+        centerOfGravity = physics.calculateCenterOfGravity(forGravityCenter);
 
-    if (Physics::timeSpeed != 0 && !timeStop) {
+    if (physics.timeSpeed != 0 && !physics.timeStop) {
         switch (selectedCollisionOption)
         {
         case 1:
             concurrency::parallel_for(0, int(objects.size()), [&](int i) {
                 for (int j = i + 1; j < objects.size(); j++) {
                     if (objects[i].collide(objects[j])) 
-                        Physics::handleCollision(objects[i], objects[j]);
+                        physics.handleCollision(objects[i], objects[j]);
                 }
                 });
             break;
@@ -212,7 +208,7 @@ void Simulation::updateGraphics() {
     app.setView(camera);
     for (auto& object : objects) {
         object.draw(app);
-        if (!timeStop && Physics::timeSpeed != 0 && showOrbits)
+        if (!physics.timeStop && physics.timeSpeed != 0 && showOrbits)
             ParticlesSystem::add(new Pixel(object.properties.pos / powf(10, 3), object.properties.color, ParticlesSystem::getOrbitLifeTime()));
     }
     if (centerOfGravity.show)
@@ -260,7 +256,7 @@ void Simulation::updateEvents() {
             app.close();
 
         if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space) && (!ImGui::GetIO().WantCaptureKeyboard))
-            timeStop = !timeStop;
+            physics.timeStop = !physics.timeStop;
 
         if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::F1))
             console.show = !console.show;
@@ -446,8 +442,8 @@ void Simulation::updateGui() {
             ImGui::InputFloat("##Mass", &newObj.properties.mass, 50.f, 0);
             ImGui::Separator();
             ImGui::Text("Radius");
-            ImGui::InputInt("##Radius", &newObj.properties.radius);
-            newObj.properties.radius = std::clamp(newObj.properties.radius, 1, 750);
+            ImGui::InputFloat("##Radius", &newObj.properties.radius,0.5,1);
+            newObj.properties.radius = std::max(0.f, newObj.properties.radius);
             ImGui::Separator();
             ImGui::Text("Position:");
             float position[2] = {newObj.properties.pos.x/1000, newObj.properties.pos.y/1000 };
@@ -495,7 +491,7 @@ void Simulation::updateGui() {
 
         }
         else if (ImGui::simulationSettingsMenu) {//Simulation settings menu
-            ImGui::Checkbox("Gravity on", &Physics::gravityOn);
+            ImGui::Checkbox("Gravity on", &physics.gravityOn);
             ImGui::Separator();
             ImGui::RadioButton("Destruction upon collision", &selectedCollisionOption, 0);
 
@@ -539,8 +535,8 @@ void Simulation::updateGui() {
         }
         else {//Main menu
             ImGui::Text("Time Speed");
-            ImGui::SliderFloat("##TimeSpeed", &Physics::timeSpeed, 0, 1500);
-            ImGui::Checkbox("Stop time\t Press Space", &timeStop);
+            ImGui::SliderFloat("##TimeSpeed", &physics.timeSpeed, 0, 1500);
+            ImGui::Checkbox("Stop time\t Press Space", &physics.timeStop);
             if (ImGui::Button("Reset timer"))
                 timer.reset();
 
@@ -559,8 +555,8 @@ void Simulation::updateGui() {
             ImGui::InputFloat("##Mass", &selectedObj->properties.mass, 50.f);
             ImGui::Separator();
             ImGui::Text("Radius");
-            ImGui::InputInt("##Radius", &selectedObj->properties.radius);
-            selectedObj->properties.radius = std::clamp(selectedObj->properties.radius, 1, 750);
+            ImGui::InputFloat("##Radius", &selectedObj->properties.radius,0.5,1);
+            selectedObj->properties.radius = std::max(0.f, selectedObj->properties.radius);
             ImGui::Separator();
             ImGui::Text("Speed:");
             float* speed[2] = { &selectedObj->properties.speed.x, &selectedObj->properties.speed.y };

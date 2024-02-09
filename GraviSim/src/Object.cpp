@@ -2,7 +2,7 @@
 #include <iostream>
 
 
-Object::Object(float mass, int radius, sf::Vector2f pos, sf::Vector2f speed, std::string name, sf::Color color, bool fixed) : m_picture(radius, 90) {
+Object::Object(float mass, float radius, sf::Vector2f pos, sf::Vector2f speed, std::string name, sf::Color color, bool fixed) : m_picture(radius, 900) {
 	this->properties.pos = pos*powf(10,3);
 	this->properties.mass = mass;
 	this->properties.speed = speed;
@@ -17,7 +17,7 @@ Object::Object(float mass, int radius, sf::Vector2f pos, sf::Vector2f speed, std
 	useForGravityCenter=false;
 }
 
-Object::Object(Properties properties) : m_picture(properties.radius, 90) {
+Object::Object(Properties properties) : m_picture(properties.radius, 900) {
 	this->properties = properties;
 
 	useForGravityCenter = false;
