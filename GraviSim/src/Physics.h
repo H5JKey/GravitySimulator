@@ -3,10 +3,25 @@
 #include "Object.h"
 #include "Save.h"
 #include <ppl.h>
+#include "VectorMath.h"
+#include "ParticlesSystem.h"
 
 
 
+class Force {
+	sf::Vector2f direction;
+	float value;
+public:
+	Force(float value,sf::Vector2f direction) {
+		VectorMath::normalize(direction);
+		this->direction = direction;
+		this->value = value;
+	}
 
+	sf::Vector2f getVec() {
+		return direction * value;
+	}
+};
 
 
 class Physics
@@ -17,7 +32,7 @@ public:
 	bool gravityOn;
 	float restitutionCoefficient;
 
-
+	std::vector<Force> forces;
 
 
 	Physics() {

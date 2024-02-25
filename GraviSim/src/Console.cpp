@@ -31,6 +31,17 @@ int Console::handleCommand(std::string command)
 				}
 			}
 		}
+		else if (args[0] == "/forces") {
+			if (args[1] == "add") {
+				simulation->physics.forces.push_back(Force(stof(args[4]), sf::Vector2f(stof(args[2]), stof(args[3]))));
+			}
+			else if (args[1] == "clear") {
+				simulation->physics.forces.clear();
+			}
+			else if (args[1] == "pop") {
+				simulation->physics.forces.pop_back();
+			}
+		}
 	}
 	return error;
 }
