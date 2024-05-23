@@ -2,25 +2,55 @@
 
 
 void Physics::update(std::vector<Object>& objects, sf::Time EllapsedTime) {
+
+	if (selectedCollisionOption == 0) {
+		objects.erase(std::remove_if(objects.begin(), objects.end(), [&](auto& object) {
+			for (Object& otherObject : objects) {
+				if (&otherObject == &object) continue;
+				if (object.collide(otherObject)) {
+					if (otherObject.properties.mass >= object.properties.mass) {
+
+						ParticlesSystem::add(new Explosion(400, object.properties.pos / powf(10, 3), object.properties.color));
+						return true;
+					}
+				}
+
+			}
+			return false;
+			}), objects.end());
+	}
+
 	Concurrency::parallel_for(0, int(objects.size()), [&](int i) {
 		objects[i].properties.acceleration = { 0,0 };
 		if (!timeStop && timeSpeed != 0) {
+			if (selectedCollisionOption == 1) {
+				for (int j = i + 1; j < objects.size(); j++) {
+					if (objects[i].collide(objects[j]))
+						calculateCollision(objects[i], objects[j]);
+				}
+			}
 			if (gravityOn) {
 				for (std::size_t j = 0; j < objects.size(); j++) {
+					if (&objects[i] == &objects[j])
+						continue;
 					if (!objects[j].properties.affectsOthers) continue;
-					if (objects[i].properties.affectedByGravity)
-						objects[i].properties.acceleration += calculateAcceleration(objects[i], objects[j]);
+					if (objects[i].properties.affectedByGravity) {
+						if (gravityRange==0 || VectorMath::length(objects[j].properties.pos - objects[i].properties.pos)/powf(10,3) <= gravityRange) {
+							objects[i].properties.acceleration += calculateAcceleration(objects[i], objects[j]);
+						}
+					}
 				}
 			}
 			for (Force force : forces) 
 				objects[i].properties.acceleration += (force.getVec() / objects[i].properties.mass);
+			objects[i].updateSpeed(EllapsedTime.asSeconds() * timeSpeed);
 		}
-		objects[i].updateSpeed(EllapsedTime.asSeconds() * timeSpeed);
 	});
 
 	Concurrency::parallel_for(0, int(objects.size()), [&](int i) {
-		objects[i].updatePosition(EllapsedTime.asSeconds() * timeSpeed);
 		objects[i].updateGraphic();
+		if (!timeStop && timeSpeed != 0) 
+			objects[i].updatePosition(EllapsedTime.asSeconds() * timeSpeed);
 	});
 }
 
@@ -46,7 +76,8 @@ sf::Vector2f Physics::calculateCenterOfGravity(std::vector<Object*>& forGravityC
 }
 
 
-void Physics::handleCollision(Object& object1, Object& object2) {
+
+void Physics::calculateCollision(Object& object1, Object& object2) {
 
 	sf::Vector2f n = object2.properties.pos - object1.properties.pos;
 

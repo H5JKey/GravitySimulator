@@ -31,6 +31,8 @@ public:
 	bool timeStop;
 	bool gravityOn;
 	float restitutionCoefficient;
+	int selectedCollisionOption;
+	float gravityRange;
 
 	std::vector<Force> forces;
 
@@ -40,6 +42,8 @@ public:
 		gravityOn = true;
 		restitutionCoefficient = 1;
 		timeStop = false;
+		selectedCollisionOption = 0;
+		gravityRange = 0;
 	}
 
 	void update(std::vector<Object>& objects, sf::Time EllapsedTime);
@@ -47,5 +51,5 @@ public:
 	sf::Vector2f calculateAcceleration(const Object& obj1, const Object& obj2);
 	sf::Vector2f calculateCenterOfGravity(std::vector<Object*>& forGravityCenter);
 
-	void handleCollision(Object& object1, Object& oblect2);
+	void calculateCollision(Object& object1, Object& oblect2);
 };

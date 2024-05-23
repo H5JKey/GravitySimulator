@@ -81,8 +81,6 @@ private:
 	bool showOrbits;
 	bool copied = false;
 	int savedTimeSpeed;
-	int selectedCollisionOption;
-	float restitutionCoefficient;
 	sf::Vector2f cursorPosition;
 	CenterOfGravity centerOfGravity;
 	FpsTracker fpsTracker;

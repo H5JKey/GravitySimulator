@@ -78,8 +78,7 @@ Simulation::Simulation():console(this) {
 
     selectedObj = nullptr;
     savedTimeSpeed = 0;
-    restitutionCoefficient = 1.f;
-    selectedCollisionOption = 0;
+   
 
     sf::ContextSettings settings;
     settings.antialiasingLevel = 16;
@@ -163,37 +162,7 @@ void Simulation::updateObjects() {
     if (centerOfGravity.show)
         centerOfGravity = physics.calculateCenterOfGravity(forGravityCenter);
 
-    if (physics.timeSpeed != 0 && !physics.timeStop) {
-        switch (selectedCollisionOption)
-        {
-        case 1:
-            concurrency::parallel_for(0, int(objects.size()), [&](int i) {
-                for (int j = i + 1; j < objects.size(); j++) {
-                    if (objects[i].collide(objects[j])) 
-                        physics.handleCollision(objects[i], objects[j]);
-                }
-                });
-            break;
 
-        case 0:
-            objects.erase(std::remove_if(objects.begin(), objects.end(), [&](auto& object) {
-                for (Object& otherObject : objects) {
-                    if (&otherObject == &object) continue;
-                    if (object.collide(otherObject)) {
-                        if (otherObject.properties.mass >= object.properties.mass) {
-
-                            ParticlesSystem::add(new Explosion(1000, object.properties.pos / powf(10, 3), object.properties.color));
-                            return true;
-                        }
-                    }
-
-                }
-                return false;
-                }), objects.end());
-            break;
-        }
-
-    }
 }
 
 
@@ -375,8 +344,10 @@ void Simulation::updateGui() {
             }
 
             if (ImGui::BeginMenu("Objects")) {
-                if (ImGui::MenuItem("Add object"))
+                if (ImGui::MenuItem("Add object")) {
                     ImGui::addObjMenu = true;
+                    selectedObj = nullptr;
+                }
                 if (ImGui::MenuItem("View all objects"))
                     ImGui::objectsMenu = true;
                 ImGui::otherSettingsMenu = false;
@@ -492,13 +463,17 @@ void Simulation::updateGui() {
         }
         else if (ImGui::simulationSettingsMenu) {//Simulation settings menu
             ImGui::Checkbox("Gravity on", &physics.gravityOn);
+            if (physics.gravityOn) {
+                ImGui::Text("Gravity range");
+                ImGui::SliderFloat("##Gravity range", &physics.gravityRange, 0, 500);
+            }
             ImGui::Separator();
-            ImGui::RadioButton("Destruction upon collision", &selectedCollisionOption, 0);
+            ImGui::RadioButton("Destruction upon collision", &physics.selectedCollisionOption, 0);
 
-            ImGui::RadioButton("Collision", &selectedCollisionOption, 1);
-            if (selectedCollisionOption == 1) {
+            ImGui::RadioButton("Collision", &physics.selectedCollisionOption, 1);
+            if (physics.selectedCollisionOption == 1) {
                 ImGui::Text("Restitution coefficient");
-                ImGui::SliderFloat("##restitution coefficientSlider", &restitutionCoefficient, 0, 1);
+                ImGui::SliderFloat("##restitution coefficientSlider", &physics.restitutionCoefficient, 0, 1);
             }
             ImGui::Separator();
             if (ImGui::Button("Exit"))
@@ -628,7 +603,7 @@ void Simulation::updateGui() {
             }
             if (ImGui::Button("Delete         ", { 150,20 })) {
                 objects.erase(std::remove_if(objects.begin(), objects.end(), [&](const auto& object) {return &object == ImGui::contextMenu.selectedObject; }), objects.end());
-  
+                selectedObj = nullptr;
                 ImGui::contextMenu.show = false;
             }
         }

@@ -14,7 +14,6 @@ void Save::load(std::vector<Object>& objects, sf::Vector2f& center, sf::Time& ti
 
 	for (int i=0; i<n; i++)
 		m_file.read((char*)&objects[i].properties, sizeof(objects[i].properties));
-	objects.resize(n);
 }
 
 void Save::save(std::vector<Object>& objects, sf::Vector2f center, sf::Time time) {
