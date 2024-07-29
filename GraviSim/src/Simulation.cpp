@@ -226,6 +226,13 @@ void Simulation::updateEvents() {
 
         if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Space) && (!ImGui::GetIO().WantCaptureKeyboard))
             physics.timeStop = !physics.timeStop;
+        if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Up) && (!ImGui::GetIO().WantCaptureKeyboard)) {
+            physics.timeSpeed += 15;
+        }
+        if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::Down) && (!ImGui::GetIO().WantCaptureKeyboard)) {
+            physics.timeSpeed -= 15;
+            physics.timeSpeed = std::max(physics.timeSpeed, 0.f);
+        }
 
         if ((event.type == sf::Event::KeyPressed) && (event.key.code == sf::Keyboard::F1))
             console.show = !console.show;
@@ -432,7 +439,7 @@ void Simulation::updateGui() {
             newObj.properties.color = { static_cast<sf::Uint8>(color[0] * 255), static_cast<sf::Uint8>(color[1] * 255), static_cast<sf::Uint8>(color[2] * 255) };
             ImGui::Separator();
             ImGui::Checkbox("Fixed", &newObj.properties.fixed);
-            ImGui::Checkbox("Consider in gravity center", &newObj.useForGravityCenter);
+            ImGui::Checkbox("Use in gravity center", &newObj.useForGravityCenter);
             ImGui::Checkbox("Affected by gravity", &newObj.properties.affectedByGravity);
             ImGui::Checkbox("Affectes others", &newObj.properties.affectsOthers);
             ImGui::Separator();
@@ -468,9 +475,9 @@ void Simulation::updateGui() {
                 ImGui::SliderFloat("##Gravity range", &physics.gravityRange, 0, 500);
             }
             ImGui::Separator();
-            ImGui::RadioButton("Destruction upon collision", &physics.selectedCollisionOption, 0);
+            ImGui::RadioButton("Destroy on collision", &physics.selectedCollisionOption, 0);
 
-            ImGui::RadioButton("Collision", &physics.selectedCollisionOption, 1);
+            ImGui::RadioButton("Solve collision", &physics.selectedCollisionOption, 1);
             if (physics.selectedCollisionOption == 1) {
                 ImGui::Text("Restitution coefficient");
                 ImGui::SliderFloat("##restitution coefficientSlider", &physics.restitutionCoefficient, 0, 1);
@@ -544,7 +551,7 @@ void Simulation::updateGui() {
             ImGui::Separator();
             ImGui::Separator();
             ImGui::Checkbox("Fixed", &selectedObj->properties.fixed);
-            ImGui::Checkbox("Consider in gravity center",&selectedObj->useForGravityCenter);
+            ImGui::Checkbox("Use in gravity center",&selectedObj->useForGravityCenter);
             ImGui::Checkbox("Affected by gravity", &selectedObj->properties.affectedByGravity);
             ImGui::Checkbox("Affectes others", &selectedObj->properties.affectsOthers);
             if (ImGui::Button("Copy")) {
@@ -592,7 +599,7 @@ void Simulation::updateGui() {
                 ImGui::contextMenu.show = false;
             }
             if (!ImGui::contextMenu.selectedObject->useForGravityCenter) {
-                if (ImGui::Button("Consider      ", { 150,20 })) {
+                if (ImGui::Button("Use            ", { 150,20 })) {
                     ImGui::contextMenu.selectedObject->useForGravityCenter = true;
                 }
             }
@@ -615,7 +622,7 @@ void Simulation::updateGui() {
             ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
 
             ImGui::Button("Copy     Ctrl+C", { 150,20 });
-            ImGui::Button("Consider       ", { 150,20 });
+            ImGui::Button("Use            ", { 150,20 });
             ImGui::Button("Delete         ", { 150,20 });
 
             ImGui::PopStyleColor();
