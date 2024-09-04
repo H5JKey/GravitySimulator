@@ -10,10 +10,9 @@ In this program you can:
 Also there is a console (F1 to use) with following commands:
   1. /fill {x1} {y1} {x2} {y2} {dx} {dy} - fill from (x1,y1) to (x2,y2) every (dx,dy) with copied object
   2. /add {x} {y} - add new object from copied
-  3. /force
-     3.1. /force add {x} {y} {value} - add new constant force for all objects with direction (x,y)
-     3.2. /force add {x} {y} {value}m - add new constant acceleration for all objects with direction (x,y)
-     3.3. /force pop - delete last added force
-     3.4. /force clear - clear all added forces
+  3. /forces add {x} {y} {value} - add new constant force for all objects with direction (x,y)
+  4. /forces add {x} {y} {value}m - add new constant acceleration for all objects with direction (x,y)
+  5. /forces pop - delete last added force
+  6. /forces clear - clear all added forces
 # Preview
 ![image](https://github.com/H5JKey/GravitySimulator/blob/master/Preview.png "Preview")
