@@ -11,15 +11,21 @@
 class Force {
 	sf::Vector2f direction;
 	float value;
+	bool m_devideByMass;
 public:
-	Force(float value,sf::Vector2f direction) {
+	Force(float value,sf::Vector2f direction, bool devideByMass) {
 		VectorMath::normalize(direction);
 		this->direction = direction;
 		this->value = value;
+		this->m_devideByMass = devideByMass;
 	}
 
 	sf::Vector2f getVec() {
 		return direction * value;
+	}
+
+	bool devideByMass() const {
+		return m_devideByMass;
 	}
 };
 

@@ -187,7 +187,6 @@
     <ClInclude Include="lib\imgui\imstb_rectpack.h" />
     <ClInclude Include="lib\imgui\imstb_textedit.h" />
     <ClInclude Include="lib\imgui\imstb_truetype.h" />
-    <ClInclude Include="lib\imgui_file_dialog\dirent.h" />
     <ClInclude Include="lib\imgui_file_dialog\ImGuiFileDialog.h" />
     <ClInclude Include="lib\imgui_file_dialog\ImGuiFileDialogConfig.h" />
     <ClInclude Include="src\ParticleSources.h" />

@@ -19,7 +19,7 @@ namespace ImGui {
 
 
 
-    void setStyle() {
+    void setStyle(sf::RenderWindow& app) {
         ImGuiStyle& style = ImGui::GetStyle();
         style.Colors[ImGuiCol_Text] = ImVec4(1.00f, 1.00f, 1.00f, 1.00f);
         style.Colors[ImGuiCol_TextDisabled] = ImVec4(0.50f, 0.50f, 0.50f, 1.00f);
@@ -71,6 +71,8 @@ namespace ImGui {
         style.Colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
         style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
         style.GrabRounding = style.FrameRounding = 2.3f;
+        float factor = GetDpiForWindow(app.getSystemHandle())/96.f;
+        ImGui::GetIO().FontGlobalScale = factor;
     }
 }
 
@@ -84,7 +86,7 @@ Simulation::Simulation():console(this) {
     settings.antialiasingLevel = 16;
     app.create(sf::VideoMode(), "Gravity Simulator", sf::Style::Fullscreen, settings);
     ImGui::SFML::Init(app);
-    ImGui::setStyle();
+    ImGui::setStyle(app);
 
     clock.restart();
 
@@ -333,9 +335,8 @@ void Simulation::updateEvents() {
 void Simulation::updateGui() {
 
     ImGui::SFML::Update(app, ellapsedTime);
-    ImGui::Begin("Gravity simulation", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar);
+    ImGui::Begin("Gravity simulation", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_AlwaysAutoResize);
     {
-
         if (ImGui::BeginMenuBar())
         {
             if (ImGui::BeginMenu("File"))
@@ -529,7 +530,7 @@ void Simulation::updateGui() {
     }
     ImGui::End();
     if (ImGui::editingMenu) {//Editing selected object
-        ImGui::Begin("##ObjectMenu", nullptr, ImGuiWindowFlags_NoResize); {
+        ImGui::Begin("##ObjectMenu", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize); {
             ImGui::Text("Name:");
             ImGui::InputText("##Name", &selectedObj->properties.name);
             ImGui::Separator();
@@ -580,8 +581,8 @@ void Simulation::updateGui() {
 
     if (ImGui::contextMenu.show) {
         ImGui::SetNextWindowPos(ImGui::contextMenu.pos);
-        ImGui::Begin("Context menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
-        if (ImGui::Button("Paste    Ctrl+V", { 150,20 })) {
+        ImGui::Begin("Context menu", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
+        if (ImGui::Button("Paste    Ctrl+V", { 150 * ImGui::GetIO().FontGlobalScale,20 * ImGui::GetIO().FontGlobalScale })) {
             if (copied) {
                 objects.push_back(copiedObject);
                 sf::Vector2f pos = app.mapPixelToCoords(ImGui::contextMenu.pos);
@@ -590,25 +591,24 @@ void Simulation::updateGui() {
                 ImGui::contextMenu.show = false;
             }
         }
-
         if (ImGui::contextMenu.selectedObject) {
-            if (ImGui::Button("Copy     Ctrl+C", { 150,20 })) {
+            if (ImGui::Button("Copy     Ctrl+C", {150*ImGui::GetIO().FontGlobalScale,20* ImGui::GetIO().FontGlobalScale })) {
                 copied = true;
                 copiedObject = *ImGui::contextMenu.selectedObject;
                 copiedObject.useForGravityCenter = false;
                 ImGui::contextMenu.show = false;
             }
             if (!ImGui::contextMenu.selectedObject->useForGravityCenter) {
-                if (ImGui::Button("Use            ", { 150,20 })) {
+                if (ImGui::Button("Use            ", { 150 * ImGui::GetIO().FontGlobalScale,20 * ImGui::GetIO().FontGlobalScale })) {
                     ImGui::contextMenu.selectedObject->useForGravityCenter = true;
                 }
             }
             if (ImGui::contextMenu.selectedObject->useForGravityCenter) {
-                if (ImGui::Button("Not consider  ", { 150,20 })) {
+                if (ImGui::Button("Not consider  ", { 150 * ImGui::GetIO().FontGlobalScale,20 * ImGui::GetIO().FontGlobalScale })) {
                     ImGui::contextMenu.selectedObject->useForGravityCenter = false;
                 }
             }
-            if (ImGui::Button("Delete         ", { 150,20 })) {
+            if (ImGui::Button("Delete         ", { 150 * ImGui::GetIO().FontGlobalScale,20 * ImGui::GetIO().FontGlobalScale })) {
                 objects.erase(std::remove_if(objects.begin(), objects.end(), [&](const auto& object) {return &object == ImGui::contextMenu.selectedObject; }), objects.end());
                 selectedObj = nullptr;
                 ImGui::contextMenu.show = false;
@@ -621,9 +621,9 @@ void Simulation::updateGui() {
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, { color.x,color.y,color.z,color.w / 2 });
             ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyle().Colors[ImGuiCol_TextDisabled]);
 
-            ImGui::Button("Copy     Ctrl+C", { 150,20 });
-            ImGui::Button("Use            ", { 150,20 });
-            ImGui::Button("Delete         ", { 150,20 });
+            ImGui::Button("Copy     Ctrl+C", { 150 * ImGui::GetIO().FontGlobalScale,20 * ImGui::GetIO().FontGlobalScale });
+            ImGui::Button("Use            ", { 150 * ImGui::GetIO().FontGlobalScale,20 * ImGui::GetIO().FontGlobalScale });
+            ImGui::Button("Delete         ", { 150 * ImGui::GetIO().FontGlobalScale,20 * ImGui::GetIO().FontGlobalScale });
 
             ImGui::PopStyleColor();
             ImGui::PopStyleColor();
@@ -640,7 +640,7 @@ void Simulation::updateGui() {
     if (console.show) {     
         ImGui::SetNextWindowSize(ImVec2(app.getSize().x, 40));
         ImGui::SetNextWindowPos(ImVec2(0, app.getSize().y - 40));
-        ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar);
+        ImGui::Begin("Console", nullptr, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
         {
             std::string consoleCommand;
             ImGui::SetNextItemWidth(app.getSize().x - 15);

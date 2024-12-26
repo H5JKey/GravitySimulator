@@ -42,7 +42,7 @@ void Physics::update(std::vector<Object>& objects, sf::Time EllapsedTime) {
 				}
 			}
 			for (Force force : forces) 
-				objects[i].properties.acceleration += (force.getVec() / objects[i].properties.mass);
+				objects[i].properties.acceleration += (force.getVec() / (force.devideByMass() ? objects[i].properties.mass : 1));
 			objects[i].updateSpeed(EllapsedTime.asSeconds() * timeSpeed);
 		}
 	});

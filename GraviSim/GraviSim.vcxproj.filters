@@ -119,9 +119,6 @@
     <ClInclude Include="lib\imgui_file_dialog\ImGuiFileDialog.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="lib\imgui_file_dialog\dirent.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="lib\imgui_file_dialog\ImGuiFileDialogConfig.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>

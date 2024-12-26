@@ -8,6 +8,7 @@
 #include "VectorMath.h"
 #include "HUD.h"
 #include "Console.h"
+#include <Windows.h>
 
 
 #include <ppl.h>

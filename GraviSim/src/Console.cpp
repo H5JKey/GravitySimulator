@@ -33,7 +33,12 @@ int Console::handleCommand(std::string command)
 		}
 		else if (args[0] == "/forces") {
 			if (args[1] == "add") {
-				simulation->physics.forces.push_back(Force(stof(args[4]), sf::Vector2f(stof(args[2]), stof(args[3]))));
+				if (args[4][args[4].length() - 1] == 'm') {
+					args[4] = args[4].substr(0, args[4].length() - 1);
+					simulation->physics.forces.push_back(Force(stof(args[4]), sf::Vector2f(stof(args[2]), stof(args[3])), false));
+				}
+				else
+					simulation->physics.forces.push_back(Force(stof(args[4]), sf::Vector2f(stof(args[2]), stof(args[3])), true));
 			}
 			else if (args[1] == "clear") {
 				simulation->physics.forces.clear();
