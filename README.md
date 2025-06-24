@@ -5,7 +5,7 @@ Its a simple gravity and collision simulation program based on Newton's law of g
 ## Building
 
 ```sh
-git clone https://github.com/H5JKey/GravitySimulator
+git clone https://github.com/H5JKey/GravitySimulator.git
 mkdir build && cd build
 cmake ..
 cmake --build .
