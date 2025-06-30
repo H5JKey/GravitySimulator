@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.15)
-project(example
+cmake_minimum_required(VERSION 3.5)
+project(GravitySimulator
   LANGUAGES CXX
   VERSION 1.0
 )
